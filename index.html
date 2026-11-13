@@ -13,43 +13,43 @@
       box-sizing: border-box;
       padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      --bg: #F2F5F3;
+      --bg: #F6F3F3;
       --surface: #FFFFFF;
-      --surface-2: #EAF0ED;
-      --ink: #14211D;
-      --muted: #566862;
-      --line: #D9E2DE;
-      --accent: #0B5C8A;
-      --accent-soft: #DCEBF4;
+      --surface-2: #EFE8E8;
+      --ink: #221415;
+      --muted: #6B5759;
+      --line: #E2D5D6;
+      --accent: #8B1A22;
+      --accent-soft: #F7DFE1;
       --on-accent: #FFFFFF;
-      --good: #14703C;
-      --good-soft: #DDF1E4;
-      --warn: #8F5600;
-      --warn-soft: #F8EBD2;
-      --bad: #AE2A1F;
-      --sim: #5B3AB8;
-      --sim-soft: #E9E2F8;
+      --good: #146B3A;
+      --good-soft: #DCF0E4;
+      --warn: #946300;
+      --warn-soft: #FBEEC8;
+      --bad: #9E1C24;
+      --sim: #B58100;
+      --sim-soft: #FDF3D1;
       --f-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
       --f-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #0E1815;
-        --surface: #15231F;
-        --surface-2: #1C2D28;
-        --ink: #E7EFEB;
-        --muted: #94A69F;
-        --line: #273933;
-        --accent: #6DB7E6;
-        --accent-soft: #17384B;
-        --on-accent: #08202F;
+        --bg: #170F10;
+        --surface: #221618;
+        --surface-2: #2D1D20;
+        --ink: #F2E9EA;
+        --muted: #AC9698;
+        --line: #3E2A2D;
+        --accent: #E26B74;
+        --accent-soft: #461B20;
+        --on-accent: #24090B;
         --good: #5ED08C;
         --good-soft: #173A27;
-        --warn: #E5B351;
-        --warn-soft: #3A2D12;
+        --warn: #F0C24B;
+        --warn-soft: #3D2E0D;
         --bad: #F38B80;
-        --sim: #B9A0FF;
-        --sim-soft: #2A2145;
+        --sim: #F5C842;
+        --sim-soft: #3B2E0B;
         color-scheme: dark;
       }
     }
@@ -72,14 +72,14 @@
     .tn { font-variant-numeric: tabular-nums; }
 
     header { display: flex; flex-direction: column; gap: 6px; }
-    .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
     h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1; }
     .sub { color: var(--muted); max-width: 68ch; margin: 0; }
 
     .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
     .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; }
     .seg button { border: 0; background: transparent; padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
-    .seg button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .14); }
+    .seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); box-shadow: 0 1px 2px rgb(0 0 0 / .16); }
     .seg .full { display: none; }
     @media (min-width: 560px) { .seg .full { display: inline; } .seg .short { display: none; } }
 
@@ -128,11 +128,11 @@
     button.cell:hover { filter: brightness(0.96); }
     button.cell[aria-expanded="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
     .cell::before { content: attr(data-l); display: none; font-size: 11px; margin-right: 6px; color: var(--muted); }
-    .cell.cont { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+    .cell.cont { background: var(--good-soft); color: var(--good); font-weight: 600; }
     .cell.ok { box-shadow: inset 0 0 0 1px var(--muted); color: var(--ink); }
     .cell sup { font-size: 9.5px; margin-left: 3px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
     .cell.nc { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
-    .cell.sim { box-shadow: inset 0 0 0 1.5px var(--sim); }
+    .cell.sim { background: var(--sim-soft); box-shadow: inset 0 0 0 1.5px var(--sim); }
 
     .tot { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
     .tot b { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -160,8 +160,8 @@
     .rut-table th:first-child, .rut-table td:first-child { text-align: left; font-weight: 600; }
     .rut-table th { background: color-mix(in srgb, var(--surface-2) 60%, var(--surface)); color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
     .rut-table tr:last-child td { border-bottom: 0; }
-    .rut-table tr.used td:first-child { color: var(--accent); }
-    .rut-badge { display: inline-block; font-size: 10px; text-transform: uppercase; padding: 1px 5px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); margin-left: 6px; vertical-align: middle; }
+    .rut-table tr.used td:first-child { color: var(--good); }
+    .rut-badge { display: inline-block; font-size: 10px; text-transform: uppercase; padding: 1px 5px; border-radius: 4px; background: var(--good-soft); color: var(--good); margin-left: 6px; vertical-align: middle; }
 
     .detail-notes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; }
     .detail-notes li.ok b { color: var(--good); }
@@ -184,7 +184,7 @@
     .fields { display: flex; flex-wrap: wrap; gap: 8px 12px; }
     .fld { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
     .fld input { width: 88px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-variant-numeric: tabular-nums; }
-    .fld input.mod { border-color: var(--sim); box-shadow: inset 0 0 0 1px var(--sim); }
+    .fld input.mod { background: var(--sim-soft); border-color: var(--sim); box-shadow: inset 0 0 0 1px var(--sim); }
     .hint { font-size: 12.5px; color: var(--muted); }
     .res { font-size: 13px; margin-top: 4px; }
 
