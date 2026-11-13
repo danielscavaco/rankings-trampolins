@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Apuramento Jogos Europeus 2027</title>
+  <title>Rankings Trampolins</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
@@ -242,13 +242,20 @@
       .cut { padding: 6px 14px; }
       .rut-table th, .rut-table td { padding: 6px 8px; font-size: 12px; }
     }
+    
+    .flag-pt {
+      height: 1em;
+      width: auto;
+      vertical-align: -0.15em;
+      margin-left: 3px;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="eyebrow">Trampolins · Ranking de apuramento</div>
-      <h1 id="titulo">Apuramento Jogos Europeus 2027</h1>
+      <div class="eyebrow"> Rankings · Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
+      <h1 id="titulo">Jogos Europeus 2027</h1>
       <p class="sub" id="sub"></p>
     </header>
 
@@ -378,7 +385,7 @@
       /* ---------- cabeçalho, separadores e badge live ---------- */
       function renderTop() {
         var c = S.cfg;
-        $('#sub').textContent = c.local + ' · ' + c.datas + '. Ferramenta de consulta: a convocatória é decidida pela Direção da FGP.';
+        $('#sub').textContent = c.local + ' · ' + c.datas;
         $('#tabsDisc').innerHTML = DISC_ORDER.map(function (d) {
           return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(c.disciplinas[d].nome) + '</span></button>';
         }).join('');
