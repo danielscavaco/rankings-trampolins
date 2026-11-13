@@ -12,6 +12,18 @@
     "results": "data/results.json"
   },
   {
+    "id": "cm27",
+    "engine": "fgp_minimos",
+    "ordemData": "2027-11-10",
+    "visivelDe": "2027-04-17",
+    "visivelAte": "2027-11-25",
+    "curto": "CM · CMJ · CMGI 2027",
+    "nome": "Campeonatos do Mundo 2027",
+    "config": "data/cm27-config.json",
+    "athletes": "data/cm27-athletes.json",
+    "results": "data/cm27-results.json"
+  },
+  {
     "id": "og28",
     "engine": "fig_olympic",
     "ordemData": "2028-07-14",
