@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 19:49:01
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (LIVE SYNC) — 2026-11-13 19:51:42
 Competições alvo: World Championships 2026 (Swiss Timing) | WC Cottbus
 ====================================================================
 
@@ -107,7 +107,7 @@ DESTINO: World Championships 2026 (Swiss Timing) (data/results.json -> "nanjing"
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 51.3 (séries: 27 + 24.3)
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 20.9 (séries: 20.9)
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.1 (séries: 25.1)
-RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 0 fases atualizadas.
+RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 51 fases atualizadas.
 Fonte [Sporttech OVS]: https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/
 Stages carregados (Sporttech OVS): 11
   • [1] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (44 atletas)
@@ -153,4 +153,4 @@ DESTINO: WC Cottbus (data/results.json -> "cottbus")
 [ERRO - SEM PROVA] João Saraiva (TUM · SEN · M · ACM) -> Nenhuma prova correspondente encontrada.
 [ERRO - SEM PROVA] Diogo Gomes (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
 [ERRO - SEM PROVA] João Azinheira (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
-RESUMO (WC Cottbus): 7 encontrados | 16 com erro/não encontrados | 0 fases atualizadas.
+RESUMO (WC Cottbus): 7 encontrados | 16 com erro/não encontrados | 12 fases atualizadas.
