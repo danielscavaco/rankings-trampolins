@@ -3,7 +3,7 @@
   "local": "Portugal (Teste Sporttech)",
   "datas": "Ensaio Técnico",
   "liveManual": true,
-  "escaloes": ["11-12", "13-14", "JUN", "17-21", "SEN"],
+  "escaloes": ["SEN"],
   "eventos": [
     {
       "id": "cn_teste",
@@ -12,32 +12,19 @@
       "datas": "Ensaio",
       "inicio": "2026-12-05",
       "fim": "2026-12-05",
-      "disciplinas": ["TRI", "SYN"],
-      "escaloes": ["11-12", "13-14", "JUN", "17-21", "SEN"]
+      "disciplinas": ["TRI", "DMT", "TUM"],
+      "escaloes": ["SEN"]
     }
   ],
+  ,
   "disciplinas": {
-    "TRI": {
-      "tipo": "late",
-      "vagas": 4,
-      "porEscalao": {
-        "11-12": { "vagas": 4, "minimos": { "F": { "q1": 75.0, "late": 42.0 }, "M": { "q1": 75.0, "late": 42.0 } } },
-        "13-14": { "vagas": 4, "minimos": { "F": { "q1": 80.0, "late": 45.0 }, "M": { "q1": 80.0, "late": 45.0 } } },
-        "JUN":   { "vagas": 4, "minimos": { "F": { "q1": 86.0, "late": 49.0 }, "M": { "q1": 88.0, "late": 51.0 } } },
-        "17-21": { "vagas": 4, "minimos": { "F": { "q1": 86.0, "late": 49.0 }, "M": { "q1": 89.0, "late": 52.0 } } },
-        "SEN":   { "vagas": 4, "minimos": { "F": { "q1": 90.0, "late": 52.0 }, "M": { "q1": 96.0, "late": 56.0 } } }
-      }
-    },
-    "SYN": {
-      "tipo": "late",
-      "vagas": 2,
-      "porEscalao": {
-        "11-12": { "vagas": 2, "minimos": { "F": { "q1": 65.0, "late": 36.0 }, "M": { "q1": 65.0, "late": 36.0 }, "Mix": { "q1": 65.0, "late": 36.0 } } },
-        "13-14": { "vagas": 2, "minimos": { "F": { "q1": 70.0, "late": 39.0 }, "M": { "q1": 70.0, "late": 39.0 } } },
-        "JUN":   { "vagas": 2, "minimos": { "F": { "q1": 75.0, "late": 42.0 }, "M": { "q1": 76.0, "late": 43.0 } } },
-        "17-21": { "vagas": 2, "minimos": { "F": { "q1": 75.0, "late": 42.0 }, "M": { "q1": 77.0, "late": 44.0 } } },
-        "SEN":   { "vagas": 2, "minimos": { "F": { "q1": 78.0, "late": 45.0 }, "M": { "q1": 82.0, "late": 48.0 } } }
-      }
-    }
+    "TRI": { "nome": "Trampolim Individual", "sigla": "TRI", "tipo": "late", "vagas": 2 },
+    "DMT": { "nome": "Duplo Minitrampolim", "sigla": "DMT", "tipo": "ne", "vagas": 1 },
+    "TUM": { "nome": "Tumbling", "sigla": "TUM", "tipo": "ne", "vagas": 1 }
+  },
+  "minimos": {
+    "TRI": { "F": { "q1": 51.5, "late": 53.0 }, "M": { "q1": 60.0, "late": 61.0 } },
+    "DMT": { "F": { "base": 48.5, "ne": 27.0 }, "M": { "base": 55.5, "ne": 29.0 } },
+    "TUM": { "F": { "base": 46.0, "ne": 24.0 }, "M": { "base": 52.0, "ne": 27.0 } }
   }
 }
