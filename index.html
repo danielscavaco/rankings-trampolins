@@ -936,17 +936,23 @@
             '<div class="fact warn"><span>Zona de Corte</span><b>' + sum.bubbleCrit2Slots + '</b></div>';
 
           var cleanTrackerLabel = function (lbl) {
-            return String(lbl || '').replace(/\s*\([^)]*\)\s*/g, '').trim();
+            return String(lbl || '')
+              .replace(/\s*\([^)]*\)\s*/g, '')
+              .replace(/^Américas$/i, 'América')
+              .trim();
           };
 
-          var sortedTrackers = R.continentTrackers.slice().sort(function (a, b) {
-            var aHost = /^anfitri[aã]o/i.test(a.label) || a.id === 'HOST';
-            var bHost = /^anfitri[aã]o/i.test(b.label) || b.id === 'HOST';
+          var trackersList = Array.isArray(R.continentTrackers) ? R.continentTrackers.slice() : [];
+          trackersList.sort(function (a, b) {
+            var lblA = cleanTrackerLabel(a.label);
+            var lblB = cleanTrackerLabel(b.label);
+            var aHost = /^anfitri[aã]o/i.test(lblA) || a.id === 'HOST';
+            var bHost = /^anfitri[aã]o/i.test(lblB) || b.id === 'HOST';
             if (aHost !== bHost) return aHost ? 1 : -1;
-            return cleanTrackerLabel(a.label).localeCompare(cleanTrackerLabel(b.label), 'pt');
+            return lblA.localeCompare(lblB, 'pt');
           });
 
-          var pillsHtml = sortedTrackers.map(function (ct) {
+          var pillsHtml = trackersList.map(function (ct) {
             var lbl = cleanTrackerLabel(ct.label);
             if (ct.qualified) {
               return '<span class="qt-pill done" title="Vaga já garantida por ' + esc(ct.byNoc) + '">' + esc(lbl) + ' <span class="qt-noc">(' + esc(ct.byNoc) + ')</span></span>';
@@ -954,11 +960,12 @@
             return '<span class="qt-pill" title="Reserva 1 vaga até um país deste grupo entrar no apuramento">' + esc(lbl) + '</span>';
           }).join('');
 
-          $('#trackerBox').innerHTML =
-            '<div class="quota-tracker">' +
-            '<div class="qt-head"><span><b>Vagas reservadas (Critério 3 Continental + Anfitrião):</b> ' + sum.reservedSlots + ' ' + (sum.reservedSlots === 1 ? 'vaga reservada' : 'vagas reservadas')</span></div>' +
-            '<div class="qt-pills">' + pillsHtml + '</div>' +
-            '</div>';
+          $('#trackerBox').innerHTML = trackersList.length
+            ? '<div class="quota-tracker">' +
+              '<div class="qt-head"><span><b>Vagas reservadas (Critério 3 Continental + Anfitrião):</b> ' + sum.reservedSlots + ' ' + (sum.reservedSlots === 1 ? 'vaga reservada' : 'vagas reservadas') +
+              '<div class="qt-pills">' + pillsHtml + '</div>' +
+              '</div>'
+            : '';
 
           $('#legendBox').innerHTML =
             '<div class="legend">' +
