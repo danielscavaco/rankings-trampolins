@@ -1,66 +1,110 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 18:57:02
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 19:07:07
 Competições alvo: World Championships 2026 (Swiss Timing)
 ====================================================================
 
 Fonte [Swiss Timing]: https://gym.longinestiming.com/2026/Trampoline-18189/en-us/Default
-Stages carregados (Swiss Timing): 31
-  • [000018040001010401] Men&#x27;s Tumbling - Qualification -> TUM | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001020301] Women&#x27;s Double Mini - Qualification -> DMT | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001030101] Mixed Synchro - Qualification -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q1 (0 atletas)
-  • [000018040001010101] Men&#x27;s Trampoline - Qualification -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001020401] Women&#x27;s Tumbling - Qualification -> TUM | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001020101] Women&#x27;s Trampoline - Qualification -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001010301] Men&#x27;s Double Mini - Qualification -> DMT | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001010201] Men&#x27;s Synchro - Qualification -> SYN | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001020201] Women&#x27;s Synchro - Qualification -> SYN | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001010202] Men&#x27;s Synchro - Qualification Round 2 -> SYN | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001020202] Women&#x27;s Synchro - Qualification Round 2 -> SYN | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001010402] Men&#x27;s Tumbling - Qualification Round 2 -> TUM | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001020302] Women&#x27;s Double Mini - Qualification Round 2 -> DMT | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001030102] Mixed Synchro - Qualification Round 2 -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q1 (0 atletas)
-  • [000018040001010302] Men&#x27;s Double Mini - Qualification Round 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001020402] Women&#x27;s Tumbling - Qualification Round 2 -> TUM | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001010102] Men&#x27;s Trampoline - Qualification Round 2 -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (0 atletas)
-  • [000018040001020102] Women&#x27;s Trampoline - Qualification Round 2 -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (0 atletas)
-  • [000018040001010303] Men&#x27;s Double Mini - Final 1 -> DMT | Escalões: [SEN] | Sexo: M | Fase: f1 (0 atletas)
-  • [000018040001010304] Men&#x27;s Double Mini - Final 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: f2 (0 atletas)
-  • [000018040001020403] Women&#x27;s Tumbling - Final 1 -> TUM | Escalões: [SEN] | Sexo: F | Fase: f1 (0 atletas)
-  • [000018040001020404] Women&#x27;s Tumbling - Final 2 -> TUM | Escalões: [SEN] | Sexo: F | Fase: f2 (0 atletas)
-  • [000018040001030103] Mixed Synchro - Individual Final -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: f (0 atletas)
-  • [000018040001010403] Men&#x27;s Tumbling - Final 1 -> TUM | Escalões: [SEN] | Sexo: M | Fase: f1 (0 atletas)
-  • [000018040001010404] Men&#x27;s Tumbling - Final 2 -> TUM | Escalões: [SEN] | Sexo: M | Fase: f2 (0 atletas)
-  • [000018040001020303] Women&#x27;s Double Mini - Final 1 -> DMT | Escalões: [SEN] | Sexo: F | Fase: f1 (0 atletas)
-  • [000018040001020304] Women&#x27;s Double Mini - Final 2 -> DMT | Escalões: [SEN] | Sexo: F | Fase: f2 (0 atletas)
-  • [000018040001020203] Women&#x27;s Synchro - Individual Final -> SYN | Escalões: [SEN] | Sexo: F | Fase: f (0 atletas)
-  • [000018040001010203] Men&#x27;s Synchro - Individual Final -> SYN | Escalões: [SEN] | Sexo: M | Fase: f (0 atletas)
-  • [000018040001020103] Women&#x27;s Trampoline - Individual Final -> TRI | Escalões: [SEN] | Sexo: F | Fase: f (0 atletas)
-  • [000018040001010103] Men&#x27;s Trampoline - Individual Final -> TRI | Escalões: [SEN] | Sexo: M | Fase: f (0 atletas)
+Stages carregados (Swiss Timing): 45
+  • [000018040001010401] Men's Tumbling - Qualification -> TUM | Escalões: [SEN] | Sexo: M | Fase: q1 (42 atletas)
+  • [000018040001020301] Women's Double Mini - Qualification -> DMT | Escalões: [SEN] | Sexo: F | Fase: q1 (41 atletas)
+  • [000018040001030101] Mixed Synchro - Qualification -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q1 (37 atletas)
+  • [000018040001010101] Men's Trampoline - Qualification -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (90 atletas)
+  • [000018040001020401] Women's Tumbling - Qualification -> TUM | Escalões: [SEN] | Sexo: F | Fase: q1 (45 atletas)
+  • [000018040001020101] Women's Trampoline - Qualification -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (70 atletas)
+  • [000018040001010301] Men's Double Mini - Qualification -> DMT | Escalões: [SEN] | Sexo: M | Fase: q1 (49 atletas)
+  • [000018040001010201] Men's Synchro - Qualification -> SYN | Escalões: [SEN] | Sexo: M | Fase: q1 (37 atletas)
+  • [000018040001020201] Women's Synchro - Qualification -> SYN | Escalões: [SEN] | Sexo: F | Fase: q1 (24 atletas)
+  • [000018040001010202] Men's Synchro - Qualification Round 2 -> SYN | Escalões: [SEN] | Sexo: M | Fase: q2 (16 atletas)
+  • [000018040001020202] Women's Synchro - Qualification Round 2 -> SYN | Escalões: [SEN] | Sexo: F | Fase: q2 (16 atletas)
+  • [000018040001010402] Men's Tumbling - Qualification Round 2 -> TUM | Escalões: [SEN] | Sexo: M | Fase: q2 (24 atletas)
+  • [000018040001020302] Women's Double Mini - Qualification Round 2 -> DMT | Escalões: [SEN] | Sexo: F | Fase: q2 (16 atletas)
+  • [000018040001030102] Mixed Synchro - Qualification Round 2 -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q2 (16 atletas)
+  • [000018040001020405] Women's Tumbling - Team Final -> TUM | Escalões: [SEN] | Sexo: F | Fase: tf (23 atletas)
+  • [000018040001010305] Men's Double Mini - Team Final -> DMT | Escalões: [SEN] | Sexo: M | Fase: tf (13 atletas)
+  • [000018040001020305] Women's Double Mini - Team Final -> DMT | Escalões: [SEN] | Sexo: F | Fase: tf (15 atletas)
+  • [000018040001010405] Men's Tumbling - Team Final -> TUM | Escalões: [SEN] | Sexo: M | Fase: tf (15 atletas)
+  • [000018040001010302] Men's Double Mini - Qualification Round 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: q2 (23 atletas)
+  • [000018040001020402] Women's Tumbling - Qualification Round 2 -> TUM | Escalões: [SEN] | Sexo: F | Fase: q2 (24 atletas)
+  • [000018040001010102] Men's Trampoline - Qualification Round 2 -> TRI | Escalões: [SEN] | Sexo: M | Fase: q2 (24 atletas)
+  • [000018040001020102] Women's Trampoline - Qualification Round 2 -> TRI | Escalões: [SEN] | Sexo: F | Fase: q2 (24 atletas)
+  • [000018040001010303] Men's Double Mini - Final 1 -> DMT | Escalões: [SEN] | Sexo: M | Fase: f1 (8 atletas)
+  • [000018040001010304] Men's Double Mini - Final 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: f2 (3 atletas)
+  • [000018040001020403] Women's Tumbling - Final 1 -> TUM | Escalões: [SEN] | Sexo: F | Fase: f1 (7 atletas)
+  • [000018040001020404] Women's Tumbling - Final 2 -> TUM | Escalões: [SEN] | Sexo: F | Fase: f2 (4 atletas)
+  • [000018040001030103] Mixed Synchro - Individual Final -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: f (8 atletas)
+  • [000018040001010403] Men's Tumbling - Final 1 -> TUM | Escalões: [SEN] | Sexo: M | Fase: f1 (8 atletas)
+  • [000018040001010404] Men's Tumbling - Final 2 -> TUM | Escalões: [SEN] | Sexo: M | Fase: f2 (4 atletas)
+  • [000018040001020303] Women's Double Mini - Final 1 -> DMT | Escalões: [SEN] | Sexo: F | Fase: f1 (8 atletas)
+  • [000018040001020304] Women's Double Mini - Final 2 -> DMT | Escalões: [SEN] | Sexo: F | Fase: f2 (4 atletas)
+  • [000018040001020104] Women's Trampoline - Team Final -> TRI | Escalões: [SEN] | Sexo: F | Fase: tf (24 atletas)
+  • [000018040001010104] Men's Trampoline - Team Final -> TRI | Escalões: [SEN] | Sexo: M | Fase: tf (24 atletas)
+  • [000018040001020203] Women's Synchro - Individual Final -> SYN | Escalões: [SEN] | Sexo: F | Fase: f (8 atletas)
+  • [000018040001010203] Men's Synchro - Individual Final -> SYN | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
+  • [000018040001020103] Women's Trampoline - Individual Final -> TRI | Escalões: [SEN] | Sexo: F | Fase: f (8 atletas)
+  • [000018040001010103] Men's Trampoline - Individual Final -> TRI | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
+  • [000018040001010105] Men's Trampoline - Team All Around Final -> TRI | Escalões: [SEN] | Sexo: M | Fase: aa (5 atletas)
+  • [000018040001010204] Men's Synchro - Team All Around Final -> SYN | Escalões: [SEN] | Sexo: M | Fase: aa (5 atletas)
+  • [000018040001010306] Men's Double Mini - Team All Around Final -> DMT | Escalões: [SEN] | Sexo: M | Fase: aa (5 atletas)
+  • [000018040001010406] Men's Tumbling - Team All Around Final -> TUM | Escalões: [SEN] | Sexo: M | Fase: aa (5 atletas)
+  • [000018040001020105] Women's Trampoline - Team All Around Final -> TRI | Escalões: [SEN] | Sexo: F | Fase: aa (5 atletas)
+  • [000018040001020204] Women's Synchro - Team All Around Final -> SYN | Escalões: [SEN] | Sexo: F | Fase: aa (5 atletas)
+  • [000018040001020306] Women's Double Mini - Team All Around Final -> DMT | Escalões: [SEN] | Sexo: F | Fase: aa (5 atletas)
+  • [000018040001020406] Women's Tumbling - Team All Around Final -> TUM | Escalões: [SEN] | Sexo: F | Fase: aa (5 atletas)
 
 ====================================================================
 DESTINO: World Championships 2026 (Swiss Timing) (data/test-results.json -> "cn_teste")
 ====================================================================
-[ERRO - NÃO ENCONTRADO] Catarina Nunes (TRI · SEN · F · LGC) -> Não aparece em "Women&#x27;s Trampoline - Qualification / Women&#x27;s Trampoline - Qualification Round 2 / Women&#x27;s Trampoline - Individual Final".
-[ERRO - NÃO ENCONTRADO] Sofia Correia (TRI · SEN · F · SCP) -> Não aparece em "Women&#x27;s Trampoline - Qualification / Women&#x27;s Trampoline - Qualification Round 2 / Women&#x27;s Trampoline - Individual Final".
-[ERRO - NÃO ENCONTRADO] Inês Reis (TRI · SEN · F · SFRUA) -> Não aparece em "Women&#x27;s Trampoline - Qualification / Women&#x27;s Trampoline - Qualification Round 2 / Women&#x27;s Trampoline - Individual Final".
-[ERRO - NÃO ENCONTRADO] Gabriel Albuquerque (TRI · SEN · M · APAGL) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
-[ERRO - NÃO ENCONTRADO] Pedro Ferreira (TRI · SEN · M · SCP) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
-[ERRO - NÃO ENCONTRADO] Lucas Santos (TRI · SEN · M · CFE) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
-[ERRO - NÃO ENCONTRADO] Diogo Abreu (TRI · SEN · M · SCP) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
-[ERRO - NÃO ENCONTRADO] Alexandra Garcia (DMT · SEN · F · AGCM) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] Matilde Nobre (DMT · SEN · F · CCRAM) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] Beatriz Mendes (DMT · SEN · F · CFE) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] Matilde Oliveira (DMT · SEN · F · GCV) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] Diogo Cabral (DMT · SEN · M · AAE) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] André Dias (DMT · SEN · M · APAGL) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] Francisco José (DMT · SEN · M · CFE) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] Diogo Fernandes (DMT · SEN · M · LGC) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
-[ERRO - NÃO ENCONTRADO] Francisca Pinto (TUM · SEN · F · GMNA) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
-[ERRO - NÃO ENCONTRADO] Mariana Cascalheira (TUM · SEN · F · GMNA) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
-[ERRO - NÃO ENCONTRADO] Matilde Santos (TUM · SEN · F · GMNA) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
-[ERRO - NÃO ENCONTRADO] Salomé Ferraz (TUM · SEN · F · SFEM) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
-[ERRO - NÃO ENCONTRADO] Vasco Peso (TUM · SEN · M · SFEM) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
-[ERRO - NÃO ENCONTRADO] João Saraiva (TUM · SEN · M · ACM) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
-[ERRO - NÃO ENCONTRADO] Diogo Gomes (TUM · SEN · M · GMNA) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
-[ERRO - NÃO ENCONTRADO] João Azinheira (TUM · SEN · M · GMNA) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
-RESUMO (World Championships 2026 (Swiss Timing)): 0 encontrados | 23 com erro/não encontrados | 0 fases atualizadas.
+[OK] Catarina Nunes (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 51.78 (séries: 51.78 + 47.45)
+[OK] Sofia Correia (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 53.6 (séries: 38.64 + 53.6)
+[OK] Sofia Correia (TRI · SEN · F) -> "Women's Trampoline - Team All Around Final" [aa] via Nome | Nota: 54.27 (séries: —)
+[OK] Inês Reis (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 51.67 (séries: 51.67 + 30.36)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 64.1 (séries: 63.48 + 64.1)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Qualification Round 2" [q2] via Nome | Nota: 63.61 (séries: 20.2)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Team Final" [tf] via Nome | Nota: 65.06 (séries: —)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Individual Final" [f] via Nome | Nota: 64.57 (séries: —)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Team All Around Final" [aa] via Nome | Nota: 65.39 (séries: —)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 60.23 (séries: 59.31 + 60.23)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men's Trampoline - Qualification Round 2" [q2] via Nome | Nota: 60.3 (séries: 18.1)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men's Trampoline - Team Final" [tf] via Nome | Nota: 59.02 (séries: —)
+[OK] Lucas Santos (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 58.49 (séries: 58.49 + 57.37)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 57.45 (séries: 52.52 + 57.45)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men's Trampoline - Team Final" [tf] via Nome | Nota: 56.74 (séries: —)
+[OK] Alexandra Garcia (DMT · SEN · F) -> "Women's Double Mini - Qualification" [q1] via Nome | Nota: 50.2 (séries: 25 + 25.2)
+[OK] Alexandra Garcia (DMT · SEN · F) -> "Women's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 25.2 (séries: 7.2)
+[OK] Alexandra Garcia (DMT · SEN · F) -> "Women's Double Mini - Team All Around Final" [aa] via Nome | Nota: 25.5 (séries: —)
+[OK] Matilde Nobre (DMT · SEN · F) -> "Women's Double Mini - Qualification" [q1] via Nome | Nota: 48.3 (séries: 24.3 + 24)
+[OK] Beatriz Mendes (DMT · SEN · F) -> "Women's Double Mini - Qualification" [q1] via Nome | Nota: 47.5 (séries: 24 + 23.5)
+[ERRO - NÃO ENCONTRADO] Matilde Oliveira (DMT · SEN · F · GCV) -> Não aparece em "Women's Double Mini - Qualification / Women's Double Mini - Qualification Round 2 / Women's Double Mini - Team Final / Women's Double Mini - Final 1 / Women's Double Mini - Final 2 / Women's Double Mini - Team All Around Final".
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 56.9 (séries: 28.3 + 28.6)
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Team Final" [tf] via Nome | Nota: 30 (séries: —)
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 20.5 (séries: 5.1)
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Team All Around Final" [aa] via Nome | Nota: 29.2 (séries: —)
+[OK] André Dias (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 54.7 (séries: 27.7 + 27)
+[OK] Francisco José (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 46.4 (séries: 26 + 20.4)
+[OK] Francisco José (DMT · SEN · M) -> "Men's Double Mini - Team Final" [tf] via Nome | Nota: 27 (séries: —)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 55 (séries: 27.7 + 27.3)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Team Final" [tf] via Nome | Nota: 28.7 (séries: —)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 29.2 (séries: 10)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Final 1" [f1] via Nome | Nota: 28.7 (séries: —)
+[OK] Francisca Pinto (TUM · SEN · F) -> "Women's Tumbling - Qualification" [q1] via Nome | Nota: 43.5 (séries: 22.1 + 21.4)
+[OK] Francisca Pinto (TUM · SEN · F) -> "Women's Tumbling - Team Final" [tf] via Nome | Nota: 22.4 (séries: —)
+[OK] Mariana Cascalheira (TUM · SEN · F) -> "Women's Tumbling - Qualification" [q1] via Nome | Nota: 43.4 (séries: 24 + 19.4)
+[OK] Mariana Cascalheira (TUM · SEN · F) -> "Women's Tumbling - Team Final" [tf] via Nome | Nota: 16.7 (séries: —)
+[ERRO - NÃO ENCONTRADO] Matilde Santos (TUM · SEN · F · GMNA) -> Não aparece em "Women's Tumbling - Qualification / Women's Tumbling - Team Final / Women's Tumbling - Qualification Round 2 / Women's Tumbling - Final 1 / Women's Tumbling - Final 2 / Women's Tumbling - Team All Around Final".
+[OK] Salomé Ferraz (TUM · SEN · F) -> "Women's Tumbling - Qualification" [q1] via Nome | Nota: 43.3 (séries: 21.2 + 22.1)
+[OK] Salomé Ferraz (TUM · SEN · F) -> "Women's Tumbling - Team Final" [tf] via Nome | Nota: 18.9 (séries: —)
+[OK] Salomé Ferraz (TUM · SEN · F) -> "Women's Tumbling - Team All Around Final" [aa] via Nome | Nota: 21.1 (séries: —)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 58.2 (séries: 29 + 29.2)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 29.7 (séries: 11.8)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 29 (séries: —)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Final 1" [f1] via Nome | Nota: 30.5 (séries: —)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Final 2" [f2] via Nome | Nota: 31 (séries: —)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Team All Around Final" [aa] via Nome | Nota: 29.1 (séries: —)
+[OK] João Saraiva (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 49.8 (séries: 24.9 + 24.9)
+[OK] João Saraiva (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 25.3 (séries: 6.9)
+[OK] Diogo Gomes (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 49.4 (séries: 25.7 + 23.7)
+[OK] Diogo Gomes (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.3 (séries: —)
+[OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 51.3 (séries: 27 + 24.3)
+[OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 20.9 (séries: 4.5)
+[OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.1 (séries: —)
+RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 0 fases atualizadas.
