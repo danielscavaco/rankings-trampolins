@@ -5,7 +5,7 @@
       "url": "https://gym.longinestiming.com/2026/Trampoline-18189/en-us/Default",
       "eventoId": "cn_teste",
       "configFile": "data/test-config.json",
-      "athletesFile": "data/athletes.json",
+      "athletesFile": "data/test-athletes.json",
       "resultsFile": "data/test-results.json"
     }
   ]
