@@ -640,8 +640,8 @@
         } else {
           $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
           $('#tabsSub').innerHTML =
-            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG (Vagas)</span><span class="full">Ranking Internacional (FIG)</span></button>' +
-            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP (Nacional)</span><span class="full">Ranking Nacional (FGP)</span></button>';
+            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">Internacional</span><span class="full">Ranking Internacional</span></button>' +
+            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">Nacional</span><span class="full">Ranking Nacional</span></button>';
         }
 
         $('#tabsSex').innerHTML = ['F', 'M'].map(function (s) {
@@ -933,7 +933,7 @@
             '<div class="fact"><span>Vagas Totais</span><b>' + sum.totalQuotas + '</b></div>' +
             '<div class="fact blue"><span>Critério 1 (CM 27)</span><b>' + sum.crit1Count + '</b></div>' +
             '<div class="fact good"><span>Critério 2 Garantidas</span><b>' + sum.safeCrit2Slots + '</b></div>' +
-            '<div class="fact warn"><span>Zona de Corte (Amarelo)</span><b>' + sum.bubbleCrit2Slots + '</b></div>';
+            '<div class="fact warn"><span>Zona de Corte</span><b>' + sum.bubbleCrit2Slots + '</b></div>';
 
           var pillsHtml = R.continentTrackers.map(function (ct) {
             if (ct.qualified) {
