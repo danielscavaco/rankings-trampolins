@@ -4,22 +4,13 @@
 const fs = require('fs');
 const path = require('path');
 
-// ============================================================================
-// CONFIGURAÇÃO DO ENSAIO SPORTTECH
-// ============================================================================
-const CONFIG = {
-  sporttechBaseUrl: 'https://sporttech.io/events/56c681e4-f2c2-45df-787d-ea9164169d95/ovs/',
-  eventoId: 'cn_teste',
-  athletesFile: path.resolve(__dirname, '../data/test-athletes.json'),
-  resultsFile: path.resolve(__dirname, '../data/test-results.json'),
-  logFile: path.resolve(__dirname, 'scrape-report.log'),
-  pollIntervalMs: 30000
-};
+const TARGETS_FILE = path.resolve(__dirname, 'live-targets.json');
+const LOG_FILE = path.resolve(__dirname, 'scrape-report.log');
+const POLL_INTERVAL_MS = 10000;
 
 const args = process.argv.slice(2);
 const IS_CHECK_ONLY = args.includes('--check');
 const IS_LIVE_LOOP = args.includes('--live');
-const IS_DUMP_ATHLETES = args.includes('--dump-athletes');
 
 const DISC_MAP = { 0: 'TRI', 1: 'SYN', 2: 'DMT', 3: 'TUM' };
 const KIND_MAP = { 0: 'q1', 6: 'q2', 3: 'f', 8: 'f1', 7: 'f2' };
@@ -39,29 +30,35 @@ function cleanClub(c) {
   return String(c || '').replace(/^POR\s*[,/-]\s*/i, '').trim();
 }
 
-// Expande abreviaturas comuns (ex: "Mª", "M.ª", "M.a" -> "maria") e extrai "primeiro ultimo"
-function firstLastKey(fullName) {
+// Expande abreviaturas (mesmo coladas ao nome: "MªClara" -> "maria clara") e limpa partículas
+function nameTokens(fullName) {
   const expanded = String(fullName || '')
-    .replace(/(^|\s)m\.?\s*[ªa](?=\s|$)/gi, '$1maria')
-    .replace(/(^|\s)j\.?\s*[ºo](?=\s|$)/gi, '$1joao');
+    .replace(/(^|\s)m\.?\s*[ªa](?=[A-ZÀ-Ýa-zà-ÿ\s]|$)/g, '$1maria ')
+    .replace(/(^|\s)j\.?\s*[ºo](?=[A-ZÀ-Ýa-zà-ÿ\s]|$)/g, '$1joao ')
+    .replace(/(^|\s)m\.(?=\s*[A-ZÀ-Ý])/g, '$1maria ');
 
-  const parts = stripAccents(expanded)
-    .replace(/[^a-z\s-]/g, ' ')
+  return stripAccents(expanded)
+    .replace(/[^a-z\s]/g, ' ')
     .split(/\s+/)
-    .filter(Boolean);
-
-  if (parts.length === 0) return '';
-  if (parts.length === 1) return parts[0];
-  return `${parts[0]} ${parts[parts.length - 1]}`;
+    .filter(w => w.length > 1 && !['de', 'da', 'do', 'das', 'dos', 'e'].includes(w));
 }
 
-function synNameKey(pairName) {
-  return String(pairName || '')
-    .split(/[\/&+]/)
-    .map(firstLastKey)
-    .filter(Boolean)
-    .sort()
-    .join(' | ');
+function isSamePerson(nameA, nameB) {
+  const tA = nameTokens(nameA);
+  const tB = nameTokens(nameB);
+  if (!tA.length || !tB.length) return false;
+
+  const flA = `${tA[0]} ${tA[tA.length - 1]}`;
+  const flB = `${tB[0]} ${tB[tB.length - 1]}`;
+  const flBRev = `${tB[tB.length - 1]} ${tB[0]}`;
+  if (flA === flB || flA === flBRev) return true;
+
+  const [shorter, longer] = tA.length <= tB.length ? [tA, tB] : [tB, tA];
+  if (shorter.length >= 2 && shorter.every(tok => longer.includes(tok))) {
+    return true;
+  }
+
+  return false;
 }
 
 function normalizeSex(sexCat) {
@@ -76,10 +73,8 @@ function normalizeSex(sexCat) {
 function mapEscalao(comp) {
   const raw = stripAccents(`${comp.AgeGroup || ''} ${comp.Title || ''}`);
 
-  // Ignora explicitamente divisões Base / 2D
   if (/\b(base|2d|2a\s*div)\b/.test(raw)) return [];
 
-  // Provas Nacionais (prefixo Inic / Juv / Jun / Sen): obrigatório ser 1D ou Elite
   const isNacional = /\b(inic|juv|jun|sen)\b/.test(raw);
   if (isNacional && !/\b(1d|elite)\b/.test(raw)) {
     return [];
@@ -129,13 +124,6 @@ function parseFrameDetail(f) {
   return out;
 }
 
-/**
- * Calcula a pontuação de qualificação (q1) e melhor série (late) segundo a disciplina e escalão:
- * - SYN JUN: soma das duas séries (r1 + r2)
- * - SYN 17-21: apenas a 1.ª série (r1)
- * - SYN 11-12 e 13-14: apenas a 2.ª série (r2), exceto se só houver 1 série (extra concurso -> r1)
- * - TRI / DMT / TUM: total da qualificação (p.MarkTTT_G) e melhor série individual
- */
 function computeEffectiveScore(ath, entry, faseKey) {
   if (ath.disc !== 'SYN' || faseKey !== 'q1') {
     const bestSingle = entry.routines.length > 0
@@ -158,7 +146,6 @@ function computeEffectiveScore(ath, entry, faseKey) {
   }
 
   if (ath.escalao === '11-12' || ath.escalao === '13-14') {
-    // Se tiver 2 séries, conta apenas a 2.ª; se só tiver 1 (extra concurso), usa a 1.ª
     const chosen = r2 !== null ? r2 : r1;
     return { qScore: chosen, singleScore: chosen };
   }
@@ -205,17 +192,22 @@ function matchAthlete(ath, stageEntries) {
     if (byFig) return { entry: byFig, method: `FIG ID (${ath.figId})` };
   }
 
-  // 3. Por Primeiro + Último Nome (com normalização de Mª/M.ª e ordenado em SYN) + Clube
-  const targetKey = isSyn ? synNameKey(ath.nome) : firstLastKey(ath.nome);
-  if (!targetKey) return null;
-
+  // 3. Por Nome Normalizado (tokens flexíveis + Mª/M.) + Clube
   const candidates = stageEntries.filter(e => {
-    const eKey = isSyn ? synNameKey(e.nome) : firstLastKey(e.nome);
-    return eKey === targetKey;
+    if (!isSyn) {
+      return isSamePerson(ath.nome, e.nome);
+    }
+    const athMembers = String(ath.nome || '').split(/[\/&+]/).map(s => s.trim()).filter(Boolean);
+    const stMembers = String(e.nome || '').split(/[\/&+]/).map(s => s.trim()).filter(Boolean);
+    if (athMembers.length !== 2 || stMembers.length !== 2) return false;
+    return (
+      (isSamePerson(athMembers[0], stMembers[0]) && isSamePerson(athMembers[1], stMembers[1])) ||
+      (isSamePerson(athMembers[0], stMembers[1]) && isSamePerson(athMembers[1], stMembers[0]))
+    );
   });
 
   if (candidates.length === 1) {
-    return { entry: candidates[0], method: 'Nome (1.º + Último)' };
+    return { entry: candidates[0], method: 'Nome' };
   }
   if (candidates.length > 1) {
     const athClubs = String(ath.clube || '').split('/').map(cleanClub);
@@ -228,7 +220,7 @@ function matchAthlete(ath, stageEntries) {
 }
 
 // ============================================================================
-// CARREGAMENTO DE STAGES DA SPORTTECH
+// CARREGAMENTO DE STAGES DA SPORTTECH (1 LEITURA POR CICLO)
 // ============================================================================
 const stageCache = new Map();
 
@@ -244,7 +236,7 @@ async function loadAllStages(apiBase, logLines) {
     if (!disc) continue;
     const sexo = normalizeSex(c.SexCategory);
     const escaloes = mapEscalao(c);
-    if (escaloes.length === 0) continue; // Ignora divisões Base / 2D ou não mapeadas
+    if (escaloes.length === 0) continue;
 
     const isSenOnly = escaloes.length === 1 && escaloes[0] === 'SEN';
 
@@ -328,82 +320,19 @@ async function loadAllStages(apiBase, logLines) {
 }
 
 // ============================================================================
-// GERADOR AUTOMÁTICO DE TEST-ATHLETES.JSON (--dump-athletes)
-// ============================================================================
-async function dumpTestAthletes(stageList) {
-  const generated = [];
-  const seenKeys = new Set();
-
-  // Seleciona apenas stages de qualificação (q1) para não duplicar ginastas da final
-  const q1Stages = stageList.filter(s => s.fase === 'q1');
-
-  for (const st of q1Stages) {
-    // Escolhe o escalão principal (no caso de Jun 1D / Jun Elite, usa 'JUN')
-    const esc = st.escaloes[0];
-    // Apanha até 6 ginastas/pares por prova para termos uma amostra rica
-    for (const e of st.entries.slice(0, 6)) {
-      const slug = stripAccents(e.nome).replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-      const id = `${st.disc.toLowerCase()}_${esc.replace('-', '')}_${st.sexo.toLowerCase()}_${slug}`;
-      if (seenKeys.has(id)) continue;
-      seenKeys.add(id);
-
-      const rec = {
-        id,
-        nome: e.nome,
-        clube: e.clubes.filter(Boolean).join(' / ') || 'POR',
-        disc: st.disc,
-        escalao: esc,
-        sexo: st.sexo
-      };
-      if (e.filiados.length === 1) rec.filiado = e.filiados[0];
-      if (e.figIds.length === 1) rec.figId = e.figIds[0];
-      generated.push(rec);
-    }
-  }
-
-  // Adiciona 3 ginastas fictícios propositados para validar os alertas de erro no log
-  generated.push(
-    {
-      id: 'erro_1_nome_inventado',
-      nome: 'Zé Ninguém Inexistente',
-      clube: 'SCP',
-      disc: 'TRI',
-      escalao: 'SEN',
-      sexo: 'M'
-    },
-    {
-      id: 'erro_2_escalao_trocado',
-      nome: 'Diogo Abreu',
-      clube: 'SCP',
-      disc: 'TRI',
-      escalao: '11-12',
-      sexo: 'M'
-    },
-    {
-      id: 'erro_3_syn_inexistente',
-      nome: 'Atleta Fantasma A / Atleta Fantasma B',
-      clube: 'GCN / AAC',
-      disc: 'SYN',
-      escalao: '13-14',
-      sexo: 'F'
-    }
-  );
-
-  fs.writeFileSync(CONFIG.athletesFile, JSON.stringify(generated, null, 2), 'utf8');
-  console.log(`Gerado ${CONFIG.athletesFile} com ${generated.length} entradas (${generated.length - 3} reais + 3 de erro).`);
-}
-
-// ============================================================================
-// EXECUÇÃO PRINCIPAL
+// EXECUÇÃO PRINCIPAL (PARA TODOS OS TARGETS EM LIVE-TARGETS.JSON)
 // ============================================================================
 async function runSync() {
   const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
-  const apiBase = CONFIG.sporttechBaseUrl.replace(/\/+$/, '') + '/api/';
+  const liveCfg = JSON.parse(fs.readFileSync(TARGETS_FILE, 'utf8'));
+  const apiBase = String(liveCfg.sporttechUrl || '').replace(/\/+$/, '') + '/api/';
+  const targets = liveCfg.targets || [];
 
   const logLines = [
     `====================================================================`,
     `RELATÓRIO SPORTTECH OVS (${IS_CHECK_ONLY ? 'VERIFICAÇÃO START LIST' : 'LIVE SYNC'}) — ${nowStr}`,
     `API: ${apiBase}`,
+    `Competições alvo: ${targets.map(t => t.nome).join(' | ')}`,
     `====================================================================`,
     ``
   ];
@@ -413,102 +342,110 @@ async function runSync() {
     stageList = await loadAllStages(apiBase, logLines);
   } catch (err) {
     logLines.push(`[ERRO CRÍTICO] Falha ao ler API Sporttech: ${err.message}`);
-    fs.writeFileSync(CONFIG.logFile, logLines.join('\n'), 'utf8');
+    fs.writeFileSync(LOG_FILE, logLines.join('\n'), 'utf8');
     console.error(logLines.join('\n'));
     return;
   }
 
-  if (IS_DUMP_ATHLETES) {
-    await dumpTestAthletes(stageList);
-  }
-
-  const athletes = JSON.parse(fs.readFileSync(CONFIG.athletesFile, 'utf8'));
-  let resultsDoc = { live: true, atualizadoEm: nowStr, resultados: { [CONFIG.eventoId]: {} } };
-  if (fs.existsSync(CONFIG.resultsFile)) {
-    resultsDoc = JSON.parse(fs.readFileSync(CONFIG.resultsFile, 'utf8'));
-  }
-  resultsDoc.resultados = resultsDoc.resultados || {};
-  resultsDoc.resultados[CONFIG.eventoId] = {};
-
-  logLines.push(`Stages competitivos carregados da Sporttech (1D/Elite; Q2/Finais só SEN): ${stageList.length}`);
+  logLines.push(`Stages competitivos carregados da Sporttech: ${stageList.length}`);
   stageList.forEach(st => {
     logLines.push(`  • [${st.sid}] ${st.title} -> ${st.disc} | Escalões: [${st.escaloes.join(', ')}] | Sexo: ${st.sexo} | Fase: ${st.fase} (${st.entries.length} inscritos)`);
   });
-  logLines.push(``);
-  logLines.push(`--- CRUZAMENTO DE GINASTAS (${athletes.length} no JSON) ---`);
 
-  let matchedCount = 0;
-  let missingCount = 0;
-  let updatedScores = 0;
+  for (const target of targets) {
+    const athPath = path.resolve(__dirname, '..', target.athletesFile);
+    const resPath = path.resolve(__dirname, '..', target.resultsFile);
+    const eventoId = target.eventoId;
 
-  for (const ath of athletes) {
-    const relevantStages = stageList.filter(st => {
-      if (st.disc !== ath.disc) return false;
-      if (st.sexo && st.sexo !== ath.sexo) return false;
-      if (!st.escaloes.includes(ath.escalao)) return false;
-      return true;
-    });
-
-    if (relevantStages.length === 0) {
-      missingCount++;
-      logLines.push(`[ERRO - SEM PROVA] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube}) -> Nenhuma prova correspondente na Sporttech.`);
-      continue;
+    const athletes = JSON.parse(fs.readFileSync(athPath, 'utf8'));
+    let resultsDoc = { live: true, atualizadoEm: nowStr, resultados: { [eventoId]: {} } };
+    if (fs.existsSync(resPath)) {
+      resultsDoc = JSON.parse(fs.readFileSync(resPath, 'utf8'));
     }
+    resultsDoc.resultados = resultsDoc.resultados || {};
+    const prevEventData = resultsDoc.resultados[eventoId] || {};
+    const nextEventData = {};
 
-    let foundAny = false;
-    const evRec = resultsDoc.resultados[CONFIG.eventoId][ath.id] || { rotinas: {} };
-    evRec.rotinas = evRec.rotinas || {};
+    logLines.push(``);
+    logLines.push(`====================================================================`);
+    logLines.push(`DESTINO: ${target.nome} (${target.resultsFile} -> "${eventoId}")`);
+    logLines.push(`====================================================================`);
 
-    for (const st of relevantStages) {
-      const m = matchAthlete(ath, st.entries);
-      if (m) {
-        foundAny = true;
-        const e = m.entry;
-        const faseKey = st.fase;
-        const { qScore, singleScore } = computeEffectiveScore(ath, e, faseKey);
+    let matchedCount = 0;
+    let missingCount = 0;
+    let updatedScores = 0;
 
-        logLines.push(`[OK] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo}) -> "${st.title}" [${faseKey}] via ${m.method} | Nota apuramento: ${qScore ?? 'sem nota'} (séries: ${e.routines.map(r => r.total).join(' + ') || '—'})`);
+    for (const ath of athletes) {
+      const relevantStages = stageList.filter(st => {
+        if (st.disc !== ath.disc) return false;
+        if (st.sexo && st.sexo !== ath.sexo) return false;
+        if (!st.escaloes.includes(ath.escalao)) return false;
+        return true;
+      });
 
-        if (!IS_CHECK_ONLY && qScore !== null) {
-          evRec[faseKey] = qScore;
-          if (faseKey === 'q1') {
-            if (singleScore !== null) evRec.late = singleScore;
-            if (e.routines[0]) evRec.rotinas.q1_1 = e.routines[0];
-            if (e.routines[1]) evRec.rotinas.q1_2 = e.routines[1];
-          } else if (e.routines.length > 0) {
-            evRec.rotinas[faseKey] = e.routines[0];
+      if (relevantStages.length === 0) {
+        missingCount++;
+        logLines.push(`[ERRO - SEM PROVA] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube}) -> Nenhuma prova correspondente na Sporttech.`);
+        continue;
+      }
+
+      let foundAny = false;
+      const evRec = { ...(prevEventData[ath.id] || {}), rotinas: { ...((prevEventData[ath.id] || {}).rotinas || {}) } };
+
+      for (const st of relevantStages) {
+        const m = matchAthlete(ath, st.entries);
+        if (m) {
+          foundAny = true;
+          const e = m.entry;
+          const faseKey = st.fase;
+          const { qScore, singleScore } = computeEffectiveScore(ath, e, faseKey);
+
+          logLines.push(`[OK] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo}) -> "${st.title}" [${faseKey}] via ${m.method} | Nota: ${qScore ?? 'sem nota'} (séries: ${e.routines.map(r => r.total).join(' + ') || '—'})`);
+
+          if (!IS_CHECK_ONLY && qScore !== null) {
+            evRec[faseKey] = qScore;
+            if (faseKey === 'q1') {
+              if (singleScore !== null) evRec.late = singleScore;
+              if (e.routines[0]) evRec.rotinas.q1_1 = e.routines[0];
+              if (e.routines[1]) evRec.rotinas.q1_2 = e.routines[1];
+            } else if (e.routines.length > 0) {
+              evRec.rotinas[faseKey] = e.routines[0];
+            }
+            updatedScores++;
           }
-          updatedScores++;
         }
       }
-    }
 
-    if (foundAny) {
-      matchedCount++;
-      if (!IS_CHECK_ONLY && (Object.keys(evRec.rotinas).length > 0 || evRec.q1 !== undefined)) {
-        resultsDoc.resultados[CONFIG.eventoId][ath.id] = evRec;
+      if (foundAny) {
+        matchedCount++;
+        if (!IS_CHECK_ONLY && (Object.keys(evRec.rotinas).length > 0 || evRec.q1 !== undefined)) {
+          nextEventData[ath.id] = evRec;
+        }
+      } else {
+        missingCount++;
+        logLines.push(`[ERRO - NÃO ENCONTRADO] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube}) -> Não aparece em "${relevantStages.map(s => s.title).join(' / ')}".`);
       }
-    } else {
-      missingCount++;
-      logLines.push(`[ERRO - NÃO ENCONTRADO] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube}) -> Não aparece em "${relevantStages.map(s => s.title).join(' / ')}".`);
+    }
+
+    logLines.push(`RESUMO (${target.nome}): ${matchedCount} encontrados | ${missingCount} com erro/não encontrados | ${updatedScores} fases atualizadas.`);
+
+    if (!IS_CHECK_ONLY) {
+      resultsDoc.resultados[eventoId] = nextEventData;
+      // Só atualiza o timestamp se os dados realmente mudaram (evita commits desnecessários)
+      if (JSON.stringify(prevEventData) !== JSON.stringify(nextEventData)) {
+        resultsDoc.atualizadoEm = nowStr;
+        fs.writeFileSync(resPath, JSON.stringify(resultsDoc, null, 2), 'utf8');
+      }
     }
   }
 
-  logLines.push(``);
-  logLines.push(`RESUMO: ${matchedCount} encontrados | ${missingCount} com erro/não encontrados | ${updatedScores} fases atualizadas.`);
-
-  fs.writeFileSync(CONFIG.logFile, logLines.join('\n'), 'utf8');
+  fs.writeFileSync(LOG_FILE, logLines.join('\n'), 'utf8');
   console.log(logLines.join('\n'));
-
-  if (!IS_CHECK_ONLY) {
-    resultsDoc.atualizadoEm = nowStr;
-    fs.writeFileSync(CONFIG.resultsFile, JSON.stringify(resultsDoc, null, 2), 'utf8');
-  }
 }
 
 (async () => {
   await runSync();
   if (IS_LIVE_LOOP) {
-    setInterval(runSync, CONFIG.pollIntervalMs);
+    setInterval(runSync, POLL_INTERVAL_MS);
   }
 })();
