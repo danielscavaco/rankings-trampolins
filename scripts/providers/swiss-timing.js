@@ -1,11 +1,12 @@
 'use strict';
 
-const { cleanClub, normalizeSex, mapEscalaoText, fetchWithRetry, stripAccents } = require('../lib/core');
+const { cleanClub, normalizeSex, mapEscalaoText, stripAccents } = require('../lib/core');
 
 const pageCache = new Map();
 
 function decodeHtml(str) {
   return String(str || '')
+    .replace(/&#x27;/gi, "'")
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
@@ -17,16 +18,18 @@ function decodeHtml(str) {
 
 function parseSwissDisc(text) {
   const s = stripAccents(text);
-  if (/\bsynchro/.test(s)) return 'SYN';
+  if (/\bsynchro|\bsyn\b/.test(s)) return 'SYN';
   if (/\bdouble\s*mini|\bdmt\b/.test(s)) return 'DMT';
   if (/\btumbling|\btum\b/.test(s)) return 'TUM';
-  if (/\btrampoline|\bindividual\b/.test(s)) return 'TRI';
+  if (/\btrampoline|\bindividual|\btra\b|\btri\b/.test(s)) return 'TRI';
   return null;
 }
 
 function parseSwissPhase(subtitleText, linkClass) {
   const s = stripAccents(`${subtitleText} ${linkClass}`);
-  if (/\bqualification\s*2|\bq2\b/.test(s)) return 'q2';
+  if (/\ball[\s-]*around/.test(s)) return 'aa';
+  if (/\bteam\s*final|\bteam\b/.test(s)) return 'tf';
+  if (/\bqualification\s*round\s*2|\bqualification\s*2|\bq2\b/.test(s)) return 'q2';
   if (/\bqualification|\bq1\b/.test(s)) return 'q1';
   if (/\bfinal\s*2|\bf2\b/.test(s)) return 'f2';
   if (/\bfinal\s*1|\bf1\b/.test(s)) return 'f1';
@@ -35,7 +38,6 @@ function parseSwissPhase(subtitleText, linkClass) {
 }
 
 function parseRoutineCell(cellHtml) {
-  // O número principal antes de <small> é o total da rotina (ex: "29.000")
   const mainPart = cellHtml.split(/<small>/i)[0];
   const totalMatch = decodeHtml(mainPart).match(/(\d+\.\d+)/);
   if (!totalMatch) return null;
@@ -44,7 +46,7 @@ function parseRoutineCell(cellHtml) {
   if (!Number.isFinite(total) || total <= 0) return null;
 
   const detail = { e: 0, d: 0, hd: 0, tof: 0, p: 0, total };
-  const judgeRegex = /<span class="judgescore">\s*([A-Za-z]+)\s*:\s*([0-9.]+)\s*<\/span>/gi;
+  const judgeRegex = /<span[^>]*class="[^"]*judgescore[^"]*"[^>]*>\s*([A-Za-z]+)\s*:\s*([0-9.]+)\s*<\/span>/gi;
   let m;
   while ((m = judgeRegex.exec(cellHtml)) !== null) {
     const label = m[1].toUpperCase();
@@ -68,18 +70,24 @@ function parseRankingTable(html, isSyn) {
     const rowHtml = rowMatch[1];
     if (!/<td\b/i.test(rowHtml)) continue;
 
-    // Nome(s) completos dentro de <div class="fulldescription">
-    const fullDescMatches = [...rowHtml.matchAll(/<div class="fulldescription">([\s\S]*?)<\/div>/gi)]
+    let rawNames = [...rowHtml.matchAll(/<div[^>]*class="[^"]*fulldescription[^"]*"[^>]*>([\s\S]*?)<\/div>/gi)]
       .map(m => decodeHtml(m[1]))
       .filter(Boolean);
 
-    if (fullDescMatches.length === 0) continue;
+    if (rawNames.length === 0) {
+      const nameTd = rowHtml.match(/<td[^>]*class="[^"]*\bname\b[^"]*"[^>]*>([\s\S]*?)<\/td>/i);
+      if (nameTd) {
+        const cleaned = decodeHtml(nameTd[1]);
+        if (cleaned && !/^name$/i.test(cleaned)) rawNames = [cleaned];
+      }
+    }
 
-    // Swiss Timing coloca "APELIDO Nome" -> convertemos para "Nome APELIDO" ou mantemos ambos os tokens
-    const formattedNames = fullDescMatches.map(rawName => {
+    if (rawNames.length === 0) continue;
+
+    // Converte "APELIDO Nome" -> "Nome APELIDO"
+    const formattedNames = rawNames.map(rawName => {
       const parts = rawName.split(/\s+/);
       if (parts.length >= 2) {
-        // Ex: "PESO Vasco" -> "Vasco PESO" (isSamePerson também funciona nos dois sentidos)
         return `${parts.slice(1).join(' ')} ${parts[0]}`;
       }
       return rawName;
@@ -87,25 +95,25 @@ function parseRankingTable(html, isSyn) {
 
     const nome = isSyn ? formattedNames.join(' / ') : formattedNames[0];
 
-    // País / Clube (<td class="noc">...POR</td>)
-    const nocMatch = rowHtml.match(/<td class="noc"[^>]*>([\s\S]*?)<\/td>/i);
+    const nocMatch = rowHtml.match(/<td[^>]*class="[^"]*\bnoc\b[^"]*"[^>]*>([\s\S]*?)<\/td>/i);
     const noc = nocMatch ? cleanClub(decodeHtml(nocMatch[1])) : '';
 
-    // Colunas de exercícios (<td class="score ...">)
     const routines = [];
-    const scoreCellRegex = /<td class="score\b[^"]*"[^>]*>([\s\S]*?)<\/td>/gi;
+    const scoreCellRegex = /<td[^>]*class="[^"]*\bscore\b[^"]*"[^>]*>([\s\S]*?)<\/td>/gi;
     let scMatch;
     while ((scMatch = scoreCellRegex.exec(rowHtml)) !== null) {
       const parsed = parseRoutineCell(scMatch[1]);
       if (parsed) routines.push(parsed);
     }
 
-    // Coluna Total (<td class="total">58.200</td>)
-    const totalMatch = rowHtml.match(/<td class="total"[^>]*>([\s\S]*?)<\/td>/i);
+    const totalMatch = rowHtml.match(/<td[^>]*class="[^"]*\btotal\b[^"]*"[^>]*>([\s\S]*?)<\/td>/i);
     const totalVal = totalMatch ? parseFloat(decodeHtml(totalMatch[1])) : NaN;
     const total = Number.isFinite(totalVal) && totalVal > 0
       ? Number(totalVal.toFixed(3))
       : (routines.length > 0 ? Number(routines.reduce((acc, r) => acc + r.total, 0).toFixed(3)) : null);
+
+    // Ignora linhas de resumo/total da equipa que não pertencem a um atleta
+    if (routines.length === 0 && total === null) continue;
 
     entries.push({
       nome,
@@ -120,23 +128,40 @@ function parseRankingTable(html, isSyn) {
   return entries;
 }
 
+async function fetchSwissHtml(url) {
+  for (let i = 0; i < 3; i++) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9'
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.text();
+    } catch (err) {
+      if (i === 2) throw err;
+      await new Promise(r => setTimeout(r, 1500 * (i + 1)));
+    }
+  }
+}
+
 async function loadStages(competitionUrl, logLines) {
   const parsedUrl = new URL(competitionUrl);
   const origin = parsedUrl.origin;
 
-  const scheduleHtml = await fetchWithRetry(competitionUrl, { accept: 'text/html' });
+  const scheduleHtml = await fetchSwissHtml(competitionUrl);
 
-  // Descobre blocos <span class="subtitle">Título <div class="resultsicons"><a ... href="...">
-  const subtitleRegex = /<span class="subtitle">([\s\S]*?)<\/span>/gi;
+  const subtitleRegex = /<span[^>]*class="[^"]*subtitle[^"]*"[^>]*>([\s\S]*?)<\/span>/gi;
   const discoveredPhases = new Map();
   let subMatch;
 
   while ((subMatch = subtitleRegex.exec(scheduleHtml)) !== null) {
     const block = subMatch[1];
-    const titleText = decodeHtml(block.split(/<div class="resultsicons"/i)[0]);
-    if (!titleText || /team|all-around/i.test(titleText)) continue;
+    const titleText = decodeHtml(block.split(/<div[^>]*class="[^"]*resultsicons[^"]*"/i)[0]);
+    if (!titleText) continue;
 
-    // Procura links de Ranking/Results ou StartList
     const linkRegex = /<a\b([^>]*href="([^"]*\/Phase\/(?:Ranking|Results|StartList)\/[^"]+)"[^>]*)>/gi;
     let lk;
     while ((lk = linkRegex.exec(block)) !== null) {
@@ -145,7 +170,6 @@ async function loadStages(competitionUrl, logLines) {
       const classMatch = attrs.match(/class="([^"]*)"/i);
       const linkClass = classMatch ? classMatch[1] : '';
 
-      // Prefere sempre Ranking/Results em relação a StartList para a mesma fase
       const phaseIdMatch = href.match(/\/Phase\/(?:Ranking|Results|StartList)\/([0-9A-Za-z]+)/i);
       const phaseKey = phaseIdMatch ? phaseIdMatch[1] : href;
       const isRanking = /\/Phase\/(?:Ranking|Results)\//i.test(href);
@@ -178,7 +202,7 @@ async function loadStages(competitionUrl, logLines) {
 
     let phaseHtml;
     try {
-      phaseHtml = await fetchWithRetry(ph.url, { accept: 'text/html' });
+      phaseHtml = await fetchSwissHtml(ph.url);
       pageCache.set(ph.phaseId, phaseHtml);
     } catch (err) {
       if (pageCache.has(ph.phaseId)) {
@@ -190,6 +214,11 @@ async function loadStages(competitionUrl, logLines) {
     }
 
     const entries = parseRankingTable(phaseHtml, disc === 'SYN');
+
+    if (entries.length === 0 && stageList.length === 0) {
+      const sample = phaseHtml.replace(/\s+/g, ' ').slice(0, 220);
+      logLines.push(`[DEBUG Swiss Timing] HTML recebido em ${ph.url} (${phaseHtml.length} bytes): ${sample}`);
+    }
 
     stageList.push({
       sid: ph.phaseId,
