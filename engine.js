@@ -174,7 +174,7 @@
       if (!isNum(rec.q1)) return out;
       out.base = rec.q1;
       var q1ok = rec.q1 >= minQ1;
-      items.push({ label: 'Q1 (melhor série)', value: rec.q1, ok: q1ok, note: '' });
+      items.push({ label: 'Q1', value: rec.q1, ok: q1ok, note: '' });
 
       var prevOk = q1ok, best = null, bestKey = null;
       [['q2', 'Q2'], ['f', 'Final']].forEach(function (p) {
