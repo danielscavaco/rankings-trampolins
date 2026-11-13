@@ -12,7 +12,8 @@ import unicodedata
 import urllib.request
 from zoneinfo import ZoneInfo
 
-KIND_MAP = {0: 'Q', 6: 'Q2', 3: 'F', 8: 'F1', 7: 'F2'}
+# Sporttech Stage Kinds: 0=Q, 6=Q2, 3=F, 8=F1, 7=F2, 1/4=TF (Team Final), 2/5=AA (All-Around)
+KIND_MAP = {0: 'Q', 6: 'Q2', 3: 'F', 8: 'F1', 7: 'F2', 4: 'TF', 5: 'AA'}
 DISC_MAP = {0: 'TRI', 1: 'SYN', 2: 'DMT', 3: 'TUM'}
 BASE_LONGINES = 'https://gym.longinestiming.com'
 
@@ -65,6 +66,43 @@ def match_athlete(athletes, raw_name, disc, sex):
     return None
 
 
+def build_routine_dict(e=None, d=None, hd=None, tof=None, p=0.0, b=0.0, fallback_total=None):
+    """Constrói o dicionário da série com as chaves ordenadas: e, d, hd, tof, p (e b se > 0)."""
+    out = {}
+    if e is not None:
+        out['e'] = round(e, 3)
+    if d is not None:
+        out['d'] = round(d, 3)
+    if hd is not None:
+        out['hd'] = round(hd, 3)
+    if tof is not None:
+        out['tof'] = round(tof, 3)
+    if e is not None or d is not None:
+        out['p'] = round(p or 0.0, 3)
+        if b:
+            out['b'] = round(b, 3)
+    elif fallback_total is not None:
+        out['total'] = round(fallback_total, 3)
+    return out
+
+
+def routine_total_val(rt):
+    """Calcula o total numérico de uma rotina para ordenação interna (ex: escolher melhor série)."""
+    if not rt:
+        return 0.0
+    if 'total' in rt:
+        return float(rt['total'])
+    return round(
+        float(rt.get('e', 0.0)) +
+        float(rt.get('d', 0.0)) +
+        float(rt.get('hd', 0.0)) +
+        float(rt.get('tof', 0.0)) +
+        float(rt.get('b', 0.0)) -
+        float(rt.get('p', 0.0)),
+        3
+    )
+
+
 def frame_detail(f):
     T = round((f.get('MarkTTT_G') or 0) / 1000.0, 3)
     E = f.get('ETotalT_G') or 0
@@ -75,20 +113,23 @@ def frame_detail(f):
     B = round((f.get('BonusT') or 0) / 10.0, 3)
 
     d_val = round(D / 10.0, 3)
-    out = {'d': d_val, 'p': P, 'total': T}
-    if B:
-        out['b'] = B
 
     for e in (E / 10.0, E / 1000.0, E / 100.0):
         for h in (H / 100.0, H / 10.0, H / 1000.0):
             for x in (X / 1000.0, X * 2 / 100.0, X / 100.0, X / 10.0):
                 if abs(e + d_val + h + x + B - P - T) < 0.006:
-                    out['e'] = round(e, 3)
-                    if H or X:
-                        out['hd'] = round(h, 3)
-                        out['tof'] = round(x, 3)
-                    return out
-    return out
+                    has_tri_extra = bool(H or X)
+                    return build_routine_dict(
+                        e=e,
+                        d=d_val,
+                        hd=h if has_tri_extra else None,
+                        tof=x if has_tri_extra else None,
+                        p=P,
+                        b=B,
+                        fallback_total=T,
+                    )
+
+    return build_routine_dict(d=d_val, p=P, b=B, fallback_total=T)
 
 
 def normalize_sex(raw_sex):
@@ -117,7 +158,8 @@ def fetch_sporttech(uuid, athletes, minimos, national_mode=False):
     event_records = {}
 
     for cid, c in comps.items():
-        if (c.get('Title') or '').lower() == 'test':
+        title_c = (c.get('Title') or '').lower()
+        if title_c == 'test' or 'synchro' in title_c or 'mixed' in title_c:
             continue
         disc = DISC_MAP.get(c.get('Discipline'))
         if disc not in ('TRI', 'DMT', 'TUM'):
@@ -128,6 +170,9 @@ def fetch_sporttech(uuid, athletes, minimos, national_mode=False):
         if not sex:
             continue
 
+        is_team_comp = 'team' in title_c
+        is_aa_comp = 'all around' in title_c or 'all-around' in title_c
+
         for sid in c.get('Stages') or []:
             st = stages.get(str(sid)) or stages.get(sid)
             if not st:
@@ -135,7 +180,13 @@ def fetch_sporttech(uuid, athletes, minimos, national_mode=False):
             if st.get('InProgress_G'):
                 any_live = True
 
+            st_title = (st.get('Title') or '').lower()
             kind = KIND_MAP.get(st.get('Kind'), str(st.get('Kind')))
+            if is_team_comp or 'team' in st_title:
+                kind = 'TF'
+            elif is_aa_comp or 'all around' in st_title or 'all-around' in st_title:
+                kind = 'AA'
+
             lim = st.get('PerfomanceFramesLimit') or 2
 
             det = get_json(
@@ -183,61 +234,46 @@ def fetch_sporttech(uuid, athletes, minimos, national_mode=False):
                             rec['rotinas']['q1_1'] = frames[0]
                         if len(frames) >= 2:
                             rec['rotinas']['q1_2'] = frames[1]
-                        if frames:
-                            best_f = max(frames, key=lambda x: x['total'])
-                            rec['q1'] = best_f['total']
-                            rec['rotinas']['q1'] = best_f
-                        elif perf_mk is not None:
-                            rec['q1'] = perf_mk
+                        if not frames and perf_mk is not None:
                             rec['rotinas']['q1'] = {'total': perf_mk}
                     elif kind == 'Q2':
-                        rt = frames[0] if frames else {'total': perf_mk}
-                        rec['q2'] = rt['total']
-                        rec['rotinas']['q2'] = rt
+                        rec['rotinas']['q2'] = frames[0] if frames else {'total': perf_mk}
                     elif kind in ('F', 'F1'):
-                        rt = frames[0] if frames else {'total': perf_mk}
-                        rec['f'] = rt['total']
-                        rec['rotinas']['f'] = rt
+                        rec['rotinas']['f'] = frames[0] if frames else {'total': perf_mk}
                 else:
                     if kind == 'Q':
                         if len(frames) >= 1:
                             rec['rotinas']['q1_1'] = frames[0]
                         if len(frames) >= 2:
                             rec['rotinas']['q1_2'] = frames[1]
-                        if len(frames) >= 2:
-                            rec['q1'] = round(frames[0]['total'] + frames[1]['total'], 3)
+                        if not frames and perf_mk is not None:
+                            rec['rotinas']['q1'] = {'total': perf_mk}
+                    elif kind == 'TF':
+                        if frames:
+                            rec['rotinas']['tf'] = max(frames, key=routine_total_val)
                         elif perf_mk is not None:
-                            rec['q1'] = perf_mk
-                        elif len(frames) == 1:
-                            rec['q1'] = frames[0]['total']
+                            rec['rotinas']['tf'] = {'total': perf_mk}
+                    elif kind == 'AA':
+                        if frames:
+                            rec['rotinas']['aa'] = max(frames, key=routine_total_val)
+                        elif perf_mk is not None:
+                            rec['rotinas']['aa'] = {'total': perf_mk}
                     elif kind == 'F1':
-                        rt = frames[0] if frames else {'total': perf_mk}
-                        rec['f1'] = rt['total']
-                        rec['rotinas']['f1'] = rt
+                        rec['rotinas']['f1'] = frames[0] if frames else {'total': perf_mk}
                     elif kind == 'F2':
-                        rt = frames[0] if frames else {'total': perf_mk}
-                        rec['f2'] = rt['total']
-                        rec['rotinas']['f2'] = rt
+                        rec['rotinas']['f2'] = frames[0] if frames else {'total': perf_mk}
                     elif kind == 'F':
                         if len(frames) >= 1:
-                            rec['f1'] = frames[0]['total']
                             rec['rotinas']['f1'] = frames[0]
                         if len(frames) >= 2:
-                            rec['f2'] = frames[1]['total']
                             rec['rotinas']['f2'] = frames[1]
-
-                    ne_min = ((minimos.get(disc) or {}).get(sex) or {}).get('ne')
-                    if ne_min is not None:
-                        best_single = max([rt['total'] for rt in rec['rotinas'].values()] or [0])
-                        if best_single >= ne_min:
-                            rec['ne'] = best_single
 
     return event_records, any_live
 
 
 def detect_disc_sex_phase(title):
     t = title.lower()
-    if 'synchro' in t or 'team' in t or 'all around' in t or 'mixed' in t:
+    if 'synchro' in t or 'mixed' in t:
         return None, None, None
     if 'trampoline' in t:
         disc = 'TRI'
@@ -255,7 +291,12 @@ def detect_disc_sex_phase(title):
     else:
         return None, None, None
 
-    if 'qualification round 2' in t or 'qual. round 2' in t:
+    # Em TRI não precisamos de rondas de equipas/AA para apuramento; em DMT/TUM contam para NE
+    if 'team' in t:
+        phase = 'TF' if disc in ('DMT', 'TUM') else None
+    elif 'all around' in t or 'all-around' in t:
+        phase = 'AA' if disc in ('DMT', 'TUM') else None
+    elif 'qualification round 2' in t or 'qual. round 2' in t:
         phase = 'Q2'
     elif 'qualification' in t:
         phase = 'Q'
@@ -335,13 +376,29 @@ def fetch_longines(event_code, athletes, minimos):
                     continue
                 if tot_f <= 0:
                     continue
-                rt = {'total': tot_f, 'p': 0.0}
-                for k_src, k_dst in (('E', 'e'), ('Execution', 'e'), ('D', 'd'), ('Difficulty', 'd'), ('H', 'hd'), ('HD', 'hd'), ('T', 'tof'), ('ToF', 'tof'), ('P', 'p'), ('Penalty', 'p')):
+
+                parsed = {}
+                for k_src, k_dst in (
+                    ('E', 'e'), ('Execution', 'e'),
+                    ('D', 'd'), ('Difficulty', 'd'),
+                    ('H', 'hd'), ('HD', 'hd'),
+                    ('T', 'tof'), ('ToF', 'tof'),
+                    ('P', 'p'), ('Penalty', 'p'),
+                ):
                     if ex.get(k_src) is not None:
                         try:
-                            rt[k_dst] = round(float(str(ex[k_src]).replace(',', '.')), 3)
+                            parsed[k_dst] = round(float(str(ex[k_src]).replace(',', '.')), 3)
                         except ValueError:
                             pass
+
+                rt = build_routine_dict(
+                    e=parsed.get('e'),
+                    d=parsed.get('d'),
+                    hd=parsed.get('hd'),
+                    tof=parsed.get('tof'),
+                    p=parsed.get('p', 0.0),
+                    fallback_total=tot_f,
+                )
                 ex_list.append(rt)
 
             if not ex_list:
@@ -354,14 +411,9 @@ def fetch_longines(event_code, athletes, minimos):
                         rec['rotinas']['q1_1'] = ex_list[0]
                     if len(ex_list) >= 2:
                         rec['rotinas']['q1_2'] = ex_list[1]
-                    best_f = max(ex_list, key=lambda x: x['total'])
-                    rec['q1'] = best_f['total']
-                    rec['rotinas']['q1'] = best_f
                 elif phase == 'Q2':
-                    rec['q2'] = ex_list[0]['total']
                     rec['rotinas']['q2'] = ex_list[0]
                 elif phase in ('F', 'F1'):
-                    rec['f'] = ex_list[0]['total']
                     rec['rotinas']['f'] = ex_list[0]
             else:
                 if phase == 'Q':
@@ -369,29 +421,19 @@ def fetch_longines(event_code, athletes, minimos):
                         rec['rotinas']['q1_1'] = ex_list[0]
                     if len(ex_list) >= 2:
                         rec['rotinas']['q1_2'] = ex_list[1]
-                    if len(ex_list) >= 2:
-                        rec['q1'] = round(ex_list[0]['total'] + ex_list[1]['total'], 3)
-                    elif len(ex_list) == 1:
-                        rec['q1'] = ex_list[0]['total']
+                elif phase == 'TF':
+                    rec['rotinas']['tf'] = max(ex_list, key=routine_total_val)
+                elif phase == 'AA':
+                    rec['rotinas']['aa'] = max(ex_list, key=routine_total_val)
                 elif phase == 'F1':
-                    rec['f1'] = ex_list[0]['total']
                     rec['rotinas']['f1'] = ex_list[0]
                 elif phase == 'F2':
-                    rec['f2'] = ex_list[0]['total']
                     rec['rotinas']['f2'] = ex_list[0]
                 elif phase == 'F':
                     if len(ex_list) >= 1:
-                        rec['f1'] = ex_list[0]['total']
                         rec['rotinas']['f1'] = ex_list[0]
                     if len(ex_list) >= 2:
-                        rec['f2'] = ex_list[1]['total']
                         rec['rotinas']['f2'] = ex_list[1]
-
-                ne_min = ((minimos.get(disc) or {}).get(sex) or {}).get('ne')
-                if ne_min is not None:
-                    best_single = max([rt['total'] for rt in rec['rotinas'].values()] or [0])
-                    if best_single >= ne_min:
-                        rec['ne'] = best_single
 
     return records, any_live
 
