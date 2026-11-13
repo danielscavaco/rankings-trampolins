@@ -1,0 +1,74 @@
+[
+  {
+    "id": "tra_sen_m_diogo",
+    "nome": "Diogo Abreu",
+    "clube": "SCP",
+    "disc": "TRI",
+    "escalao": "SEN",
+    "sexo": "M"
+  },
+  {
+    "id": "tra_sen_m_pedro",
+    "nome": "Pedro Ferreira",
+    "clube": "SCP",
+    "disc": "TRI",
+    "escalao": "SEN",
+    "sexo": "M"
+  },
+  {
+    "id": "tra_sen_f_sofia",
+    "nome": "Sofia Correia",
+    "clube": "LGC",
+    "disc": "TRI",
+    "escalao": "SEN",
+    "sexo": "F"
+  },
+  {
+    "id": "tra_jun_f_mariana",
+    "nome": "Mariana Carvalho",
+    "clube": "LGC",
+    "disc": "TRI",
+    "escalao": "JUN",
+    "sexo": "F"
+  },
+  {
+    "id": "syn_sen_m_1",
+    "nome": "Diogo Abreu / Pedro Ferreira",
+    "clube": "SCP / SCP",
+    "disc": "SYN",
+    "escalao": "SEN",
+    "sexo": "M"
+  },
+  {
+    "id": "syn_sen_f_1",
+    "nome": "Ingrid Maior / Sofia Correia",
+    "clube": "LGC / LGC",
+    "disc": "SYN",
+    "escalao": "SEN",
+    "sexo": "F"
+  },
+  {
+    "id": "erro_1_nome_inventado",
+    "nome": "Zé Ninguém Inexistente",
+    "clube": "SCP",
+    "disc": "TRI",
+    "escalao": "SEN",
+    "sexo": "M"
+  },
+  {
+    "id": "erro_2_escalao_trocado",
+    "nome": "Diogo Abreu",
+    "clube": "SCP",
+    "disc": "TRI",
+    "escalao": "11-12",
+    "sexo": "M"
+  },
+  {
+    "id": "erro_3_syn_inexistente",
+    "nome": "Atleta Fantasma A / Atleta Fantasma B",
+    "clube": "GCN / AAC",
+    "disc": "SYN",
+    "escalao": "13-14",
+    "sexo": "F"
+  }
+]
