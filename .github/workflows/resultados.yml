@@ -31,7 +31,7 @@ jobs:
       - name: Sincronizar resultados segundo config.json
         run: |
           EVENT_ID="${{ github.event.inputs.event_id }}"
-          TESTE="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.modo_teste && 'true' || 'false' }}"
+          TESTE="${{ github.event.inputs.modo_teste == true && 'true' || 'false' }}"
 
           OUT_FILE="data/results.json"
           if [ "$TESTE" = "true" ]; then
