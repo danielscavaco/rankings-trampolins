@@ -487,7 +487,7 @@
       /* Mapa completo NOC (IOC) -> ISO 3166-1 alpha-2 para todas as federações FIG */
       var NOC_TO_ISO2 = {
         ALB: 'al', ALG: 'dz', ANG: 'ao', ARG: 'ar', ARM: 'am', ARU: 'aw', ASA: 'as', AUS: 'au', AUT: 'at', AZE: 'az',
-        BAH: 'bs', BAN: 'bd', BAR: 'bb', BEL: 'be', BEN: 'bj', BER: 'bm', BIH: 'ba', BOL: 'bo', BOT: 'bw',
+        BAH: 'bs', BAN: 'bd', BAR: 'bb', BEL: 'be', BEN: 'bj', BER: 'bm', BIH: 'ba', BLR: 'by', BOL: 'bo', BOT: 'bw',
         BRA: 'br', BRN: 'bh', BUL: 'bg', BUR: 'bf', CAN: 'ca', CAY: 'ky', CGO: 'cg', CHI: 'cl', CHN: 'cn', CIV: 'ci',
         CMR: 'cm', COD: 'cd', COK: 'ck', COL: 'co', CPV: 'cv', CRC: 'cr', CRO: 'hr', CUB: 'cu', CYP: 'cy', CZE: 'cz',
         DEN: 'dk', DOM: 'do', ECU: 'ec', EGY: 'eg', ESA: 'sv', ESP: 'es', EST: 'ee', ETH: 'et', FIJ: 'fj', FIN: 'fi',
@@ -497,7 +497,7 @@
         LAO: 'la', LAT: 'lv', LBA: 'ly', LBN: 'lb', LTU: 'lt', LUX: 'lu', MAC: 'mo', MAR: 'ma', MAS: 'my', MDA: 'md',
         MEX: 'mx', MGL: 'mn', MKD: 'mk', MLT: 'mt', MNE: 'me', MRI: 'mu', NAM: 'na', NCA: 'ni', NED: 'nl', NEP: 'np',
         NGR: 'ng', NOR: 'no', NZL: 'nz', PAK: 'pk', PAN: 'pa', PAR: 'py', PER: 'pe', PHI: 'ph', PLE: 'ps', PNG: 'pg',
-        POL: 'pl', POR: 'pt', PRK: 'kp', PUR: 'pr', QAT: 'qa', ROU: 'ro', RSA: 'za', SAM: 'ws', SEN: 'sn',
+        POL: 'pl', POR: 'pt', PRK: 'kp', PUR: 'pr', QAT: 'qa', ROU: 'ro', RSA: 'za', RUS: 'ru', SAM: 'ws', SEN: 'sn',
         SEY: 'sc', SGP: 'sg', SLE: 'sl', SLO: 'si', SMR: 'sm', SRB: 'rs', SRI: 'lk', SUD: 'sd', SUI: 'ch', SVK: 'sk',
         SWE: 'se', SWZ: 'sz', SYR: 'sy', TGA: 'to', THA: 'th', TJK: 'tj', TKM: 'tm', TPE: 'tw', TTO: 'tt', TUN: 'tn',
         TUR: 'tr', UAE: 'ae', UGA: 'ug', UKR: 'ua', URU: 'uy', USA: 'us', UZB: 'uz', VEN: 've', VIE: 'vn', YEM: 'ye',
@@ -950,11 +950,11 @@
             '<div class="legend">' +
             '<span class="leg-item"><i class="leg-swatch blue"></i>Critério 1 (Mundial 2027 — ordenado por Q2)</span>' +
             '<span class="leg-item"><i class="leg-swatch good"></i>Critério 2 Garantido (Taças do Mundo)</span>' +
-            '<span class="leg-item"><i class="leg-swatch warn"></i>Zona de Corte (dependente das uniões continentais / ' + esc(sum.hostNoc) + ' ainda por preencher)</span>' +
+            '<span class="leg-item"><i class="leg-swatch warn"></i>Zona de Corte (dependente das vagas continentais e/ou do país organizador)</span>' +
             '</div>';
 
           var nWc = R.wcEvents.length;
-          $('#head').innerHTML = '<span>#</span><span>Ginasta / País</span><span class="cells" style="--cols:' + nWc + '">' + R.wcEvents.map(function (ev) {
+          $('#head').innerHTML = '<span>#</span><span>Ginasta</span><span class="cells" style="--cols:' + nWc + '">' + R.wcEvents.map(function (ev) {
             var st = evState(ev);
             return '<span class="hcell"><b><span class="dot ' + st + '"></span>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
           }).join('') + '</span><span style="text-align:right">Total</span><span>Estado Olímpico</span>';
@@ -1050,7 +1050,7 @@
             }).join('');
 
             var chips = '';
-            if (r.quotaState === 'safe') chips += '<span class="chip vaga">Na vaga</span>';
+            if (r.quotaState === 'safe') chips += '<span class="chip vaga">Dentro</span>';
             else if (r.quotaState === 'bubble') chips += '<span class="chip bubble">Vaga provisória</span>';
             else if (r.rank !== null) chips += '<span class="chip min">Com pontos FIG</span>';
             else chips += '<span class="chip">Sem pontos Top 30</span>';
