@@ -1,15 +1,19 @@
-function extractJudgeScores(htmlFragment) {
+function extractJudgeScoresFromText(rawHtml) {
   const detail = { e: 0, d: 0, hd: 0, tof: 0, p: 0, total: 0 };
-  // Procura tanto <span class="judgescore">D: 11.0</span> como células individuais <td class="score D">11.0</td>
-  const judgeRegex = /<span[^>]*class="[^"]*judgescore[^"]*"[^>]*>\s*([A-Za-z]+)\s*:\s*([0-9.]+)\s*<\/span>/gi;
+  const cleaned = String(rawHtml || '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ');
+
+  const pairRegex = /\b(D|E|HD|H|TOF|T|F|S|PEN|P)\s*:\s*([0-9]+(?:\.[0-9]+)?)/gi;
   let m;
-  while ((m = judgeRegex.exec(htmlFragment)) !== null) {
+  while ((m = pairRegex.exec(cleaned)) !== null) {
     const label = m[1].toUpperCase();
     const val = Number(parseFloat(m[2]).toFixed(3));
     if (label === 'D') detail.d = val;
     else if (label === 'E') detail.e = val;
     else if (label === 'H' || label === 'HD') detail.hd = val;
-    else if (label === 'T' || label === 'TOF' || label === 'S') detail.tof = val;
+    else if (label === 'T' || label === 'TOF' || label === 'F' || label === 'S') detail.tof = val;
     else if (label === 'P' || label === 'PEN') detail.p = val;
   }
   return detail;
