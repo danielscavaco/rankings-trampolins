@@ -132,9 +132,7 @@
     .cell.ok { box-shadow: inset 0 0 0 1px var(--muted); color: var(--ink); }
     .cell sup { font-size: 9.5px; margin-left: 3px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
     .cell sup.exc-pend { text-decoration: line-through; opacity: 0.75; }
-    .cell.nc { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
-    .cell.nc sup { display: inline-block; text-decoration: none; }
-    .cell.nc sup.exc-pend { text-decoration: line-through; opacity: 0.75; }
+    .cell.nc .val { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
     .cell.sim { background: var(--sim-soft); box-shadow: inset 0 0 0 1.5px var(--sim); }
 
     .tot { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
@@ -535,12 +533,12 @@
             if (p.score > 0) {
               hasData = true;
               cl += cnt[ev.id] ? ' cont' : ' ok';
-              v = fmt(p.score) + excTag;
+              v = '<span class="val">' + fmt(p.score) + '</span>' + excTag;
               tip = cnt[ev.id] ? 'Conta para o total' : 'Mínimo atingido, fora das duas melhores';
             } else if (p.rec && p.items.length && p.items[0].value !== null) {
               hasData = true;
               cl += ' nc';
-              v = fmt(p.items[0].value) + excTag;
+              v = '<span class="val">' + fmt(p.items[0].value) + '</span>' + excTag;
               tip = 'Mínimo não atingido';
             } else if (p.rec && p.rec.rotinas && Object.keys(p.rec.rotinas).length) {
               hasData = true;
