@@ -8,11 +8,20 @@
   var nfPt = new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
   var fmtPt = function (n) { return nfPt.format(n); };
 
+  function resolveQ1Key(rec) {
+    if (!rec || !rec.rotinas) return 'q1';
+    var r1 = rec.rotinas.q1_1, r2 = rec.rotinas.q1_2;
+    if (r1 && r2) return r2.total > r1.total ? 'q1_2' : 'q1_1';
+    if (r1) return 'q1_1';
+    if (r2) return 'q1_2';
+    return 'q1';
+  }
+
   function extractRoutineStats(tipo, rec, phaseKeys) {
     var sumE = 0, sumD = 0, hasDetail = false;
     if (!rec || !rec.rotinas) return { e: 0, d: 0, hasDetail: false };
     phaseKeys.forEach(function (k) {
-      var rt = rec.rotinas[k];
+      var rt = rec.rotinas[k] || (k === 'q1_1' || k === 'q1_2' ? rec.rotinas.q1 : null);
       if (rt) {
         if (isNum(rt.e)) { sumE = r3(sumE + rt.e); hasDetail = true; }
         if (isNum(rt.d)) { sumD = r3(sumD + rt.d); hasDetail = true; }
@@ -46,7 +55,7 @@
       out.base = rec.q1;
       var q1ok = rec.q1 >= minQ1;
       items.push({
-        label: 'Q1', value: rec.q1, ok: q1ok,
+        label: 'Q1 (melhor série)', value: rec.q1, ok: q1ok,
         note: q1ok ? '' : 'abaixo do mínimo (' + fmtPt(minQ1) + ')'
       });
 
@@ -63,8 +72,9 @@
       });
 
       if (q1ok) {
+        var q1Key = resolveQ1Key(rec);
         out.score = r3(rec.q1 + (best || 0));
-        out.usedPhases = bestKey ? ['q1', bestKey] : ['q1'];
+        out.usedPhases = bestKey ? [q1Key, bestKey] : [q1Key];
         out.stats = extractRoutineStats('late', rec, out.usedPhases);
       }
       return out;
