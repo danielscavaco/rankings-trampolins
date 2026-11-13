@@ -3,10 +3,18 @@
     {
       "nome": "World Championships 2026 (Swiss Timing)",
       "url": "https://gym.longinestiming.com/2026/Trampoline-18189/en-us/Default",
-      "eventoId": "cn_teste",
-      "configFile": "data/test-config.json",
-      "athletesFile": "data/test-athletes.json",
-      "resultsFile": "data/test-results.json"
+      "eventoId": "nanjing",
+      "configFile": "data/config.json",
+      "athletesFile": "data/athletes.json",
+      "resultsFile": "data/results.json"
+    },
+    {
+      "nome": "WC Cottbus",
+      "url": "https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/",
+      "eventoId": "cottbus",
+      "configFile": "data/config.json",
+      "athletesFile": "data/athletes.json",
+      "resultsFile": "data/results.json"
     }
   ]
 }
