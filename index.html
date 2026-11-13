@@ -130,8 +130,6 @@
     .cell::before { content: attr(data-l); display: none; font-size: 11px; margin-right: 6px; color: var(--muted); }
     .cell.cont { background: var(--good-soft); color: var(--good); font-weight: 600; }
     .cell.ok { box-shadow: inset 0 0 0 1px var(--muted); color: var(--ink); }
-    .cell sup { font-size: 9.5px; margin-left: 3px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
-    .cell sup.exc-pend { text-decoration: line-through; opacity: 0.75; }
     .cell.nc .val { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
     .cell.sim { background: var(--sim-soft); box-shadow: inset 0 0 0 1.5px var(--sim); }
 
@@ -188,6 +186,20 @@
     .fld input.mod { background: var(--sim-soft); border-color: var(--sim); box-shadow: inset 0 0 0 1px var(--sim); }
     .hint { font-size: 12.5px; color: var(--muted); }
     .res { font-size: 13px; margin-top: 4px; }
+
+    /* Rodapé */
+    footer {
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    footer b { color: var(--ink); font-weight: 500; }
 
     /* Indicador não-clicável de atualização em direto */
     .live-pill {
@@ -250,25 +262,12 @@
       vertical-align: -0.15em;
       margin-left: 3px;
     }
-
-    footer {
-      margin-top: 8px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-      font-size: 12.5px;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    footer b { color: var(--ink); font-weight: 500; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="eyebrow"> Rankings · Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
+      <div class="eyebrow">Rankings · Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
       <h1 id="titulo">Jogos Europeus 2027</h1>
       <p class="sub" id="sub"></p>
     </header>
@@ -303,6 +302,7 @@
 
     <footer>
       <span>© 2026 <b>Daniel Cavaco</b></span>
+      <span>Rankings não oficiais · Trampolins</span>
     </footer>
   </div>
 
@@ -544,18 +544,15 @@
 
           var cells = R.eventos.map(function (ev) {
             var p = r.per[ev.id], cl = 'cell', v = '—', tip = '', hasData = false;
-            var excTag = p.neReached
-              ? (p.neValid ? '<sup>exc</sup>' : '<sup class="exc-pend">exc</sup>')
-              : '';
             if (p.score > 0) {
               hasData = true;
               cl += cnt[ev.id] ? ' cont' : ' ok';
-              v = '<span class="val">' + fmt(p.score) + '</span>' + excTag;
+              v = '<span class="val">' + fmt(p.score) + '</span>';
               tip = cnt[ev.id] ? 'Conta para o total' : 'Mínimo atingido, fora das duas melhores';
             } else if (p.rec && p.items.length && p.items[0].value !== null) {
               hasData = true;
               cl += ' nc';
-              v = '<span class="val">' + fmt(p.items[0].value) + '</span>' + excTag;
+              v = '<span class="val">' + fmt(p.items[0].value) + '</span>';
               tip = 'Mínimo não atingido';
             } else if (p.rec && p.rec.rotinas && Object.keys(p.rec.rotinas).length) {
               hasData = true;
@@ -572,7 +569,6 @@
           var chips = '';
           if (r.rank !== null) {
             chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
-            if (r.hasValidNe) chips += '<span class="chip vaga">Excelência</span>';
           } else {
             chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
           }
