@@ -1,0 +1,118 @@
+{
+  "titulo": "Jogos Olímpicos Los Angeles 2028",
+  "local": "Los Angeles (USA)",
+  "datas": "14 a 30 de julho de 2028",
+  "eventos": [
+    { "id": "wc27_1", "nome": "Taça do Mundo 1 (2027)", "curto": "TM1 27", "ano": 2027, "tipo": "wc", "datas": "Mai 2027" },
+    { "id": "wc27_2", "nome": "Taça do Mundo 2 (2027)", "curto": "TM2 27", "ano": 2027, "tipo": "wc", "datas": "Jul 2027" },
+    { "id": "wc27_3", "nome": "Taça do Mundo 3 (2027)", "curto": "TM3 27", "ano": 2027, "tipo": "wc", "datas": "Out 2027" },
+    { "id": "wch27",  "nome": "Campeonato do Mundo 2027", "curto": "CM 27", "ano": 2027, "tipo": "wch", "datas": "Nov 2027" },
+    { "id": "wc28_1", "nome": "Taça do Mundo 1 (2028)", "curto": "TM1 28", "ano": 2028, "tipo": "wc", "datas": "Fev 2028" },
+    { "id": "wc28_2", "nome": "Taça do Mundo 2 (2028)", "curto": "TM2 28", "ano": 2028, "tipo": "wc", "datas": "Mar 2028" },
+    { "id": "wc28_3", "nome": "Taça do Mundo 3 (2028)", "curto": "TM3 28", "ano": 2028, "tipo": "wc", "datas": "Abr 2028" }
+  ],
+  "nocContinents": {
+    "CHN": "AS", "JPN": "AS", "KAZ": "AS", "UZB": "AS",
+    "GBR": "EU", "POR": "EU", "FRA": "EU", "ESP": "EU", "GER": "EU", "NED": "EU", "AZE": "EU", "GEO": "EU", "AIN": "EU",
+    "USA": "AM", "CAN": "AM", "BRA": "AM", "MEX": "AM", "COL": "AM",
+    "AUS": "OC", "NZL": "OC",
+    "EGY": "AF", "RSA": "AF", "ALG": "AF"
+  },
+  "resultados": {
+    "M": {
+      "wc27_1": {
+        "wang_z":   { "nome": "Wang Zisai",        "noc": "CHN", "rank": 1,  "final": true },
+        "yan_l":    { "nome": "Yan Langyu",        "noc": "CHN", "rank": 2,  "final": true },
+        "nishioka": { "nome": "Ryusei Nishioka",   "noc": "JPN", "rank": 3,  "final": true },
+        "abreu_p":  { "nome": "Pedro Ferreira",    "noc": "POR", "rank": 4,  "final": true, "bestScore": 60.45, "bestD": 17.8, "bestE": 16.5, "q1_2": 59.80 },
+        "page_b":   { "nome": "Zak Perzamanos",    "noc": "GBR", "rank": 5,  "final": true },
+        "gomes_d":  { "nome": "Diogo Abreu",       "noc": "POR", "rank": 6,  "final": true, "bestScore": 59.90, "bestD": 17.5, "bestE": 16.4, "q1_2": 59.40 },
+        "morante":  { "nome": "Pierre Gouzou",     "noc": "FRA", "rank": 7,  "final": true },
+        "shostak":  { "nome": "Ruben Tavares",     "noc": "POR", "rank": 11, "final": false, "bestScore": 58.10, "bestD": 17.1, "bestE": 16.0, "q1_2": 58.10 },
+        "vega_d":   { "nome": "David Vega",        "noc": "ESP", "rank": 9,  "final": false },
+        "schmidt":  { "nome": "Fabian Vogel",      "noc": "GER", "rank": 10, "final": false },
+        "ali_s":    { "nome": "Aliaksei Shostak",  "noc": "USA", "rank": 12, "final": false },
+        "soehn_k":  { "nome": "Keegan Soehn",      "noc": "CAN", "rank": 14, "final": false },
+        "mussabay": { "nome": "Danil Mussabayev",  "noc": "KAZ", "rank": 15, "final": false },
+        "clarke_s": { "nome": "Shaun Swadener",    "noc": "AUS", "rank": 18, "final": false },
+        "ferr_g":   { "nome": "Gabriel Albuquerque","noc": "POR","rank": 19, "final": false, "bestScore": 57.20, "bestD": 16.9, "bestE": 15.8, "q1_2": 57.20 }
+      },
+      "wc27_2": {
+        "nishioka": { "nome": "Ryusei Nishioka",   "noc": "JPN", "rank": 1,  "final": true },
+        "morante":  { "nome": "Pierre Gouzou",     "noc": "FRA", "rank": 2,  "final": true },
+        "vega_d":   { "nome": "David Vega",        "noc": "ESP", "rank": 3,  "final": true },
+        "gomes_d":  { "nome": "Diogo Abreu",       "noc": "POR", "rank": 4,  "final": true, "bestScore": 60.20, "bestD": 17.6, "bestE": 16.6, "q1_2": 59.60 },
+        "schmidt":  { "nome": "Fabian Vogel",      "noc": "GER", "rank": 5,  "final": true },
+        "ali_s":    { "nome": "Aliaksei Shostak",  "noc": "USA", "rank": 6,  "final": true },
+        "abreu_p":  { "nome": "Pedro Ferreira",    "noc": "POR", "rank": 8,  "final": true, "bestScore": 59.85, "bestD": 17.8, "bestE": 16.2, "q1_2": 59.85 },
+        "soehn_k":  { "nome": "Keegan Soehn",      "noc": "CAN", "rank": 9,  "final": false },
+        "mussabay": { "nome": "Danil Mussabayev",  "noc": "KAZ", "rank": 10, "final": false },
+        "clarke_s": { "nome": "Shaun Swadener",    "noc": "AUS", "rank": 13, "final": false },
+        "ferr_g":   { "nome": "Gabriel Albuquerque","noc": "POR","rank": 16, "final": false, "bestScore": 57.90, "bestD": 17.2, "bestE": 15.9, "q1_2": 57.90 }
+      },
+      "wch27": {
+        "wang_z":   { "nome": "Wang Zisai",        "noc": "CHN", "rank": 1,  "finalRank": 1, "q2Rank": 1 },
+        "yan_l":    { "nome": "Yan Langyu",        "noc": "CHN", "rank": 2,  "finalRank": 2, "q2Rank": 2 },
+        "nishioka": { "nome": "Ryusei Nishioka",   "noc": "JPN", "rank": 3,  "finalRank": 3, "q2Rank": 3 },
+        "page_b":   { "nome": "Zak Perzamanos",    "noc": "GBR", "rank": 4,  "finalRank": 4, "q2Rank": 4 },
+        "morante":  { "nome": "Pierre Gouzou",     "noc": "FRA", "rank": 5,  "finalRank": 5, "q2Rank": 5 },
+        "vega_d":   { "nome": "David Vega",        "noc": "ESP", "rank": 6,  "finalRank": 6, "q2Rank": 7 },
+        "schmidt":  { "nome": "Fabian Vogel",      "noc": "GER", "rank": 7,  "finalRank": 7, "q2Rank": 6 },
+        "soehn_k":  { "nome": "Keegan Soehn",      "noc": "CAN", "rank": 8,  "finalRank": 8, "q2Rank": 8 },
+        "mussabay": { "nome": "Danil Mussabayev",  "noc": "KAZ", "rank": 9,  "q2Rank": 9 },
+        "abreu_p":  { "nome": "Pedro Ferreira",    "noc": "POR", "rank": 12, "q2Rank": 12, "bestScore": 60.10, "bestD": 17.8, "bestE": 16.3, "q1_2": 59.50 },
+        "gomes_d":  { "nome": "Diogo Abreu",       "noc": "POR", "rank": 15, "q2Rank": 15, "bestScore": 59.40, "bestD": 17.5, "bestE": 16.1, "q1_2": 59.10 },
+        "ferr_g":   { "nome": "Gabriel Albuquerque","noc": "POR","rank": 18, "q2Rank": 18, "bestScore": 58.30, "bestD": 17.2, "bestE": 16.0, "q1_2": 58.30 }
+      },
+      "wc28_1": {
+        "yan_l":    { "nome": "Yan Langyu",        "noc": "CHN", "rank": 1,  "final": true },
+        "mussabay": { "nome": "Danil Mussabayev",  "noc": "KAZ", "rank": 2,  "final": true },
+        "abreu_p":  { "nome": "Pedro Ferreira",    "noc": "POR", "rank": 5,  "final": true, "bestScore": 60.65, "bestD": 18.0, "bestE": 16.5, "q1_2": 60.10 },
+        "ali_s":    { "nome": "Aliaksei Shostak",  "noc": "USA", "rank": 6,  "final": true },
+        "clarke_s": { "nome": "Shaun Swadener",    "noc": "AUS", "rank": 7,  "final": true },
+        "gomes_d":  { "nome": "Diogo Abreu",       "noc": "POR", "rank": 9,  "final": false, "bestScore": 59.80, "bestD": 17.6, "bestE": 16.3, "q1_2": 59.80 },
+        "ferr_g":   { "nome": "Gabriel Albuquerque","noc": "POR","rank": 11, "final": false, "bestScore": 58.90, "bestD": 17.4, "bestE": 16.1, "q1_2": 58.90 }
+      }
+    },
+    "F": {
+      "wc27_1": {
+        "hu_y":     { "nome": "Hu Yicheng",        "noc": "CHN", "rank": 1,  "final": true },
+        "zhu_x":    { "nome": "Zhu Xueying",       "noc": "CHN", "rank": 2,  "final": true },
+        "bryony_p": { "nome": "Bryony Page",       "noc": "GBR", "rank": 3,  "final": true },
+        "mori_h":   { "nome": "Hikaru Mori",       "noc": "JPN", "rank": 4,  "final": true },
+        "martins_s":{ "nome": "Sofia Correia",     "noc": "POR", "rank": 7,  "final": true, "bestScore": 55.20, "bestD": 14.8, "bestE": 15.9, "q1_2": 54.90 },
+        "almeida_c":{ "nome": "Catarina Nunes",    "noc": "POR", "rank": 12, "final": false, "bestScore": 53.80, "bestD": 14.2, "bestE": 15.6, "q1_2": 53.80 },
+        "stevens_j":{ "nome": "Jessica Stevens",   "noc": "USA", "rank": 6,  "final": true },
+        "methot_s": { "nome": "Sophiane Methot",   "noc": "CAN", "rank": 8,  "final": true },
+        "labrousse":{ "nome": "Lea Labrousse",     "noc": "FRA", "rank": 9,  "final": false },
+        "bessette": { "nome": "Camilla Gomes",     "noc": "BRA", "rank": 10, "final": false }
+      },
+      "wc27_2": {
+        "bryony_p": { "nome": "Bryony Page",       "noc": "GBR", "rank": 1,  "final": true },
+        "mori_h":   { "nome": "Hikaru Mori",       "noc": "JPN", "rank": 2,  "final": true },
+        "stevens_j":{ "nome": "Jessica Stevens",   "noc": "USA", "rank": 4,  "final": true },
+        "labrousse":{ "nome": "Lea Labrousse",     "noc": "FRA", "rank": 5,  "final": true },
+        "martins_s":{ "nome": "Sofia Correia",     "noc": "POR", "rank": 8,  "final": true, "bestScore": 55.40, "bestD": 15.0, "bestE": 15.8, "q1_2": 55.10 },
+        "bessette": { "nome": "Camilla Gomes",     "noc": "BRA", "rank": 9,  "final": false },
+        "almeida_c":{ "nome": "Catarina Nunes",    "noc": "POR", "rank": 14, "final": false, "bestScore": 53.40, "bestD": 14.2, "bestE": 15.4, "q1_2": 53.40 }
+      },
+      "wch27": {
+        "hu_y":     { "nome": "Hu Yicheng",        "noc": "CHN", "rank": 1,  "finalRank": 1, "q2Rank": 1 },
+        "bryony_p": { "nome": "Bryony Page",       "noc": "GBR", "rank": 2,  "finalRank": 2, "q2Rank": 2 },
+        "mori_h":   { "nome": "Hikaru Mori",       "noc": "JPN", "rank": 3,  "finalRank": 3, "q2Rank": 3 },
+        "stevens_j":{ "nome": "Jessica Stevens",   "noc": "USA", "rank": 4,  "finalRank": 4, "q2Rank": 4 },
+        "methot_s": { "nome": "Sophiane Methot",   "noc": "CAN", "rank": 5,  "finalRank": 5, "q2Rank": 5 },
+        "labrousse":{ "nome": "Lea Labrousse",     "noc": "FRA", "rank": 6,  "finalRank": 6, "q2Rank": 6 },
+        "bessette": { "nome": "Camilla Gomes",     "noc": "BRA", "rank": 7,  "finalRank": 7, "q2Rank": 7 },
+        "dagnall":  { "nome": "Noemi Romero",      "noc": "ESP", "rank": 8,  "finalRank": 8, "q2Rank": 8 },
+        "martins_s":{ "nome": "Sofia Correia",     "noc": "POR", "rank": 11, "q2Rank": 11, "bestScore": 55.60, "bestD": 15.0, "bestE": 16.0, "q1_2": 55.30 },
+        "almeida_c":{ "nome": "Catarina Nunes",    "noc": "POR", "rank": 17, "q2Rank": 17, "bestScore": 54.00, "bestD": 14.4, "bestE": 15.5, "q1_2": 54.00 }
+      },
+      "wc28_1": {
+        "zhu_x":    { "nome": "Zhu Xueying",       "noc": "CHN", "rank": 1,  "final": true },
+        "martins_s":{ "nome": "Sofia Correia",     "noc": "POR", "rank": 6,  "final": true, "bestScore": 55.85, "bestD": 15.2, "bestE": 16.0, "q1_2": 55.50 },
+        "almeida_c":{ "nome": "Catarina Nunes",    "noc": "POR", "rank": 10, "final": false, "bestScore": 54.30, "bestD": 14.5, "bestE": 15.7, "q1_2": 54.30 }
+      }
+    }
+  }
+}
