@@ -197,7 +197,7 @@
         var ff = r3(rec.f1 + rec.f2);
         var meetsF = ff >= minBase;
         var okF = q1Ok && meetsF;
-        var noteF = (meetsF && !q1Ok) ? 'fase anterior sem mínimos' : '';
+        var noteF = (meetsF && !q1Ok) ? 'Q1 sem mínimos' : '';
         items.push({
           label: 'F1 + F2', value: ff, ok: okF,
           note: noteF
@@ -373,3 +373,39 @@
     ranked.forEach(function (r, i) {
       if (i > 0 && ranked[i - 1].hasValidNe === r.hasValidNe && ranked[i - 1].total === r.total) {
         var cmp = compareTied(ranked[i - 1], r);
+        if (cmp.diff === 0) {
+          r.rank = ranked[i - 1].rank;
+          r.tie = true;
+          ranked[i - 1].tie = true;
+          r.tieReason = cmp.reason;
+          ranked[i - 1].tieReason = cmp.reason;
+        } else {
+          r.rank = i + 1;
+          r.tieReason = cmp.reason;
+          if (!ranked[i - 1].tieReason) ranked[i - 1].tieReason = cmp.reason;
+        }
+      } else {
+        r.rank = i + 1;
+      }
+      r.naVaga = r.rank <= dcfg.vagas;
+    });
+
+    rest.sort(function (a, b) {
+      var av = a.bestRaw === null ? -1 : a.bestRaw, bv = b.bestRaw === null ? -1 : b.bestRaw;
+      return (bv - av) || a.entry.nome.localeCompare(b.entry.nome, 'pt');
+    });
+
+    return {
+      rows: ranked.concat(rest),
+      vagas: dcfg.vagas,
+      comMinimos: ranked.length,
+      minBase: minBase,
+      minimos: m,
+      eventos: evs
+    };
+  }
+
+  var api = { scoreEvent: scoreEvent, rank: rank, hydrateRec: hydrateRec };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.Apuramento = api;
+})(typeof self !== 'undefined' ? self : this);
