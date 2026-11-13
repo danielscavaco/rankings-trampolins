@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Verificar janela temporal (inicio <= agora <= fim)
+      - name: Verificar janela temporal (com suporte a fusos horários)
         id: check_active
         run: |
           STATUS=$(node -e '
@@ -48,8 +48,8 @@ jobs:
               const cfg = JSON.parse(fs.readFileSync(t.configFile, "utf8"));
               const ev = (cfg.eventos || []).find(e => e.id === t.eventoId) || (cfg.eventos && cfg.eventos[0]);
               if (!ev) continue;
-              const iniTs = Date.parse((ev.inicio || "2000-01-01") + "T00:00:00Z");
-              const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59Z");
+              const iniTs = Date.parse((ev.inicio || "2000-01-01") + "T00:00:00" + (ev.tz || "+14:00"));
+              const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59" + (ev.tz || "-12:00"));
               if (now >= iniTs && now <= fimTs) anyRunning = true;
               if (now <= fimTs) anyPending = true;
             }
@@ -77,7 +77,6 @@ jobs:
             while true; do
               NOW_TS=$(date +%s)
 
-              # Turno máximo de 3h30m (12600s) antes de encadear o seguinte
               if [ $((NOW_TS - START_TS)) -ge 12600 ]; then
                 echo "Turno de 3h30m concluído. A encadear próximo turno..."
                 break
@@ -93,8 +92,8 @@ jobs:
                   const cfg = JSON.parse(fs.readFileSync(t.configFile, "utf8"));
                   const ev = (cfg.eventos || []).find(e => e.id === t.eventoId) || (cfg.eventos && cfg.eventos[0]);
                   if (!ev) continue;
-                  const iniTs = Date.parse((ev.inicio || "2000-01-01") + "T00:00:00Z");
-                  const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59Z");
+                  const iniTs = Date.parse((ev.inicio || "2000-01-01") + "T00:00:00" + (ev.tz || "+14:00"));
+                  const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59" + (ev.tz || "-12:00"));
                   if (now >= iniTs && now <= fimTs) anyRunning = true;
                   if (now <= fimTs) anyPending = true;
                 }
@@ -149,7 +148,7 @@ jobs:
               const cfg = JSON.parse(fs.readFileSync(t.configFile, "utf8"));
               const ev = (cfg.eventos || []).find(e => e.id === t.eventoId) || (cfg.eventos && cfg.eventos[0]);
               if (!ev) return false;
-              const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59Z");
+              const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59" + (ev.tz || "-12:00"));
               return now <= fimTs;
             });
             console.log(anyPending ? "true" : "false");
