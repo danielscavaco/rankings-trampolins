@@ -1,0 +1,89 @@
+name: Resultados Competição
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      fonte:
+        description: 'Plataforma de resultados'
+        type: choice
+        options:
+          - sporttech
+          - longines
+        default: 'longines'
+      event_id:
+        description: 'ID do evento em config.json (ex: nanjing, cottbus)'
+        required: true
+        default: 'nanjing'
+      codigo_evento:
+        description: 'UUID (Sporttech) ou Código (Longines, ex: 18189)'
+        required: true
+        default: '18189'
+      modo_teste:
+        description: 'Modo teste (grava em data/test-live.json e faz 1 leitura)'
+        type: boolean
+        default: false
+      prova_nacional:
+        description: 'Prova nacional (Sporttech: não exigir Representing == POR)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: resultados-sync
+  cancel-in-progress: false
+
+jobs:
+  resultados:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ler resultados e gravar JSON
+        run: |
+          FONTE="${{ github.event.inputs.fonte || 'sporttech' }}"
+          EVENT_ID="${{ github.event.inputs.event_id || 'cottbus' }}"
+          CODIGO="${{ github.event.inputs.codigo_evento || '1d53811b-c3b5-4bfc-78d9-751d8bf78f9c' }}"
+          TESTE="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.modo_teste && 'true' || 'false' }}"
+          NACIONAL="${{ github.event.inputs.prova_nacional && 'true' || 'false' }}"
+
+          OUT_FILE="data/results.json"
+          if [ "$TESTE" = "true" ]; then
+            OUT_FILE="data/test-live.json"
+          fi
+
+          if [ "$FONTE" = "longines" ]; then
+            python3 scripts/longines_sync.py \
+              --event-code "$CODIGO" \
+              --event-id "$EVENT_ID" \
+              --out "$OUT_FILE" \
+              --git-push
+          else
+            EXTRA_ARGS=""
+            if [ "$NACIONAL" = "true" ]; then
+              EXTRA_ARGS="--national --ignore-age"
+            fi
+
+            if [ "$TESTE" = "true" ]; then
+              python3 scripts/sporttech_sync.py \
+                --uuid "$CODIGO" \
+                --event-id "$EVENT_ID" \
+                --out "$OUT_FILE" \
+                --poll 0 \
+                $EXTRA_ARGS \
+                --git-push
+            else
+              python3 scripts/sporttech_sync.py \
+                --uuid "$CODIGO" \
+                --event-id "$EVENT_ID" \
+                --out "$OUT_FILE" \
+                --poll 30 \
+                --budget 20400 \
+                $EXTRA_ARGS \
+                --git-push
+            fi
+          fi
