@@ -51,7 +51,7 @@ async function loadStages(competitionUrl, logLines) {
     const disc = DISC_MAP[c.Discipline];
     if (!disc) continue;
     const sexo = normalizeSex(c.SexCategory);
-    const escaloes = mapEscalaoText(`${c.AgeGroup || ''} ${c.Title || ''}`, { allowDefaultSenior: false });
+    const escaloes = mapEscalaoText(`${c.AgeGroup || ''} ${c.Title || ''}`, { allowDefaultSenior: true });
     if (escaloes.length === 0) continue;
 
     const isSenOnly = escaloes.length === 1 && escaloes[0] === 'SEN';
