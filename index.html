@@ -334,7 +334,6 @@
       }
 
       var STATE_L = { done: 'concluída', live: 'a decorrer', future: 'por realizar' };
-      function dpt(iso) { if (!iso) return ''; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
       function hasOv() { return Object.keys(S.ov).some(function (e) { return Object.keys(S.ov[e]).length; }); }
 
       /* ---------- dados ---------- */
@@ -419,9 +418,14 @@
         html += '<div class="detail-head"><h3>' + esc(r.entry.nome) + ' — ' + esc(ev.nome) + ' (' + esc(ev.curto) + ')</h3>';
         html += '<button type="button" class="detail-close" data-close-detail="1">Fechar</button></div>';
 
-        var phases = dc.tipo === 'late'
-          ? [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']]
-          : [['q1_1', 'Qual. Série 1'], ['q1_2', 'Qual. Série 2'], ['f1', 'Final 1'], ['f2', 'Final 2']];
+        var phases;
+        if (dc.tipo === 'late') {
+          phases = (rot.q1_1 || rot.q1_2)
+            ? [['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2'], ['q2', 'Q2'], ['f', 'Final']]
+            : [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
+        } else {
+          phases = [['q1_1', 'Qual. Série 1'], ['q1_2', 'Qual. Série 2'], ['f1', 'Final 1'], ['f2', 'Final 2']];
+        }
 
         var activePhases = phases.filter(function (ph) { return rot[ph[0]]; });
 
@@ -630,7 +634,7 @@
           if (v !== undefined) rec[i.dataset.f] = v;
         });
         var real = S.res[evId] && S.res[evId][id];
-        if (real && real.rotinas) rec.rotinas = real.rotinas;
+        if (real && real.rotinas && rec.q1 === real.q1) rec.rotinas = real.rotinas;
 
         var realKeys = real ? Object.keys(real).filter(function (k) { return k !== 'src' && k !== 'neFlag' && k !== 'rotinas'; }) : [];
         var recKeys = Object.keys(rec).filter(function (k) { return k !== 'rotinas'; });
