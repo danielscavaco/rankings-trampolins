@@ -1046,7 +1046,6 @@
 
         $('#facts').innerHTML =
           '<div class="fact"><span>Vagas</span><b>' + R.vagas + '</b></div>' +
-          '<div class="fact"><span>Provas a somar</span><b>' + R.provasContam + '</b></div>' +
           '<div class="fact"><span>Mínimos</span><b class="tn" style="font-size:16px">' + minTxt + '</b></div>';
         $('#trackerBox').innerHTML = '';
         $('#legendBox').innerHTML = '';
@@ -1308,8 +1307,7 @@
             : (sum.porQuotasBubble > 0 ? sum.porQuotasBubble + ' (zona de corte)' : '0 (em disputa)');
 
           $('#facts').innerHTML =
-            '<div class="fact ' + (sum.porQuotasSafe > 0 ? 'good' : (sum.porQuotasBubble > 0 ? 'warn' : '')) + '"><span>Vagas Portugal</span><b>' + porVagasTxt + '</b></div>' +
-            '<div class="fact"><span>Regra</span><b class="tn" style="font-size:15px">' + sum.bestResultsCount + ' melhores de ' + R.eventos.length + ' provas (máx. 2 em 2027)</b></div>';
+            '<div class="fact ' + (sum.porQuotasSafe > 0 ? 'good' : (sum.porQuotasBubble > 0 ? 'warn' : '')) + '"><span>Vagas Portugal</span><b>' + porVagasTxt + '</b></div>';
 
           $('#trackerBox').innerHTML = '';
           $('#legendBox').innerHTML =
