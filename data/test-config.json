@@ -12,12 +12,12 @@
       "datas": "Ensaio",
       "inicio": "2026-11-13",
       "fim": "2026-11-13",
-      "disciplinas": ["TRA", "DMT", "TUM"],
+      "disciplinas": ["TRI", "DMT", "TUM"],
       "escaloes": ["SEN"]
     }
   ],
   "disciplinas": {
-    "TRA": {
+    "TRI": {
       "nome": "Trampolim Individual",
       "porEscalao": {
         "SEN": { "tipo": "late", "vagas": 2, "minimos": { "F": { "q1": 51.50, "late": 53.0 }, "M": { "q1": 60.00, "late": 61.0 } } }
