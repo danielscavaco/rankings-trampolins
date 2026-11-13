@@ -58,8 +58,9 @@ function mapEscalaoText(rawInput, { allowDefaultSenior = false } = {}) {
 
   if (/\b(base|2d|2a\s*div)\b/.test(raw)) return [];
 
-  const isNacional = /\b(inic|juv|jun|sen)\b/.test(raw);
-  if (isNacional && !/\b(1d|elite)\b/.test(raw)) {
+  // Em provas nacionais jovens (inic/juv/jun sem idade FIG), exige 1D ou Elite
+  const isJovemNacional = /\b(inic|juv)\b/.test(raw) && !/\b(11-12|13-14|ag\s*[12])\b/.test(raw);
+  if (isJovemNacional && !/\b(1d|elite)\b/.test(raw)) {
     return [];
   }
 
@@ -69,7 +70,6 @@ function mapEscalaoText(rawInput, { allowDefaultSenior = false } = {}) {
   if (/sen\s*1d|17-21|ag\s*3\b|ag\s*4\b/.test(raw)) return ['17-21'];
   if (/sen\s*elite|\bsen\b|senior|open/.test(raw)) return ['SEN'];
 
-  // Provas FIG/Internacionais (ex: Swiss Timing "Men's Tumbling - Qualification") não dizem "Senior"
   return allowDefaultSenior ? ['SEN'] : [];
 }
 
