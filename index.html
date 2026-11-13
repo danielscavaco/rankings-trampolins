@@ -750,8 +750,8 @@
           tabsAge.hidden = true;
           tabsAge.innerHTML = '';
           $('#tabsSub').innerHTML =
-            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG</span><span class="full">Ranking Internacional (FIG)</span></button>' +
-            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP</span><span class="full">Ranking Nacional (FGP)</span></button>';
+            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG</span><span class="full">Internacional</span></button>' +
+            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP</span><span class="full">Nacional</span></button>';
         }
 
         var sexes = ['F', 'M'];
@@ -1339,7 +1339,7 @@
             }).join('');
 
             var chips = '';
-            if (r.quotaState === 'safe') chips += '<span class="chip vaga">Na vaga</span>';
+            if (r.quotaState === 'safe') chips += '<span class="chip vaga">Dentro</span>';
             else if (r.quotaState === 'bubble') chips += '<span class="chip bubble">Vaga provisória</span>';
             else if (r.rank !== null) chips += '<span class="chip min">Com pontos FIG</span>';
             else chips += '<span class="chip">Sem pontos Top 30</span>';
