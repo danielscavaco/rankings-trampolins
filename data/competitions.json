@@ -7,7 +7,7 @@
     "nome": "Jogos Europeus 2027",
     "config": "data/config.json",
     "athletes": "data/athletes.json",
-    "results": "data/results.json",
+    "results": "data/results.json"
   },
   {
     "id": "og28",
