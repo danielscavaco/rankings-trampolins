@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 19:07:07
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (LIVE SYNC) — 2026-11-13 19:09:21
 Competições alvo: World Championships 2026 (Swiss Timing)
 ====================================================================
 
@@ -107,4 +107,4 @@ DESTINO: World Championships 2026 (Swiss Timing) (data/test-results.json -> "cn_
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 51.3 (séries: 27 + 24.3)
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 20.9 (séries: 4.5)
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.1 (séries: —)
-RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 0 fases atualizadas.
+RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 51 fases atualizadas.
