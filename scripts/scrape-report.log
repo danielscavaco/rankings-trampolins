@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 18:50:49
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 18:55:03
 Competições alvo: World Championships 2026 (Swiss Timing)
 ====================================================================
 
@@ -40,27 +40,27 @@ Stages carregados (Swiss Timing): 31
 ====================================================================
 DESTINO: World Championships 2026 (Swiss Timing) (data/test-results.json -> "cn_teste")
 ====================================================================
-[ERRO - SEM PROVA] Catarina Nunes (TRI · undefined · F · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Sofia Correia (TRI · undefined · F · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Inês Reis (TRI · undefined · F · SFRUA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Gabriel Albuquerque (TRI · undefined · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Pedro Ferreira (TRI · undefined · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Lucas Santos (TRI · undefined · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Abreu (TRI · undefined · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Alexandra Garcia (DMT · undefined · F · AGCM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Nobre (DMT · undefined · F · CCRAM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Beatriz Mendes (DMT · undefined · F · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Oliveira (DMT · undefined · F · GCV) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Cabral (DMT · undefined · M · AAE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] André Dias (DMT · undefined · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisco José (DMT · undefined · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Fernandes (DMT · undefined · M · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisca Pinto (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Mariana Cascalheira (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Santos (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Salomé Ferraz (TUM · undefined · F · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Vasco Peso (TUM · undefined · M · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Saraiva (TUM · undefined · M · ACM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Gomes (TUM · undefined · M · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Azinheira (TUM · undefined · M · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Catarina Nunes (TRA · SEN · F · LGC) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Sofia Correia (TRA · SEN · F · SCP) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Inês Reis (TRA · SEN · F · SFRUA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Gabriel Albuquerque (TRA · SEN · M · APAGL) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Pedro Ferreira (TRA · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Lucas Santos (TRA · SEN · M · CFE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Abreu (TRA · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
+[ERRO - NÃO ENCONTRADO] Alexandra Garcia (DMT · SEN · F · AGCM) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] Matilde Nobre (DMT · SEN · F · CCRAM) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] Beatriz Mendes (DMT · SEN · F · CFE) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] Matilde Oliveira (DMT · SEN · F · GCV) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] Diogo Cabral (DMT · SEN · M · AAE) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] André Dias (DMT · SEN · M · APAGL) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] Francisco José (DMT · SEN · M · CFE) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] Diogo Fernandes (DMT · SEN · M · LGC) -> Não aparece em "Men&#x27;s Double Mini - Qualification / Men&#x27;s Double Mini - Qualification Round 2 / Men&#x27;s Double Mini - Final 1 / Men&#x27;s Double Mini - Final 2".
+[ERRO - NÃO ENCONTRADO] Francisca Pinto (TUM · SEN · F · GMNA) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
+[ERRO - NÃO ENCONTRADO] Mariana Cascalheira (TUM · SEN · F · GMNA) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
+[ERRO - NÃO ENCONTRADO] Matilde Santos (TUM · SEN · F · GMNA) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
+[ERRO - NÃO ENCONTRADO] Salomé Ferraz (TUM · SEN · F · SFEM) -> Não aparece em "Women&#x27;s Tumbling - Qualification / Women&#x27;s Tumbling - Qualification Round 2 / Women&#x27;s Tumbling - Final 1 / Women&#x27;s Tumbling - Final 2".
+[ERRO - NÃO ENCONTRADO] Vasco Peso (TUM · SEN · M · SFEM) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
+[ERRO - NÃO ENCONTRADO] João Saraiva (TUM · SEN · M · ACM) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
+[ERRO - NÃO ENCONTRADO] Diogo Gomes (TUM · SEN · M · GMNA) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
+[ERRO - NÃO ENCONTRADO] João Azinheira (TUM · SEN · M · GMNA) -> Não aparece em "Men&#x27;s Tumbling - Qualification / Men&#x27;s Tumbling - Qualification Round 2 / Men&#x27;s Tumbling - Final 1 / Men&#x27;s Tumbling - Final 2".
 RESUMO (World Championships 2026 (Swiss Timing)): 0 encontrados | 23 com erro/não encontrados | 0 fases atualizadas.
