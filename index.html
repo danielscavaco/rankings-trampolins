@@ -566,16 +566,26 @@
       }
 
       getJSON('data/competitions.json').then(function (list) {
-        /* Ordenar cronologicamente por ordemData (ex: EG27 -> CM27 -> OG28) */
-        S.comps = list.slice().sort(function (a, b) {
-          return String(a.ordemData || '9999-12-31').localeCompare(String(b.ordemData || '9999-12-31'));
-        });
-        if (!S.comps.length) throw new Error('Sem competições configuradas.');
-        fromHash();
-        var comp = activeCompMeta();
-        S.activeId = comp.id;
-        return loadCompetition(comp).then(renderAll);
-      }).catch(function (e) {
+          var hoje = today();
+          var mostrarTodas = params.get('todas') === '1';
+
+          S.comps = list
+            .filter(function (c) {
+              if (mostrarTodas) return true;
+              if (c.visivelDe && hoje < c.visivelDe) return false;
+              if (c.visivelAte && hoje > c.visivelAte) return false;
+              return true;
+            })
+            .sort(function (a, b) {
+              return String(a.ordemData || '9999-12-31').localeCompare(String(b.ordemData || '9999-12-31'));
+            });
+
+          if (!S.comps.length) throw new Error('Sem competições ativas neste momento.');
+          fromHash();
+          var comp = activeCompMeta();
+          S.activeId = comp.id;
+          return loadCompetition(comp).then(renderAll);
+        }).catch(function (e) {
         $('#list').innerHTML = '<li class="row"><div class="detail"><p>Não foi possível carregar os dados (' + esc(e.message) + ').</p></div></li>';
       });
 
