@@ -218,7 +218,7 @@
     .rk.crit1 { color: var(--blue); }
     .rk.nocfull, .row.out .rk { color: var(--muted); font-size: 22px; }
 
-    .who { display: flex; flex-direction: column; min-width: 0; }
+    .who { display: flex; flex-direction: column; min-width: 0; align-items: flex-start; gap: 3px; }
     .who b { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .who small { color: var(--muted); font-size: 12px; }
     .noc-tag {
@@ -1023,8 +1023,7 @@
             html += '<li class="' + rowCls + '">' +
               '<div class="rowgrid">' +
               '<span class="' + rkCls + '">' + rkTxt + '</span>' +
-              '<span class="who"><b>' + esc(r.ath.nome) + nocBadge(r.ath.noc, isPor) + '</b>' +
-              '<small>' + (isCrit1 ? 'Final CM27: ' + r.crit1.finalRank + 'º · Q2: ' + r.crit1.q2Rank + 'º' : (r.nCont + ' de ' + sum.bestResultsCount + ' provas · máx. 2 em 2027')) + '</small></span>' +
+              '<span class="who"><b>' + esc(r.ath.nome) + '</b>' + nocBadge(r.ath.noc, isPor) + '</span>' +
               '<span class="cells" style="--cols:' + nWc + '">' + cells + '</span>' +
               totHtml +
               '<span class="st">' + chips + '</span>' +
@@ -1082,7 +1081,7 @@
             htmlFgp += '<li class="' + rowCls + '">' +
               '<div class="rowgrid">' +
               '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
-              '<span class="who"><b>' + esc(r.ath.nome) + nocBadge('POR', true) + '</b><small>Melhor série: ' + (r.bestScore ? fmt(r.bestScore) : '—') + ' · D max: ' + (r.bestD ? fmt(r.bestD) : '—') + '</small></span>' +
+              '<span class="who"><b>' + esc(r.ath.nome) + '</b><small>Melhor série: ' + (r.bestScore ? fmt(r.bestScore) : '—') + '</small><small>D max: ' + (r.bestD ? fmt(r.bestD) : '—') + '</small></span>' +
               '<span class="cells" style="--cols:' + nAll + '">' + cells + '</span>' +
               '<span class="tot"><b>' + fmtPts(r.total) + '</b><small>' + r.nCont + ' provas</small></span>' +
               '<span class="st">' + chips + '</span>' +
