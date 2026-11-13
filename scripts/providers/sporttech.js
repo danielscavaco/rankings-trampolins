@@ -50,7 +50,10 @@ async function loadStages(competitionUrl, logLines) {
     if ((c.Title || '').toLowerCase() === 'test') continue;
     const disc = DISC_MAP[c.Discipline];
     if (!disc) continue;
-    const sexo = normalizeSex(c.SexCategory);
+
+    // Procura o género tanto em SexCategory como no Title (ex: "Individual Women")
+    const sexo = normalizeSex(`${c.SexCategory || ''} ${c.Title || ''}`);
+    // allowDefaultSenior: true permite provas internacionais sem "Senior" no título (ex: WC Cottbus)
     const escaloes = mapEscalaoText(`${c.AgeGroup || ''} ${c.Title || ''}`, { allowDefaultSenior: true });
     if (escaloes.length === 0) continue;
 
@@ -128,6 +131,12 @@ async function loadStages(competitionUrl, logLines) {
       });
     }
   }
+
+  if (stageList.length === 0) {
+    const rawComps = Object.values(comps).map(c => `"${c.Title}" (Disc:${c.Discipline}, Sex:${c.SexCategory}, Age:${c.AgeGroup})`).join(' | ');
+    logLines.push(`[DEBUG Sporttech] Competitions brutas na API: ${rawComps || 'nenhuma'}`);
+  }
+
   return stageList;
 }
 
