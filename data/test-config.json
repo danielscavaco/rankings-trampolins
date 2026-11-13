@@ -20,19 +20,19 @@
     "TRA": {
       "nome": "Trampolim Individual",
       "porEscalao": {
-        "SEN":   { "tipo": "late",    "vagas": 2, "minimos": { "F": { "q1": 51.50, "late": 53.0 }, "M": { "q1": 60.00, "late": 61.0 } } }
+        "SEN": { "tipo": "late", "vagas": 2, "minimos": { "F": { "q1": 51.50, "late": 53.0 }, "M": { "q1": 60.00, "late": 61.0 } } }
       }
     },
     "DMT": {
       "nome": "Duplo Mini-Trampolim",
       "porEscalao": {
-        "SEN":   { "tipo": "ne", "usarExcelencia": true, "vagas": 1, "minimos": { "F": { "base": 48.50, "ne": 27.00 }, "M": { "base": 55.50, "ne": 29.00 } } }
+        "SEN": { "tipo": "ne", "usarExcelencia": true, "vagas": 1, "minimos": { "F": { "base": 48.50, "ne": 27.00 }, "M": { "base": 55.50, "ne": 29.00 } } }
       }
     },
     "TUM": {
       "nome": "Tumbling",
       "porEscalao": {
-        "SEN":   { "tipo": "ne", "usarExcelencia": true, "vagas": 1, "minimos": { "F": { "base": 46.00, "ne": 24.00 }, "M": { "base": 52.00, "ne": 27.00 } } }
+        "SEN": { "tipo": "ne", "usarExcelencia": true, "vagas": 1, "minimos": { "F": { "base": 46.00, "ne": 24.00 }, "M": { "base": 52.00, "ne": 27.00 } } }
       }
     }
   }
