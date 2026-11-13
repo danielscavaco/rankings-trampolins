@@ -417,6 +417,11 @@
       vertical-align: -0.15em;
       margin-left: 3px;
     }
+
+    #trackerBox:empty,
+    #legendBox:empty {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -435,6 +440,7 @@
 
       <div class="controls">
         <div class="seg" role="tablist" aria-label="Sub-vista" id="tabsSub"></div>
+        <div class="seg" role="tablist" aria-label="Escalão" id="tabsAge" hidden></div>
         <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
         <div class="club-filter" id="clubFilterBox" hidden>
           <label for="clubFilter" class="hint">Clube</label>
@@ -647,6 +653,23 @@
       }
 
       /* ---------- menu lateral, cabeçalho e badge live contextual ---------- */
+      var S = {
+        comps: [],
+        activeId: '',
+        cache: {},
+        laView: 'fig',
+        disc: 'TRI',
+        age: '',
+        sex: 'F',
+        club: '',
+        detail: null,
+        ov: {},
+        simId: ''
+      };
+
+      var DISC_SHORT = { TRI: 'TRA', TRA: 'TRA', SYN: 'SYN', DMT: 'DMT', TUM: 'TUM' };
+      var AGE_ORDER = ['11-12', '13-14', 'JUN', '17-21', 'SEN'];
+
       function renderChrome(pack) {
         var comp = activeCompMeta();
         var cfg = pack.cfg;
@@ -660,25 +683,73 @@
 
         $('#eyebrow').textContent = 'Rankings · ' + comp.curto;
         $('#titulo').textContent = cfg.titulo || comp.nome;
+        $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
+
+        var tabsAge = $('#tabsAge');
 
         if (!isOlympic) {
           var dKeys = discKeysFor(cfg);
           if (!cfg.disciplinas[S.disc]) S.disc = dKeys[0];
-          $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
+
+          /* Disciplinas apenas com sigla curta (TRA / SYN / DMT / TUM) */
           $('#tabsSub').innerHTML = dKeys.map(function (d) {
-            return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(cfg.disciplinas[d].nome) + '</span></button>';
+            var label = DISC_SHORT[d] || d;
+            return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc && !S.club) + '">' + esc(label) + '</button>';
           }).join('');
+
+          /* Escalões: deteta se existem escalões nos atletas ou na config */
+          var ages = [];
+          if (Array.isArray(cfg.escaloes) && cfg.escaloes.length) {
+            ages = cfg.escaloes.slice();
+          } else if (Array.isArray(pack.ath)) {
+            pack.ath.forEach(function (a) {
+              var escVal = (a.escalao || a.age || '').trim().toUpperCase();
+              if (escVal && ages.indexOf(escVal) < 0) ages.push(escVal);
+            });
+          }
+          ages.sort(function (a, b) {
+            var ia = AGE_ORDER.indexOf(a), ib = AGE_ORDER.indexOf(b);
+            if (ia >= 0 && ib >= 0) return ia - ib;
+            if (ia >= 0) return -1;
+            if (ib >= 0) return 1;
+            return a.localeCompare(b, 'pt');
+          });
+
+          if (ages.length > 1) {
+            if (!S.age || ages.indexOf(S.age) < 0) S.age = ages[0];
+            tabsAge.hidden = false;
+            tabsAge.innerHTML = ages.map(function (ag) {
+              return '<button role="tab" type="button" data-age="' + esc(ag) + '" aria-selected="' + (ag === S.age && !S.club) + '">' + esc(ag) + '</button>';
+            }).join('');
+          } else {
+            S.age = ages[0] || '';
+            tabsAge.hidden = true;
+            tabsAge.innerHTML = '';
+          }
         } else {
-          $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
+          S.age = '';
+          tabsAge.hidden = true;
+          tabsAge.innerHTML = '';
           $('#tabsSub').innerHTML =
-            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">Internacional</span><span class="full">Ranking Internacional</span></button>' +
-            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">Nacional</span><span class="full">Ranking Nacional</span></button>';
+            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG</span><span class="full">Ranking Internacional (FIG)</span></button>' +
+            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP</span><span class="full">Ranking Nacional (FGP)</span></button>';
         }
 
-        $('#tabsSex').innerHTML = ['F', 'M'].map(function (s) {
-          return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex) + '">' + SEX[s] + '</button>';
+        /* Géneros disponíveis (compacto: F / M) */
+        var sexes = ['F', 'M'];
+        if (!isOlympic && Array.isArray(pack.ath) && pack.ath.length) {
+          var foundSexes = ['F', 'M'].filter(function (sx) {
+            return pack.ath.some(function (a) { return a.sexo === sx; });
+          });
+          if (foundSexes.length) sexes = foundSexes;
+        }
+        if (sexes.indexOf(S.sex) < 0) S.sex = sexes[0];
+
+        $('#tabsSex').innerHTML = sexes.map(function (s) {
+          return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex && !S.club) + '">' + s + '</button>';
         }).join('');
 
+        /* Filtro de Clube */
         var clubBox = $('#clubFilterBox');
         if (!isOlympic && Array.isArray(pack.ath)) {
           var clubs = [];
@@ -689,7 +760,7 @@
           clubs.sort(function (a, b) { return a.localeCompare(b, 'pt'); });
           if (S.club && clubs.indexOf(S.club) < 0) S.club = '';
           clubBox.hidden = clubs.length === 0;
-          $('#clubFilter').innerHTML = '<option value="">Todos os clubes (por disciplina)</option>' +
+          $('#clubFilter').innerHTML = '<option value="">Todos os clubes</option>' +
             clubs.map(function (c) {
               return '<option value="' + esc(c) + '"' + (c === S.club ? ' selected' : '') + '>' + esc(c) + '</option>';
             }).join('');
@@ -698,7 +769,6 @@
           clubBox.hidden = true;
         }
 
-        /* Só mostra "Resultados em direto" se uma prova DESTA competição estiver a decorrer */
         var hasLiveEvent = Array.isArray(cfg.eventos) && cfg.eventos.some(function (ev) { return evState(ev) === 'live'; });
         var isLive = Boolean(cfg.liveManual || pack.meta.live || (params.get('live') === '1' && comp.id === 'eg27') || hasLiveEvent);
         $('#liveBadge').hidden = !isLive;
@@ -713,7 +783,10 @@
       }
 
       function computeEG(comp, pack) {
-        var en = pack.ath.filter(function (a) { return a.disc === S.disc && a.sexo === S.sex; });
+        var en = pack.ath.filter(function (a) {
+          var matchAge = !S.age || !a.escalao || a.escalao.toUpperCase() === S.age;
+          return a.disc === S.disc && a.sexo === S.sex && matchAge;
+        });
         var ovObj = getOvEG(comp.id);
         var hasAnyOv = Object.keys(ovObj).some(function (e) { return Object.keys(ovObj[e]).length; });
         var ov = hasAnyOv ? ovObj : null;
@@ -1262,6 +1335,17 @@
           syncHash();
           renderAll();
         }
+      });
+
+      $('#tabsAge').addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-age]');
+        if (!b) return;
+        S.age = b.dataset.age;
+        S.club = '';
+        S.simId = '';
+        S.detail = null;
+        syncHash();
+        renderAll();
       });
 
       $('#tabsSex').addEventListener('click', function (e) {
