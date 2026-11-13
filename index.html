@@ -20,6 +20,11 @@
       --accent: #8B1A22;
       --sidebar-bg: #8B1A22;
       --sidebar-ink: #FFFFFF;
+      --sidebar-active-bg: #FFFFFF;
+      --sidebar-active-ink: #8B1A22;
+      --sidebar-hover: rgb(255 255 255 / .12);
+      --sidebar-muted: rgb(255 255 255 / .82);
+      --sidebar-line: rgb(255 255 255 / .18);
       --accent-soft: #F7DFE1;
       --on-accent: #FFFFFF;
       --good: #146B3A;
@@ -43,8 +48,13 @@
         --muted: #AC9698;
         --line: #3E2A2D;
         --accent: #E26B74;
-        --sidebar-bg: #691218;
-        --sidebar-ink: #FFF5F5;
+        --sidebar-bg: #E26B74;
+        --sidebar-ink: #24090B;
+        --sidebar-active-bg: #24090B;
+        --sidebar-active-ink: #FFF5F5;
+        --sidebar-hover: rgb(36 9 11 / .12);
+        --sidebar-muted: rgb(36 9 11 / .82);
+        --sidebar-line: rgb(36 9 11 / .18);
         --accent-soft: #461B20;
         --on-accent: #24090B;
         --good: #5ED08C;
@@ -109,7 +119,7 @@
       align-items: center;
       gap: 6px;
       padding: 0 4px 12px;
-      border-bottom: 1px solid rgb(255 255 255 / .18);
+      border-bottom: 1px solid var(--sidebar-line);
     }
     .sb-nav {
       display: flex;
@@ -130,26 +140,26 @@
       padding: 10px 12px;
       border-radius: 8px;
       cursor: pointer;
-      color: rgb(255 255 255 / .82);
+      color: var(--sidebar-muted);
       transition: background .12s, color .12s;
     }
-    .sb-btn:hover { background: rgb(255 255 255 / .12); color: #FFFFFF; }
+    .sb-btn:hover { background: var(--sidebar-hover); color: var(--sidebar-ink); }
     .sb-btn[aria-current="page"] {
-      background: #FFFFFF;
-      color: #8B1A22;
+      background: var(--sidebar-active-bg);
+      color: var(--sidebar-active-ink);
       box-shadow: 0 2px 6px rgb(0 0 0 / .18);
     }
     .sb-btn b { font-weight: 600; font-size: 14px; line-height: 1.25; }
     .sb-btn small { font-size: 11px; opacity: 0.85; }
-    .sb-btn:focus-visible { outline-color: #FFFFFF; }
+    .sb-btn:focus-visible { outline-color: var(--sidebar-ink); }
 
     .sb-footer {
       padding: 12px 4px 0;
-      border-top: 1px solid rgb(255 255 255 / .18);
+      border-top: 1px solid var(--sidebar-line);
       font-size: 12px;
-      color: rgb(255 255 255 / .78);
+      color: var(--sidebar-muted);
     }
-    .sb-footer b { color: #FFFFFF; font-weight: 600; }
+    .sb-footer b { color: var(--sidebar-ink); font-weight: 600; }
 
     .main-wrap {
       flex: 1;
@@ -170,7 +180,7 @@
     }
 
     header { display: flex; flex-direction: column; gap: 6px; }
-    .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    .eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
     h1 { font-size: clamp(32px, 5vw, 44px); line-height: 1; }
     .sub { color: var(--muted); max-width: 68ch; margin: 0; }
 
@@ -489,7 +499,7 @@
 <body>
   <div class="shell">
     <aside class="sidebar" aria-label="Competições">
-      <div class="sb-brand">Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
+      <div class="sb-brand">Rankings Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
       <nav class="sb-nav" id="navComp"></nav>
       <div class="sb-footer">© 2026 <b>Daniel Cavaco</b></div>
     </aside>
@@ -497,8 +507,8 @@
     <div class="main-wrap">
       <div class="main">
         <header>
-          <div class="eyebrow" id="eyebrow">Rankings · Trampolins</div>
           <h1 id="titulo">Rankings Trampolins</h1>
+          <div class="eyebrow" id="eyebrow">OG 2028</div>
           <p class="sub" id="sub"></p>
         </header>
 
@@ -524,11 +534,11 @@
         <section class="panel" aria-labelledby="simh">
           <div class="pbody" style="padding-top:16px">
             <h2 id="simh">Simulador</h2>
-            <p class="hint" id="simHint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
+            <p class="hint" id="simHint">Escolhe um ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
             <div class="simbar">
               <label for="simAth" class="hint">Ginasta</label>
               <select id="simAth"></select>
-              <button class="btn" id="simReset" type="button">Repor esta ginasta</button>
+              <button class="btn" id="simReset" type="button">Repor este ginasta</button>
               <button class="btn" id="simResetAll" type="button">Repor tudo</button>
             </div>
             <div class="simrows" id="simRows"></div>
@@ -883,8 +893,8 @@
             '<b>' + esc(c.nome) + '</b><small>' + esc(c.curto) + '</small></button>';
         }).join('');
 
-        $('#eyebrow').textContent = 'Rankings · ' + comp.curto;
         $('#titulo').textContent = cfg.titulo || comp.nome;
+        $('#eyebrow').textContent = comp.curto;
         $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
 
         var tabsAge = $('#tabsAge');
@@ -925,8 +935,8 @@
           tabsAge.hidden = true;
           tabsAge.innerHTML = '';
           $('#tabsSub').innerHTML =
-            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG</span><span class="full">Ranking Internacional (FIG)</span></button>' +
-            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP</span><span class="full">Ranking Nacional (FGP)</span></button>';
+            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">Internacional</span><span class="full">Ranking Internacional</span></button>' +
+            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">Nacional</span><span class="full">Ranking Nacional</span></button>';
         }
 
         if (validSexes.indexOf(S.sex) < 0) S.sex = validSexes[0] || sexes[0];
@@ -1342,7 +1352,7 @@
       }
 
       function renderSimEG(comp, pack, C) {
-        $('#simHint').textContent = 'Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.';
+        $('#simHint').textContent = 'Escolhe um ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.';
         var sel = $('#simAth'), R = C.R;
         sel.innerHTML = '<option value="">Escolher…</option>' + C.entries.map(function (e) {
           return '<option value="' + esc(e.id) + '"' + (e.id === S.simId ? ' selected' : '') + '>' + esc(e.nome) + '</option>';
@@ -1394,9 +1404,9 @@
         if (S.laView === 'fig') {
           $('#facts').innerHTML =
             '<div class="fact"><span>Vagas Totais</span><b>' + sum.totalQuotas + '</b></div>' +
-            '<div class="fact blue"><span>Critério 1 (CM 27)</span><b>' + sum.crit1Count + '</b></div>' +
+            '<div class="fact blue"><span>Critério 1</span><b>' + sum.crit1Count + '</b></div>' +
             '<div class="fact good"><span>Critério 2 Garantidas</span><b>' + sum.safeCrit2Slots + '</b></div>' +
-            '<div class="fact warn"><span>Zona de Corte (Amarelo)</span><b>' + sum.bubbleCrit2Slots + '</b></div>';
+            '<div class="fact warn"><span>Zona de Corte</span><b>' + sum.bubbleCrit2Slots + '</b></div>';
 
           var cleanTrackerLabel = function (lbl) {
             return String(lbl || '')
@@ -1425,16 +1435,16 @@
 
           $('#trackerBox').innerHTML = trackersList.length
             ? '<div class="quota-tracker">' +
-              '<div class="qt-head"><span><b>Vagas reservadas (Critério 3 Continental + Anfitrião):</b> ' + sum.reservedSlots + ' ' + (sum.reservedSlots === 1 ? 'vaga reservada' : 'vagas reservadas') + ' (explicam a zona amarela; rasuram-se ao conquistar vaga)</span></div>' +
+              '<div class="qt-head"><span><b>Vagas reservadas (Critério 3 Continental + Anfitrião):</b> ' + sum.reservedSlots + ' ' + (sum.reservedSlots === 1 ? 'vaga reservada' : 'vagas reservadas') + '</span></div>' +
               '<div class="qt-pills">' + pillsHtml + '</div>' +
               '</div>'
             : '';
 
           $('#legendBox').innerHTML =
             '<div class="legend">' +
-            '<span class="leg-item"><i class="leg-swatch blue"></i>Critério 1 (Mundial 2027 — ordenado por Q2)</span>' +
+            '<span class="leg-item"><i class="leg-swatch blue"></i>Critério 1 (Campeonato do Mundo 2027)</span>' +
             '<span class="leg-item"><i class="leg-swatch good"></i>Critério 2 Garantido (Taças do Mundo)</span>' +
-            '<span class="leg-item"><i class="leg-swatch warn"></i>Zona de Corte (dependente das uniões continentais / ' + esc(sum.hostNoc) + ' ainda por preencher)</span>' +
+            '<span class="leg-item"><i class="leg-swatch warn"></i>Zona de Corte</span>' +
             '</div>';
 
           var nWc = R.wcEvents.length;
