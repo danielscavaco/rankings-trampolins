@@ -7,7 +7,7 @@
     {
       "id": "cottbus",
       "nome": "Taça do Mundo",
-      "curto": "Cottbus",
+      "curto": "TM Cottbus",
       "local": "Cottbus (GER)",
       "datas": "16–18 out 2026",
       "inicio": "2026-10-16",
@@ -21,7 +21,7 @@
     {
       "id": "nanjing",
       "nome": "Campeonato do Mundo",
-      "curto": "Nanjing",
+      "curto": "CM Nanjing",
       "local": "Nanjing (CHN)",
       "datas": "4–8 nov 2026",
       "inicio": "2026-11-04",
@@ -35,7 +35,7 @@
     {
       "id": "apur1",
       "nome": "Prova de Apuramento",
-      "curto": "Apur. mar/abr",
+      "curto": "Apuramento",
       "local": "A definir",
       "datas": "março / abril 2027",
       "inicio": null,
@@ -63,7 +63,7 @@
     {
       "id": "apur2",
       "nome": "Prova de Apuramento",
-      "curto": "Apur. abr/mai",
+      "curto": "Apuramento",
       "local": "A definir",
       "datas": "abril / maio 2027",
       "inicio": null,
@@ -90,8 +90,8 @@
     }
   ],
   "disciplinas": {
-    "TRI": { "nome": "Trampolim individual", "sigla": "TRI", "tipo": "late", "vagas": 2 },
-    "DMT": { "nome": "Duplo minitrampolim", "sigla": "DMT", "tipo": "ne", "vagas": 1 },
+    "TRI": { "nome": "Trampolim Individual", "sigla": "TRI", "tipo": "late", "vagas": 2 },
+    "DMT": { "nome": "Duplo Minitrampolim", "sigla": "DMT", "tipo": "ne", "vagas": 1 },
     "TUM": { "nome": "Tumbling", "sigla": "TUM", "tipo": "ne", "vagas": 1 }
   },
   "minimos": {
