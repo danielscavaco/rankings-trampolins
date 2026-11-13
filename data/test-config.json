@@ -1,0 +1,43 @@
+{
+  "titulo": "Ensaio Live — Nacional de Trampolins",
+  "local": "Portugal (Teste Sporttech)",
+  "datas": "Ensaio Técnico",
+  "liveManual": true,
+  "escaloes": ["11-12", "13-14", "JUN", "17-21", "SEN"],
+  "eventos": [
+    {
+      "id": "cn_teste",
+      "nome": "Campeonato Nacional (Ensaio Live)",
+      "curto": "CN Teste",
+      "datas": "Ensaio",
+      "inicio": "2026-01-01",
+      "fim": "2026-12-31",
+      "disciplinas": ["TRI", "SYN"],
+      "escaloes": ["11-12", "13-14", "JUN", "17-21", "SEN"]
+    }
+  ],
+  "disciplinas": {
+    "TRI": {
+      "tipo": "late",
+      "vagas": 4,
+      "porEscalao": {
+        "11-12": { "vagas": 4, "minimos": { "F": { "q1": 75.0, "late": 42.0 }, "M": { "q1": 75.0, "late": 42.0 } } },
+        "13-14": { "vagas": 4, "minimos": { "F": { "q1": 80.0, "late": 45.0 }, "M": { "q1": 80.0, "late": 45.0 } } },
+        "JUN":   { "vagas": 4, "minimos": { "F": { "q1": 86.0, "late": 49.0 }, "M": { "q1": 88.0, "late": 51.0 } } },
+        "17-21": { "vagas": 4, "minimos": { "F": { "q1": 86.0, "late": 49.0 }, "M": { "q1": 89.0, "late": 52.0 } } },
+        "SEN":   { "vagas": 4, "minimos": { "F": { "q1": 90.0, "late": 52.0 }, "M": { "q1": 96.0, "late": 56.0 } } }
+      }
+    },
+    "SYN": {
+      "tipo": "late",
+      "vagas": 2,
+      "porEscalao": {
+        "11-12": { "vagas": 2, "minimos": { "F": { "q1": 65.0, "late": 36.0 }, "M": { "q1": 65.0, "late": 36.0 }, "Mix": { "q1": 65.0, "late": 36.0 } } },
+        "13-14": { "vagas": 2, "minimos": { "F": { "q1": 70.0, "late": 39.0 }, "M": { "q1": 70.0, "late": 39.0 } } },
+        "JUN":   { "vagas": 2, "minimos": { "F": { "q1": 75.0, "late": 42.0 }, "M": { "q1": 76.0, "late": 43.0 } } },
+        "17-21": { "vagas": 2, "minimos": { "F": { "q1": 75.0, "late": 42.0 }, "M": { "q1": 77.0, "late": 44.0 } } },
+        "SEN":   { "vagas": 2, "minimos": { "F": { "q1": 78.0, "late": 45.0 }, "M": { "q1": 82.0, "late": 48.0 } } }
+      }
+    }
+  }
+}
