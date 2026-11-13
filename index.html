@@ -24,6 +24,8 @@
       --on-accent: #FFFFFF;
       --good: #146B3A;
       --good-soft: #DCF0E4;
+      --blue: #15589C;
+      --blue-soft: #DCEBFA;
       --warn: #946300;
       --warn-soft: #FBEEC8;
       --bad: #9E1C24;
@@ -45,6 +47,8 @@
         --on-accent: #24090B;
         --good: #5ED08C;
         --good-soft: #173A27;
+        --blue: #6DB3F8;
+        --blue-soft: #162E47;
         --warn: #F0C24B;
         --warn-soft: #3D2E0D;
         --bad: #F38B80;
@@ -65,7 +69,7 @@
       padding-right: max(16px, env(safe-area-inset-right, 0px));
     }
     [hidden] { display: none !important; }
-    .wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
     h1, h2, h3 { font-family: var(--f-display); font-weight: 600; letter-spacing: .01em; margin: 0; text-wrap: balance; }
     button, select, input { font: inherit; color: inherit; }
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
@@ -76,9 +80,9 @@
     h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1; }
     .sub { color: var(--muted); max-width: 68ch; margin: 0; }
 
-    .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
     .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; }
-    .seg button { border: 0; background: transparent; padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
+    .seg button { border: 0; background: transparent; padding: 8px 15px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
     .seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); box-shadow: 0 1px 2px rgb(0 0 0 / .16); }
     .seg .full { display: none; }
     @media (min-width: 560px) { .seg .full { display: inline; } .seg .short { display: none; } }
@@ -87,64 +91,87 @@
     .fact { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; display: flex; gap: 8px; align-items: baseline; }
     .fact span { font-size: 12px; color: var(--muted); }
     .fact b { font-family: var(--f-display); font-size: 20px; font-weight: 600; line-height: 1; }
+    .fact.blue b { color: var(--blue); }
+    .fact.good b { color: var(--good); }
+    .fact.warn b { color: var(--warn); }
 
-    .note { border-radius: 8px; padding: 10px 14px; background: var(--warn-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent); }
-    .note b { color: var(--warn); }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12.5px; color: var(--muted); align-items: center; }
+    .leg-item { display: inline-flex; align-items: center; gap: 6px; }
+    .leg-swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+    .leg-swatch.blue { background: var(--blue-soft); border: 1px solid var(--blue); }
+    .leg-swatch.good { background: var(--good-soft); border: 1px solid var(--good); }
+    .leg-swatch.warn { background: var(--warn-soft); border: 1px solid var(--warn); }
 
     /* Lista de seriação */
     .board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
     .board ol { list-style: none; margin: 0; padding: 0; }
-    .head, .rowgrid { display: grid; grid-template-columns: 44px minmax(150px, 1.5fr) minmax(0, 3.6fr) 104px 146px; gap: 0 12px; align-items: center; padding: 10px 16px; }
+    .head, .rowgrid { display: grid; grid-template-columns: 44px minmax(160px, 1.5fr) minmax(0, 3.8fr) 96px 175px; gap: 0 12px; align-items: center; padding: 10px 16px; }
     .head { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); align-items: end; }
-    .cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .cells.c6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .cells.c7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
     .hcell { display: flex; flex-direction: column; gap: 1px; text-transform: none; letter-spacing: 0; }
-    .hcell b { font-weight: 600; color: var(--ink); font-size: 12.5px; }
-    .hcell i { font-style: normal; font-size: 11px; }
+    .hcell b { font-weight: 600; color: var(--ink); font-size: 12px; }
+    .hcell i { font-style: normal; font-size: 10.5px; }
     .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; background: var(--muted); }
     .dot.done { background: var(--good); }
     .dot.live { background: var(--accent); }
 
     .row { border-top: 1px solid var(--line); }
-    .rowgrid { width: 100%; min-height: 60px; }
-    .rk { font-family: var(--f-display); font-size: 28px; font-weight: 600; line-height: 1; color: var(--ink); }
+    .row.st-crit1 { background: color-mix(in srgb, var(--blue-soft) 32%, var(--surface)); }
+    .row.st-safe  { background: color-mix(in srgb, var(--good-soft) 28%, var(--surface)); }
+    .row.st-bubble { background: color-mix(in srgb, var(--warn-soft) 35%, var(--surface)); }
+    .row.st-por   { box-shadow: inset 3px 0 0 var(--accent); }
+
+    .rowgrid { width: 100%; min-height: 58px; }
+    .rk { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1; color: var(--ink); }
     .row.out .rk { color: var(--muted); font-size: 22px; }
     .who { display: flex; flex-direction: column; min-width: 0; }
-    .who b { font-weight: 600; overflow-wrap: anywhere; }
+    .who b { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .who small { color: var(--muted); font-size: 12px; }
+    .noc-tag { font-size: 10.5px; font-weight: 600; letter-spacing: .04em; padding: 1px 6px; border-radius: 4px; background: var(--surface-2); color: var(--muted); }
+    .noc-tag.por { background: var(--accent-soft); color: var(--accent); }
 
     .cell {
-      padding: 5px 8px;
+      padding: 5px 7px;
       border-radius: 6px;
       font-variant-numeric: tabular-nums;
       color: var(--muted);
       min-height: 30px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 4px;
       border: 0;
       background: transparent;
       text-align: left;
+      font-size: 13px;
     }
     button.cell { cursor: pointer; transition: transform .08s, box-shadow .12s; }
     button.cell:hover { filter: brightness(0.96); }
     button.cell[aria-expanded="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
-    .cell::before { content: attr(data-l); display: none; font-size: 11px; margin-right: 6px; color: var(--muted); }
+    .cell::before { content: attr(data-l); display: none; font-size: 11px; margin-right: 4px; color: var(--muted); }
     .cell.cont { background: var(--good-soft); color: var(--good); font-weight: 600; }
     .cell.ok { box-shadow: inset 0 0 0 1px var(--muted); color: var(--ink); }
     .cell.nc .val { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
     .cell.sim { background: var(--sim-soft); box-shadow: inset 0 0 0 1.5px var(--sim); }
+    .cell .subrk { font-size: 10.5px; opacity: 0.78; font-weight: 400; }
 
     .tot { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
-    .tot b { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
-    .tot small { font-size: 11.5px; color: var(--muted); }
+    .tot b { font-family: var(--f-display); font-size: 25px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+    .tot small { font-size: 11px; color: var(--muted); }
 
     .st { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
     .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 9px; font-size: 11.5px; font-weight: 500; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+    .chip.crit1 { background: var(--blue-soft); color: var(--blue); }
     .chip.vaga { background: var(--good-soft); color: var(--good); }
+    .chip.bubble { background: var(--warn-soft); color: var(--warn); }
     .chip.min { background: var(--accent-soft); color: var(--accent); }
     .chip.simc { background: var(--sim-soft); color: var(--sim); }
     .chip.tie { background: var(--warn-soft); color: var(--warn); white-space: normal; line-height: 1.25; border-radius: 6px; padding: 3px 8px; }
 
     .cut { padding: 6px 16px; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--good); background: var(--good-soft); border-top: 1px solid var(--line); display: flex; justify-content: space-between; }
+    .cut.bubble { color: var(--warn); background: var(--warn-soft); }
     .gap { font-size: 12px; color: var(--muted); }
 
     /* Gaveta de detalhe técnico por prova */
@@ -168,10 +195,8 @@
     .detail-notes li.pend b { color: var(--warn); }
 
     /* Painéis e simulador */
-    details.panel, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
     .pbody { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
-    .pbody p { margin: 0; max-width: 75ch; }
-
     .simbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     select { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 38px; max-width: 100%; }
     .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; cursor: pointer; min-height: 38px; font-weight: 500; }
@@ -232,7 +257,7 @@
       100% { box-shadow: 0 0 0 0 transparent; }
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 840px) {
       .head { display: none; }
       .rowgrid {
         grid-template-columns: 36px minmax(0, 1fr) auto;
@@ -244,8 +269,8 @@
       .who { grid-area: who; }
       .tot { grid-area: tot; }
       .st { grid-area: st; flex-direction: row; flex-wrap: wrap; }
-      .cells { grid-area: cells; grid-template-columns: 1fr 1fr; }
-      .cell { flex-wrap: wrap; }
+      .cells, .cells.c6, .cells.c7 { grid-area: cells; grid-template-columns: repeat(2, 1fr); }
+      .cell { flex-wrap: wrap; justify-content: flex-start; }
       .cell::before { display: inline; }
       .detail { padding: 10px 14px 14px; }
       .simrow { grid-template-columns: 1fr; }
@@ -270,23 +295,26 @@
     </header>
 
     <div class="controls">
-      <div class="seg" role="tablist" aria-label="Especialidade" id="tabsDisc"></div>
+      <div class="seg" role="tablist" aria-label="Competição" id="tabsComp">
+        <button role="tab" type="button" data-comp="eg27" aria-selected="true">Jogos Europeus 2027</button>
+        <button role="tab" type="button" data-comp="la28" aria-selected="false">Jogos Olímpicos 2028</button>
+      </div>
+      <div class="seg" role="tablist" aria-label="Sub-vista" id="tabsSub"></div>
       <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
     </div>
 
     <div class="facts" id="facts"></div>
-    <div id="banner"></div>
+    <div id="legendBox"></div>
 
     <section class="board" aria-label="Seriação">
       <div class="head" id="head"></div>
-      <div id="cut0"></div>
       <ol id="list"></ol>
     </section>
 
     <section class="panel" aria-labelledby="simh">
       <div class="pbody" style="padding-top:16px">
         <h2 id="simh">Simulador</h2>
-        <p class="hint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
+        <p class="hint" id="simHint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
         <div class="simbar">
           <label for="simAth" class="hint">Ginasta</label>
           <select id="simAth"></select>
@@ -312,7 +340,17 @@
     (function () {
       'use strict';
       var A = window.Apuramento;
-      var S = { cfg: null, ath: [], res: {}, meta: {}, disc: 'TRI', sex: 'F', detail: null, ov: {}, simId: '' };
+      var S = {
+        comp: 'eg27', /* 'eg27' | 'la28' */
+        laView: 'fig', /* 'fig' | 'fgp' */
+        cfg: null, ath: [], res: {}, meta: {},
+        laCfg: null,
+        disc: 'TRI', sex: 'F',
+        detail: null,
+        ov: {},
+        laOv: { F: {}, M: {} },
+        simId: ''
+      };
       var $ = function (s) { return document.querySelector(s); };
       var nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
       var fmt = function (n) { return n === null || n === undefined ? '—' : nf.format(n); };
@@ -338,8 +376,12 @@
 
       var STATE_L = { done: 'concluída', live: 'a decorrer', future: 'por realizar' };
       function hasOv() { return Object.keys(S.ov).some(function (e) { return Object.keys(S.ov[e]).length; }); }
+      function hasLaOv() {
+        return ['F', 'M'].some(function (sx) {
+          return Object.keys(S.laOv[sx]).some(function (ev) { return Object.keys(S.laOv[sx][ev]).length; });
+        });
+      }
 
-      /* ---------- dados ---------- */
       function getJSON(u) {
         return fetch(u, { cache: 'no-cache' }).then(function (r) {
           if (!r.ok) throw new Error(u);
@@ -350,43 +392,77 @@
       var params = new URLSearchParams(location.search);
       var resFile = params.get('teste') === '1' ? 'data/test-live.json' : 'data/results.json';
 
-      Promise.all([getJSON('data/config.json'), getJSON('data/athletes.json'), getJSON(resFile)]).then(function (a) {
+      Promise.all([
+        getJSON('data/config.json'),
+        getJSON('data/athletes.json'),
+        getJSON(resFile),
+        getJSON('data/la28-test.json').catch(function () { return null; })
+      ]).then(function (a) {
         S.cfg = a[0];
         S.ath = a[1];
         S.res = a[2].resultados || {};
         S.meta = a[2];
+        S.laCfg = a[3];
         fromHash();
         renderAll();
       }).catch(function (e) {
-        $('#list').innerHTML = '<li class="row"><div class="detail"><p>Não foi possível carregar os dados (' + esc(e.message) + '). Recarrega a página; se continuar, os ficheiros em data/ não estão acessíveis.</p></div></li>';
+        $('#list').innerHTML = '<li class="row"><div class="detail"><p>Não foi possível carregar os dados (' + esc(e.message) + ').</p></div></li>';
       });
 
       function fromHash() {
         var h = (location.hash || '').replace('#', '').toLowerCase().split('-');
-        if (h.length === 2 && S.cfg.disciplinas[h[0].toUpperCase()] && SEX[h[1].toUpperCase()]) {
+        if (h[0] === 'la28') {
+          S.comp = 'la28';
+          if (h[1] === 'fgp' || h[1] === 'fig') S.laView = h[1];
+          if (h[2] && SEX[h[2].toUpperCase()]) S.sex = h[2].toUpperCase();
+        } else if (h.length === 2 && S.cfg.disciplinas[h[0].toUpperCase()] && SEX[h[1].toUpperCase()]) {
+          S.comp = 'eg27';
           S.disc = h[0].toUpperCase();
           S.sex = h[1].toUpperCase();
         }
       }
 
-      window.addEventListener('hashchange', function () {
-        fromHash();
-        S.simId = '';
-        S.detail = null;
-        renderAll();
-      });
-
-      function setView(d, s) {
-        S.disc = d;
-        S.sex = s;
-        S.simId = '';
-        S.detail = null;
-        try { history.replaceState(null, '', '#' + d.toLowerCase() + '-' + s.toLowerCase()); }
-        catch (e) { location.hash = d.toLowerCase() + '-' + s.toLowerCase(); }
-        renderAll();
+      function syncHash() {
+        var hash = S.comp === 'la28'
+          ? ('#la28-' + S.laView + '-' + S.sex.toLowerCase())
+          : ('#' + S.disc.toLowerCase() + '-' + S.sex.toLowerCase());
+        try { history.replaceState(null, '', hash); }
+        catch (e) { location.hash = hash; }
       }
 
-      function compute() {
+      /* ---------- cabeçalho e separadores ---------- */
+      function renderTop() {
+        document.querySelectorAll('#tabsComp button').forEach(function (b) {
+          b.setAttribute('aria-selected', String(b.dataset.comp === S.comp));
+        });
+
+        if (S.comp === 'eg27') {
+          var c = S.cfg;
+          $('#titulo').textContent = 'Jogos Europeus 2027';
+          $('#sub').textContent = c.local + ' · ' + c.datas;
+          $('#tabsSub').innerHTML = DISC_ORDER.map(function (d) {
+            return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(c.disciplinas[d].nome) + '</span></button>';
+          }).join('');
+        } else {
+          $('#titulo').textContent = 'Jogos Olímpicos 2028';
+          $('#sub').textContent = (S.laCfg ? (S.laCfg.local + ' · ' + S.laCfg.datas) : 'Los Angeles 2028') + ' · Trampolim Individual (TRI)';
+          $('#tabsSub').innerHTML =
+            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG (Vagas)</span><span class="full">Ranking Internacional (FIG)</span></button>' +
+            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP (Nacional)</span><span class="full">Ranking Nacional (FGP)</span></button>';
+        }
+
+        $('#tabsSex').innerHTML = ['F', 'M'].map(function (s) {
+          return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex) + '">' + SEX[s] + '</button>';
+        }).join('');
+
+        var isLive = Boolean(S.cfg && (S.cfg.liveManual || S.meta.live || params.get('live') === '1' || S.cfg.eventos.some(function (ev) { return evState(ev) === 'live'; })));
+        $('#liveBadge').hidden = !isLive;
+      }
+
+      /* =====================================================================
+         RENDERIZAÇÃO JOGOS EUROPEUS 2027
+         ===================================================================== */
+      function computeEG() {
         var en = S.ath.filter(function (a) { return a.disc === S.disc && a.sexo === S.sex; });
         var ov = hasOv() ? S.ov : null;
         var R = A.rank(S.cfg, S.disc, S.sex, en, S.res, ov);
@@ -396,23 +472,7 @@
         return { R: R, br: br, entries: en };
       }
 
-      /* ---------- cabeçalho, separadores e badge live ---------- */
-      function renderTop() {
-        var c = S.cfg;
-        $('#sub').textContent = c.local + ' · ' + c.datas;
-        $('#tabsDisc').innerHTML = DISC_ORDER.map(function (d) {
-          return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(c.disciplinas[d].nome) + '</span></button>';
-        }).join('');
-        $('#tabsSex').innerHTML = ['F', 'M'].map(function (s) {
-          return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex) + '">' + SEX[s] + '</button>';
-        }).join('');
-
-        var isLive = Boolean(c.liveManual || S.meta.live || params.get('live') === '1' || c.eventos.some(function (ev) { return evState(ev) === 'live'; }));
-        $('#liveBadge').hidden = !isLive;
-      }
-
-      /* ---------- detalhe técnico por prova (tabela de rotinas) ---------- */
-      function renderDetailDrawer(r, ev, dc) {
+      function renderDetailDrawerEG(r, ev, dc) {
         var p = r.per[ev.id];
         var rec = p.rec || {};
         var rot = rec.rotinas || {};
@@ -421,7 +481,6 @@
         html += '<button type="button" class="detail-close" data-close-detail="1">Fechar</button></div>';
 
         if (p.simulated) {
-          /* Na simulação não se mostram parciais reais; mostra-se apenas os valores simulados */
           var simRows = dc.tipo === 'late'
             ? [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']]
             : [['q1', 'Q1'], ['f1', 'Final 1'], ['f2', 'Final 2'], ['ne', 'Nota de excelência']];
@@ -453,9 +512,7 @@
             var extraNeKeys = ['q2', 'tf', 'aa'];
             phases = allNePhases.filter(function (ph) {
               var k = ph[0];
-              if (extraNeKeys.indexOf(k) >= 0) {
-                return p.neReached && p.nePhase === k;
-              }
+              if (extraNeKeys.indexOf(k) >= 0) return p.neReached && p.nePhase === k;
               return true;
             });
           }
@@ -511,9 +568,8 @@
         return html;
       }
 
-      /* ---------- lista ---------- */
-      function renderBoard() {
-        var C = compute(), R = C.R, cfg = S.cfg, d = S.disc, dc = cfg.disciplinas[d];
+      function renderBoardEG() {
+        var C = computeEG(), R = C.R, cfg = S.cfg, d = S.disc, dc = cfg.disciplinas[d];
         var m = R.minimos;
         var minTxt = dc.tipo === 'late'
           ? ('Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late))
@@ -522,6 +578,7 @@
         $('#facts').innerHTML =
           '<div class="fact"><span>Vagas</span><b>' + R.vagas + '</b></div>' +
           '<div class="fact"><span>Mínimos</span><b class="tn" style="font-size:16px">' + minTxt + '</b></div>';
+        $('#legendBox').innerHTML = '';
 
         $('#head').innerHTML = '<span>#</span><span>Ginasta</span><span class="cells">' + R.eventos.map(function (ev) {
           var st = evState(ev);
@@ -569,9 +626,7 @@
             chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
           }
 
-          if (r.tieReason) {
-            chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
-          }
+          if (r.tieReason) chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
 
           if (sim) {
             var b = C.br[id], delta = '';
@@ -606,7 +661,7 @@
             '<span class="who"><b>' + esc(r.entry.nome) + '</b><small>' + sub + '</small>' + gap + '</span>' +
             '<span class="cells">' + cells + '</span>' +
             '<span class="tot">' + tot + '</span><span class="st">' + chips + '</span></div>' +
-            (openEv ? renderDetailDrawer(r, openEv, dc) : '') +
+            (openEv ? renderDetailDrawerEG(r, openEv, dc) : '') +
             '</li>';
 
           var next = R.rows[i + 1];
@@ -617,17 +672,17 @@
         });
 
         $('#list').innerHTML = html || '<li class="row"><div class="detail"><p class="none">Sem ginastas nesta especialidade.</p></div></li>';
+        renderSimEG(C);
       }
 
-      /* ---------- simulador ---------- */
-      function fieldsFor(tipo) {
+      function fieldsForEG(tipo) {
         return tipo === 'late'
           ? [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']]
           : [['q1', 'Q1'], ['f1', 'F1'], ['f2', 'F2'], ['ne', 'Excelência']];
       }
 
-      function renderSim(C) {
-        C = C || compute();
+      function renderSimEG(C) {
+        $('#simHint').textContent = 'Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.';
         var sel = $('#simAth'), dc = S.cfg.disciplinas[S.disc];
         sel.innerHTML = '<option value="">Escolher…</option>' + C.entries.map(function (e) {
           return '<option value="' + esc(e.id) + '"' + (e.id === S.simId ? ' selected' : '') + '>' + esc(e.nome) + '</option>';
@@ -639,10 +694,10 @@
           var st = evState(ev), rawReal = S.res[ev.id] && S.res[ev.id][S.simId], real = A.hydrateRec(rawReal, dc.tipo), ov = S.ov[ev.id] && S.ov[ev.id][S.simId], cur = ov || real || {}, fs;
           var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
           if (useAgg) fs = [['agg', 'Valor da prova']];
-          else fs = fieldsFor(dc.tipo);
+          else fs = fieldsForEG(dc.tipo);
           var fields = fs.map(function (f) {
             var v = cur[f[0]], mod = ov && ov[f[0]] !== undefined && (!real || ov[f[0]] !== real[f[0]]);
-            return '<label class="fld">' + f[1] + '<input type="text" inputmode="decimal" autocomplete="off" id="sim-' + ev.id + '-' + f[0] + '" data-ev="' + ev.id + '" data-f="' + f[0] + '" value="' + (v === undefined ? '' : String(v)) + '" class="' + (mod ? 'mod' : '') + '" placeholder="—"></label>';
+            return '<label class="fld">' + f[1] + '<input type="text" inputmode="decimal" autocomplete="off" data-ev="' + ev.id + '" data-f="' + f[0] + '" value="' + (v === undefined ? '' : String(v)) + '" class="' + (mod ? 'mod' : '') + '" placeholder="—"></label>';
           }).join('');
           var res = '';
           var rowObj = C.R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
@@ -650,108 +705,333 @@
             var p = rowObj.per[ev.id];
             res = '<div class="res tn">' + (p.score > 0 ? '<b>' + fmt(p.score) + ' pontos</b> na prova' : 'Não conta (' + (p.items.filter(function (i) { return !i.ok && !i.pending; }).map(function (i) { return i.note; })[0] || 'sem mínimos') + ')') + '</div>';
           }
-          return '<div class="simrow"><div class="en">' + esc(ev.nome) + ' · ' + esc(ev.curto) + '<small>' + esc(ev.datas) + ' · ' + STATE_L[st] + '</small></div><div><div class="fields">' + fields + '</div>' + res + (real && real.neFlag && !useAgg || (real && real.neFlag && dc.tipo === 'ne') ? '<div class="hint">Nota de excelência já obtida nesta prova; falta o valor.</div>' : '') + '</div></div>';
+          return '<div class="simrow"><div class="en">' + esc(ev.nome) + ' · ' + esc(ev.curto) + '<small>' + esc(ev.datas) + ' · ' + STATE_L[st] + '</small></div><div><div class="fields">' + fields + '</div>' + res + '</div></div>';
         }).join('');
       }
 
-      function parseNum(s) {
-        s = String(s).trim().replace(',', '.');
-        if (!s) return undefined;
-        var n = parseFloat(s);
-        return isFinite(n) ? n : undefined;
+      /* =====================================================================
+         RENDERIZAÇÃO JOGOS OLÍMPICOS 2028 (FIG + FGP)
+         ===================================================================== */
+      function computeLA28() {
+        var ov = hasLaOv() ? S.laOv : null;
+        return A.rankLA28(S.laCfg, S.sex, ov);
       }
 
-      function onSimChange(e) {
-        var t = e.target;
-        if (!t.dataset || !t.dataset.ev) return;
-        var evId = t.dataset.ev, id = S.simId, rec = {};
-        var dc = S.cfg.disciplinas[S.disc];
-        document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
-          var v = parseNum(i.value);
-          if (v !== undefined) rec[i.dataset.f] = v;
-        });
-        var rawReal = S.res[evId] && S.res[evId][id];
-        var real = A.hydrateRec(rawReal, dc.tipo);
-
-        var simFields = fieldsFor(dc.tipo).map(function (f) { return f[0]; });
-        if (real && real.agg !== undefined) simFields = ['agg'];
-        var realKeys = real ? simFields.filter(function (k) { return real[k] !== undefined; }) : [];
-        var recKeys = Object.keys(rec);
-        var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
-
-        if (same) {
-          if (S.ov[evId]) delete S.ov[evId][id];
-        } else {
-          if (!real && !recKeys.length) {
-            if (S.ov[evId]) delete S.ov[evId][id];
-          } else {
-            if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
-            (S.ov[evId] = S.ov[evId] || {})[id] = rec;
-          }
+      function renderBoardLA28() {
+        if (!S.laCfg) {
+          $('#list').innerHTML = '<li class="row"><div class="detail"><p>Sem dados de apuramento olímpico carregados.</p></div></li>';
+          return;
         }
-        var C = compute();
-        renderBoard();
-        renderSimResults(C);
-        t.classList.toggle('mod', !same);
+        var R = computeLA28();
+        var sum = R.summary;
+
+        if (S.laView === 'fig') {
+          $('#facts').innerHTML =
+            '<div class="fact"><span>Vagas Totais</span><b>' + sum.totalQuotas + '</b></div>' +
+            '<div class="fact blue"><span>Critério 1 (CM 27)</span><b>' + sum.crit1Count + '</b></div>' +
+            '<div class="fact good"><span>Critério 2 Garantidas</span><b>' + sum.safeCrit2Slots + '</b></div>' +
+            '<div class="fact warn"><span>Zona de Corte (Cont./USA)</span><b>' + sum.bubbleCrit2Slots + '</b></div>' +
+            '<div class="fact"><span>Reserva Cont./USA</span><b>' + sum.reservedSlots + '</b></div>';
+
+          $('#legendBox').innerHTML =
+            '<div class="legend">' +
+            '<span class="leg-item"><i class="leg-swatch blue"></i>Critério 1 (Mundial 2027)</span>' +
+            '<span class="leg-item"><i class="leg-swatch good"></i>Critério 2 Garantido (Taças do Mundo)</span>' +
+            '<span class="leg-item"><i class="leg-swatch warn"></i>Zona de Corte (depende das vagas continentais / USA)</span>' +
+            '</div>';
+
+          $('#head').innerHTML = '<span>#</span><span>Ginasta / País</span><span class="cells c6">' + R.wcEvents.map(function (ev) {
+            return '<span class="hcell"><b>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
+          }).join('') + '</span><span style="text-align:right">Pts FIG</span><span>Estado Olímpico</span>';
+
+          var html = '';
+          R.figRows.forEach(function (r) {
+            var id = r.ath.id;
+            var isPor = r.ath.noc === 'POR';
+            var rowCls = 'row' +
+              (r.status === 'crit1' ? ' st-crit1' : '') +
+              (r.status === 'crit2_safe' ? ' st-safe' : '') +
+              (r.status === 'crit2_bubble' ? ' st-bubble' : '') +
+              (isPor ? ' st-por' : '');
+
+            var cells = R.wcEvents.map(function (ev) {
+              var p = r.per[ev.id];
+              var cl = 'cell';
+              if (p.pts > 0) cl += p.used ? ' cont' : ' ok';
+              if (p.simulated) cl += ' sim';
+              var txt = p.pts > 0
+                ? '<span>' + fmt(p.pts) + '</span><span class="subrk">(' + p.rec.rank + 'º)</span>'
+                : (p.rec && p.rec.rank ? '<span class="subrk">' + p.rec.rank + 'º</span>' : '—');
+              return '<span class="' + cl + '" data-l="' + esc(ev.curto) + '">' + txt + '</span>';
+            }).join('');
+
+            var chipCls = 'chip';
+            if (r.status === 'crit1') chipCls += ' crit1';
+            else if (r.status === 'crit2_safe') chipCls += ' vaga';
+            else if (r.status === 'crit2_bubble') chipCls += ' bubble';
+
+            var chips = '<span class="' + chipCls + '">' + esc(r.statusLabel) + '</span>';
+            if (r.tieReason) chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
+            if (r.simulated) chips += '<span class="chip simc">Simulado</span>';
+
+            html += '<li class="' + rowCls + '">' +
+              '<div class="rowgrid">' +
+              '<span class="rk tn">' + r.figRank + '</span>' +
+              '<span class="who"><b>' + esc(r.ath.nome) + '<span class="noc-tag' + (isPor ? ' por' : '') + '">' + esc(r.ath.noc) + '</span></b>' +
+              '<small>' + (r.crit1 ? 'Final CM27: ' + r.crit1.finalRank + 'º lugar' : (r.nCont + ' de 3 provas · máx. 2 em 2027')) + '</small></span>' +
+              '<span class="cells c6">' + cells + '</span>' +
+              '<span class="tot"><b>' + fmt(r.total) + '</b><small>pontos</small></span>' +
+              '<span class="st">' + chips + '</span>' +
+              '</div></li>';
+          });
+
+          $('#list').innerHTML = html || '<li class="row"><div class="detail"><p>Sem resultados registados.</p></div></li>';
+        } else {
+          /* Vista Ranking Nacional FGP */
+          var porVagasTxt = sum.porQuotasSafe > 0
+            ? (sum.porQuotasSafe + ' garantida' + (sum.porQuotasBubble > 0 ? ' + ' + sum.porQuotasBubble + ' zona de corte' : ''))
+            : (sum.porQuotasBubble > 0 ? sum.porQuotasBubble + ' (zona de corte)' : '0 (em disputa)');
+
+          $('#facts').innerHTML =
+            '<div class="fact ' + (sum.porQuotasSafe > 0 ? 'good' : (sum.porQuotasBubble > 0 ? 'warn' : '')) + '"><span>Vagas Portugal</span><b>' + porVagasTxt + '</b></div>' +
+            '<div class="fact"><span>Regra</span><b class="tn" style="font-size:15px">3 melhores de 7 provas (máx. 2 em 2027)</b></div>';
+
+          $('#legendBox').innerHTML =
+            '<div class="legend">' +
+            '<span class="leg-item"><i class="leg-swatch good"></i>Dentro das vagas garantidas por Portugal</span>' +
+            '<span class="leg-item"><i class="leg-swatch warn"></i>Dentro se Portugal segurar vaga na zona de corte</span>' +
+            '</div>';
+
+          $('#head').innerHTML = '<span>#</span><span>Ginasta (POR)</span><span class="cells c7">' + R.eventos.map(function (ev) {
+            return '<span class="hcell"><b>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
+          }).join('') + '</span><span style="text-align:right">Pts FIG</span><span>Estado Nacional</span>';
+
+          var htmlFgp = '', cutSafeDone = false, cutBubbleDone = false;
+          R.fgpRows.forEach(function (r, i) {
+            var rowCls = 'row' + (r.rank === null ? ' out' : '') +
+              (r.quotaState === 'safe' ? ' st-safe' : (r.quotaState === 'bubble' ? ' st-bubble' : ''));
+
+            var cells = R.eventos.map(function (ev) {
+              var p = r.per[ev.id];
+              var cl = 'cell';
+              if (p.pts > 0) cl += p.used ? ' cont' : ' ok';
+              if (p.simulated) cl += ' sim';
+              var txt = p.pts > 0
+                ? '<span>' + fmt(p.pts) + '</span><span class="subrk">(' + p.rec.rank + 'º)</span>'
+                : (p.rec && p.rec.rank ? '<span class="subrk">' + p.rec.rank + 'º</span>' : '—');
+              return '<span class="' + cl + '" data-l="' + esc(ev.curto) + '">' + txt + '</span>';
+            }).join('');
+
+            var chips = '';
+            if (r.quotaState === 'safe') chips += '<span class="chip vaga">Na vaga</span>';
+            else if (r.quotaState === 'bubble') chips += '<span class="chip bubble">Vaga provisória</span>';
+            else if (r.rank !== null) chips += '<span class="chip min">Com pontos FIG</span>';
+            else chips += '<span class="chip">Sem pontos Top 30</span>';
+
+            if (r.tieReason) chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
+            if (r.simulated) chips += '<span class="chip simc">Simulado</span>';
+
+            htmlFgp += '<li class="' + rowCls + '">' +
+              '<div class="rowgrid">' +
+              '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
+              '<span class="who"><b>' + esc(r.ath.nome) + '</b><small>Melhor série: ' + (r.bestScore ? fmt(r.bestScore) : '—') + ' · D max: ' + (r.bestD ? fmt(r.bestD) : '—') + '</small></span>' +
+              '<span class="cells c7">' + cells + '</span>' +
+              '<span class="tot"><b>' + fmt(r.total) + '</b><small>' + r.nCont + ' provas</small></span>' +
+              '<span class="st">' + chips + '</span>' +
+              '</div></li>';
+
+            var next = R.fgpRows[i + 1];
+            if (r.quotaState === 'safe' && next && next.quotaState !== 'safe' && !cutSafeDone) {
+              cutSafeDone = true;
+              htmlFgp += '<li class="cut" aria-hidden="true"><span>Limite de vagas garantidas de Portugal</span><span>' + sum.porQuotasSafe + '</span></li>';
+            }
+            if ((r.quotaState === 'safe' || r.quotaState === 'bubble') && next && next.quotaState === 'out' && !cutBubbleDone && sum.porQuotasBubble > 0) {
+              cutBubbleDone = true;
+              htmlFgp += '<li class="cut bubble" aria-hidden="true"><span>Limite provisório (zona de corte internacional)</span><span>' + (sum.porQuotasSafe + sum.porQuotasBubble) + '</span></li>';
+            }
+          });
+
+          $('#list').innerHTML = htmlFgp || '<li class="row"><div class="detail"><p>Sem ginastas portugueses com resultados registados.</p></div></li>';
+        }
+
+        renderSimLA28(R);
       }
 
-      function renderSimResults(C) {
-        var rowObj = C.R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
-        if (!rowObj) return;
-        document.querySelectorAll('#simRows .simrow').forEach(function (el, i) {
-          var ev = C.R.eventos[i], p = rowObj.per[ev.id], r = el.querySelector('.res');
-          var txt = !p.rec ? '' : (p.score > 0 ? '<b>' + fmt(p.score) + ' pontos</b> na prova' : 'Não conta (' + (p.items.filter(function (x) { return !x.ok && !x.pending; }).map(function (x) { return x.note; })[0] || 'sem mínimos') + ')');
-          if (r) { r.innerHTML = txt; if (!txt) r.remove(); }
-          else if (txt) {
-            var d = document.createElement('div');
-            d.className = 'res tn';
-            d.innerHTML = txt;
-            el.children[1].insertBefore(d, el.querySelector('.hint'));
-          }
-        });
+      function renderSimLA28(R) {
+        $('#simHint').textContent = 'Simula classificações (1.º a 30.º) nas Taças do Mundo ou Mundial 2027. Atualiza em simultâneo o Ranking Internacional e o Ranking Nacional.';
+        var list = S.laView === 'fgp'
+          ? R.fgpRows.map(function (r) { return r.ath; })
+          : R.figRows.map(function (r) { return r.ath; });
+
+        var sel = $('#simAth');
+        sel.innerHTML = '<option value="">Escolher ginasta…</option>' + list.map(function (a) {
+          return '<option value="' + esc(a.id) + '"' + (a.id === S.simId ? ' selected' : '') + '>' + esc(a.nome) + ' (' + esc(a.noc) + ')</option>';
+        }).join('');
+
+        var box = $('#simRows');
+        if (!S.simId) { box.innerHTML = ''; return; }
+
+        var athObj = list.filter(function (a) { return a.id === S.simId; })[0];
+        if (!athObj) { box.innerHTML = ''; return; }
+
+        box.innerHTML = R.eventos.map(function (ev) {
+          var real = (S.laCfg.resultados[S.sex][ev.id] && S.laCfg.resultados[S.sex][ev.id][S.simId]) || null;
+          var ov = S.laOv[S.sex][ev.id] && S.laOv[S.sex][ev.id][S.simId];
+          var cur = ov !== undefined ? (ov || {}) : (real || {});
+          var mod = ov !== undefined;
+          var ptsNow = cur.rank ? A.pointsFromRank(cur.rank) : 0;
+
+          var extraField = ev.tipo === 'wch'
+            ? '<label class="fld">Lugar Final CM27<input type="text" inputmode="numeric" data-laev="' + ev.id + '" data-laf="finalRank" value="' + (cur.finalRank || '') + '" class="' + (mod ? 'mod' : '') + '" placeholder="1-8"></label>'
+            : '';
+
+          return '<div class="simrow">' +
+            '<div class="en">' + esc(ev.nome) + '<small>' + esc(ev.datas) + '</small></div>' +
+            '<div><div class="fields">' +
+            '<label class="fld">Classificação<input type="text" inputmode="numeric" data-laev="' + ev.id + '" data-laf="rank" value="' + (cur.rank || '') + '" class="' + (mod ? 'mod' : '') + '" placeholder="1-30"></label>' +
+            extraField +
+            '</div><div class="res tn">' + (ptsNow > 0 ? '<b>' + ptsNow + ' pontos FIG</b>' : 'Sem pontos Top 30') + '</div></div></div>';
+        }).join('');
       }
 
-      /* ---------- eventos ---------- */
+      /* =====================================================================
+         EVENTOS GLOBAIS
+         ===================================================================== */
       function renderAll() {
         renderTop();
-        var C = compute();
-        renderBoard();
-        renderSim(C);
+        if (S.comp === 'eg27') renderBoardEG();
+        else renderBoardLA28();
       }
 
-      $('#tabsDisc').addEventListener('click', function (e) {
-        var b = e.target.closest('button[data-d]');
-        if (b) setView(b.dataset.d, S.sex);
+      $('#tabsComp').addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-comp]');
+        if (!b || b.dataset.comp === S.comp) return;
+        S.comp = b.dataset.comp;
+        S.simId = '';
+        S.detail = null;
+        syncHash();
+        renderAll();
       });
+
+      $('#tabsSub').addEventListener('click', function (e) {
+        var bd = e.target.closest('button[data-d]');
+        if (bd) {
+          S.disc = bd.dataset.d;
+          S.simId = '';
+          S.detail = null;
+          syncHash();
+          renderAll();
+          return;
+        }
+        var bl = e.target.closest('button[data-laview]');
+        if (bl) {
+          S.laView = bl.dataset.laview;
+          S.simId = '';
+          syncHash();
+          renderAll();
+        }
+      });
+
       $('#tabsSex').addEventListener('click', function (e) {
         var b = e.target.closest('button[data-s]');
-        if (b) setView(S.disc, b.dataset.s);
+        if (!b) return;
+        S.sex = b.dataset.s;
+        S.simId = '';
+        S.detail = null;
+        syncHash();
+        renderAll();
       });
+
       $('#list').addEventListener('click', function (e) {
         var btn = e.target.closest('button.cell[data-ath]');
         if (btn) {
           var athId = btn.dataset.ath, evId = btn.dataset.ev;
           if (S.detail && S.detail.athId === athId && S.detail.evId === evId) S.detail = null;
           else S.detail = { athId: athId, evId: evId };
-          renderBoard();
+          renderBoardEG();
           return;
         }
         if (e.target.closest('[data-close-detail]')) {
           S.detail = null;
-          renderBoard();
+          renderBoardEG();
         }
       });
-      $('#simAth').addEventListener('change', function (e) { S.simId = e.target.value; renderSim(); });
-      $('#simRows').addEventListener('change', onSimChange);
-      $('#simReset').addEventListener('click', function () {
-        Object.keys(S.ov).forEach(function (ev) { delete S.ov[ev][S.simId]; });
-        renderBoard();
-        renderSim();
+
+      $('#simAth').addEventListener('change', function (e) {
+        S.simId = e.target.value;
+        renderAll();
       });
+
+      $('#simRows').addEventListener('change', function (e) {
+        var t = e.target;
+        if (S.comp === 'eg27') {
+          if (!t.dataset || !t.dataset.ev) return;
+          var evId = t.dataset.ev, id = S.simId, rec = {};
+          var dc = S.cfg.disciplinas[S.disc];
+          document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
+            var s = String(i.value).trim().replace(',', '.');
+            var n = parseFloat(s);
+            if (s && isFinite(n)) rec[i.dataset.f] = n;
+          });
+          var rawReal = S.res[evId] && S.res[evId][id];
+          var real = A.hydrateRec(rawReal, dc.tipo);
+          var simFields = fieldsForEG(dc.tipo).map(function (f) { return f[0]; });
+          if (real && real.agg !== undefined) simFields = ['agg'];
+          var realKeys = real ? simFields.filter(function (k) { return real[k] !== undefined; }) : [];
+          var recKeys = Object.keys(rec);
+          var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
+
+          if (same) {
+            if (S.ov[evId]) delete S.ov[evId][id];
+          } else if (!real && !recKeys.length) {
+            if (S.ov[evId]) delete S.ov[evId][id];
+          } else {
+            if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
+            (S.ov[evId] = S.ov[evId] || {})[id] = rec;
+          }
+          renderAll();
+        } else {
+          if (!t.dataset || !t.dataset.laev) return;
+          var lEv = t.dataset.laev, idL = S.simId;
+          var realL = (S.laCfg.resultados[S.sex][lEv] && S.laCfg.resultados[S.sex][lEv][idL]) || null;
+          var allAths = computeLA28().figRows.map(function (r) { return r.ath; });
+          var athMeta = allAths.filter(function (a) { return a.id === idL; })[0] || { nome: idL, noc: 'POR' };
+          var patch = Object.assign({}, realL || { nome: athMeta.nome, noc: athMeta.noc });
+          var hasAny = false;
+
+          document.querySelectorAll('#simRows input[data-laev="' + lEv + '"]').forEach(function (inp) {
+            var val = parseInt(String(inp.value).trim(), 10);
+            if (isFinite(val) && val > 0) {
+              patch[inp.dataset.laf] = val;
+              hasAny = true;
+            } else {
+              delete patch[inp.dataset.laf];
+            }
+          });
+
+          S.laOv[S.sex][lEv] = S.laOv[S.sex][lEv] || {};
+          if (!hasAny) {
+            S.laOv[S.sex][lEv][idL] = null;
+          } else {
+            S.laOv[S.sex][lEv][idL] = patch;
+          }
+          renderAll();
+        }
+      });
+
+      $('#simReset').addEventListener('click', function () {
+        if (S.comp === 'eg27') {
+          Object.keys(S.ov).forEach(function (ev) { delete S.ov[ev][S.simId]; });
+        } else {
+          Object.keys(S.laOv[S.sex]).forEach(function (ev) { delete S.laOv[S.sex][ev][S.simId]; });
+        }
+        renderAll();
+      });
+
       $('#simResetAll').addEventListener('click', function () {
-        S.ov = {};
-        renderBoard();
-        renderSim();
+        if (S.comp === 'eg27') S.ov = {};
+        else S.laOv = { F: {}, M: {} };
+        renderAll();
       });
     })();
   </script>
