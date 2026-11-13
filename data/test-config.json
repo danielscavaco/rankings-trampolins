@@ -10,8 +10,8 @@
       "nome": "Campeonato Nacional (Ensaio Live)",
       "curto": "CN Teste",
       "datas": "Ensaio",
-      "inicio": "2026-01-01",
-      "fim": "2026-12-31",
+      "inicio": "2026-12-05",
+      "fim": "2026-12-05",
       "disciplinas": ["TRI", "SYN"],
       "escaloes": ["11-12", "13-14", "JUN", "17-21", "SEN"]
     }
