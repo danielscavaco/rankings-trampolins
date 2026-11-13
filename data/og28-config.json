@@ -1,8 +1,18 @@
 {
-  "titulo": "Jogos Olímpicos Los Angeles 2028",
+  "titulo": "Jogos Olímpicos 2028",
   "local": "Los Angeles (USA)",
   "datas": "14 a 30 de julho de 2028",
   "liveManual": false,
+  "regras": {
+    "totalQuotas": 16,
+    "crit1Max": 8,
+    "maxPerNocDefault": 1,
+    "maxSecondQuotaNocs": 3,
+    "secondQuotaMaxWcPos": 3,
+    "bestResultsCount": 3,
+    "maxResultsYear": { "2027": 2 },
+    "hostNoc": "USA"
+  },
   "eventos": [
     { "id": "wc27_1", "nome": "Taça do Mundo (Baku, AZE)", "curto": "Baku 2027", "ano": 2027, "tipo": "wc", "datas": "Mai 2027", "inicio": "2027-05-28", "fim": "2027-05-30" },
     { "id": "wc27_2", "nome": "Taça do Mundo (Metz, FRA)", "curto": "Metz 2027", "ano": 2027, "tipo": "wc", "datas": "Jun 2027", "inicio": "2027-06-11", "fim": "2027-06-13" },
@@ -12,13 +22,42 @@
     { "id": "wc28_2", "nome": "Taça do Mundo (Alkmaar, NED)", "curto": "Alkmaar 2028", "ano": 2028, "tipo": "wc", "datas": "Mar 2028", "inicio": "2028-03-23", "fim": "2028-03-25" },
     { "id": "wc28_3", "nome": "Taça do Mundo (Changsha, CHN)", "curto": "Changsha 2028", "ano": 2028, "tipo": "wc", "datas": "Abr 2028", "inicio": "2028-04-21", "fim": "2028-04-23" }
   ],
+  "unioes": [
+    { "code": "EG",   "label": "Europa (EG)" },
+    { "code": "AGU",  "label": "Ásia (AGU)" },
+    { "code": "PAGU", "label": "Américas (PAGU)" },
+    { "code": "UAG",  "label": "África (UAG)" },
+    { "code": "OGU",  "label": "Oceânia (OGU)" }
+  ],
   "nocContinents": {
-    "CHN": "AS", "JPN": "AS", "KAZ": "AS", "UZB": "AS", "KOR": "AS",
-    "GBR": "EU", "POR": "EU", "FRA": "EU", "ESP": "EU", "GER": "EU", "NED": "EU",
-    "AUT": "EU", "UKR": "EU", "AZE": "EU", "GEO": "EU", "GRE": "EU", "BUL": "EU",
-    "BLR": "EU", "RUS": "EU", "AIN": "EU",
-    "USA": "AM", "CAN": "AM", "BRA": "AM", "MEX": "AM", "COL": "AM",
-    "AUS": "OC", "NZL": "OC",
-    "EGY": "AF", "RSA": "AF", "ALG": "AF"
+    "ALB": "EG", "ARM": "EG", "AUT": "EG", "AZE": "EG", "BEL": "EG", "BIH": "EG", "BLR": "EG",
+    "BUL": "EG", "CRO": "EG", "CYP": "EG", "CZE": "EG", "DEN": "EG", "ESP": "EG", "EST": "EG",
+    "FIN": "EG", "FRA": "EG", "GBR": "EG", "GEO": "EG", "GER": "EG", "GRE": "EG", "HUN": "EG",
+    "IRL": "EG", "ISL": "EG", "ISR": "EG", "ITA": "EG", "LAT": "EG", "LTU": "EG", "LUX": "EG",
+    "MDA": "EG", "MKD": "EG", "MLT": "EG", "MNE": "EG", "NED": "EG", "NOR": "EG", "POL": "EG",
+    "POR": "EG", "ROU": "EG", "RUS": "EG", "AIN": "EG", "SLO": "EG", "SMR": "EG", "SRB": "EG",
+    "SUI": "EG", "SVK": "EG", "SWE": "EG", "TUR": "EG", "UKR": "EG",
+
+    "BAN": "AGU", "BRN": "AGU", "CHN": "AGU", "HKG": "AGU", "INA": "AGU", "IND": "AGU", "IRI": "AGU",
+    "IRQ": "AGU", "JOR": "AGU", "JPN": "AGU", "KAZ": "AGU", "KGZ": "AGU", "KOR": "AGU", "KSA": "AGU",
+    "KUW": "AGU", "LAO": "AGU", "LBN": "AGU", "MAC": "AGU", "MAS": "AGU", "MGL": "AGU", "NEP": "AGU",
+    "PAK": "AGU", "PHI": "AGU", "PLE": "AGU", "PRK": "AGU", "QAT": "AGU", "SGP": "AGU", "SRI": "AGU",
+    "SYR": "AGU", "THA": "AGU", "TJK": "AGU", "TKM": "AGU", "TPE": "AGU", "UAE": "AGU", "UZB": "AGU",
+    "VIE": "AGU", "YEM": "AGU",
+
+    "ARG": "PAGU", "ARU": "PAGU", "BAH": "PAGU", "BAR": "PAGU", "BER": "PAGU", "BOL": "PAGU", "BRA": "PAGU",
+    "CAN": "PAGU", "CAY": "PAGU", "CHI": "PAGU", "COL": "PAGU", "CRC": "PAGU", "CUB": "PAGU", "DOM": "PAGU",
+    "ECU": "PAGU", "ESA": "PAGU", "GUA": "PAGU", "HAI": "PAGU", "HON": "PAGU", "JAM": "PAGU", "MEX": "PAGU",
+    "NCA": "PAGU", "PAN": "PAGU", "PAR": "PAGU", "PER": "PAGU", "PUR": "PAGU", "TTO": "PAGU", "URU": "PAGU",
+    "USA": "PAGU", "VEN": "PAGU",
+
+    "ALG": "UAG", "ANG": "UAG", "BEN": "UAG", "BOT": "UAG", "BUR": "UAG", "CGO": "UAG", "CIV": "UAG",
+    "CMR": "UAG", "COD": "UAG", "CPV": "UAG", "EGY": "UAG", "ETH": "UAG", "GAB": "UAG", "GHA": "UAG",
+    "KEN": "UAG", "LBA": "UAG", "MAR": "UAG", "MRI": "UAG", "NAM": "UAG", "NGR": "UAG", "RSA": "UAG",
+    "SEN": "UAG", "SEY": "UAG", "SLE": "UAG", "SUD": "UAG", "SWZ": "UAG", "TUN": "UAG", "UGA": "UAG",
+    "ZAM": "UAG", "ZIM": "UAG",
+
+    "ASA": "OGU", "AUS": "OGU", "COK": "OGU", "FIJ": "OGU", "GUM": "OGU", "NZL": "OGU", "PNG": "OGU",
+    "SAM": "OGU", "TGA": "OGU"
   }
 }
