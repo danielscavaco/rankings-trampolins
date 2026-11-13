@@ -681,12 +681,29 @@
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       }
 
-      function evState(ev) {
-        var t = today();
-        if (ev.fim && t > ev.fim) return 'done';
-        if (ev.inicio && t >= ev.inicio && t <= ev.fim) return 'live';
-        return 'future';
-      }
+      function evBounds(ev) {
+     if (!ev.inicio || !ev.fim) return null;
+     if (ev.tz) {
+       return {
+         ini: Date.parse(ev.inicio + 'T00:00:00' + ev.tz),
+         fim: Date.parse(ev.fim + 'T23:59:59' + ev.tz)
+       };
+     }
+     // Margem global (UTC+14 no início a UTC-12 no fim) cobre qualquer fuso horário do planeta
+     return {
+       ini: Date.parse(ev.inicio + 'T00:00:00+14:00'),
+       fim: Date.parse(ev.fim + 'T23:59:59-12:00')
+     };
+   }
+
+   function evState(ev) {
+     var b = evBounds(ev);
+     if (!b) return 'future';
+     var now = Date.now();
+     if (now > b.fim) return 'done';
+     if (now >= b.ini && now <= b.fim) return 'live';
+     return 'future';
+   }
 
       var STATE_L = { done: 'concluída', live: 'a decorrer', future: 'por realizar' };
 
@@ -758,7 +775,7 @@
       function syncLivePoller(shouldPoll) {
         S.isLiveActive = Boolean(shouldPoll);
         if (S.isLiveActive && !S.liveTimer) {
-          S.liveTimer = setInterval(checkLiveUpdate, 30000);
+          S.liveTimer = setInterval(checkLiveUpdate, 10000);
         } else if (!S.isLiveActive && S.liveTimer) {
           clearInterval(S.liveTimer);
           S.liveTimer = null;
