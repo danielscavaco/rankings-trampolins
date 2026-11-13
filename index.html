@@ -69,15 +69,73 @@
       padding-right: max(16px, env(safe-area-inset-right, 0px));
     }
     [hidden] { display: none !important; }
-    .wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
     h1, h2, h3 { font-family: var(--f-display); font-weight: 600; letter-spacing: .01em; margin: 0; text-wrap: balance; }
     button, select, input { font: inherit; color: inherit; }
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
     .tn { font-variant-numeric: tabular-nums; }
 
+    /* Layout com Menu Lateral Esquerdo */
+    .shell {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 224px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+    .sidebar {
+      position: sticky;
+      top: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sb-brand {
+      font-size: 11.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .sb-nav { display: flex; flex-direction: column; gap: 4px; }
+    .sb-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: background .12s, color .12s;
+    }
+    .sb-btn:hover { background: var(--surface-2); color: var(--ink); }
+    .sb-btn[aria-current="page"] {
+      background: var(--accent);
+      color: var(--on-accent);
+      box-shadow: 0 1px 3px rgb(0 0 0 / .16);
+    }
+    .sb-btn b { font-weight: 600; font-size: 13.5px; line-height: 1.25; }
+    .sb-btn small { font-size: 11px; opacity: 0.82; }
+
+    .main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
     header { display: flex; flex-direction: column; gap: 6px; }
     .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
-    h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1; }
+    h1 { font-size: clamp(32px, 5vw, 44px); line-height: 1; }
     .sub { color: var(--muted); max-width: 68ch; margin: 0; }
 
     .controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
@@ -95,6 +153,40 @@
     .fact.good b { color: var(--good); }
     .fact.warn b { color: var(--warn); }
 
+    /* Tracker de vagas reservadas (Continentes + Anfitrião) */
+    .quota-tracker {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .qt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+    .qt-head b { color: var(--ink); font-weight: 600; }
+    .qt-pills { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+    .qt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--warn-soft);
+      color: var(--warn);
+      border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+    }
+    .qt-pill.done {
+      background: var(--surface-2);
+      color: var(--muted);
+      border-color: var(--line);
+      text-decoration: line-through;
+      opacity: 0.78;
+    }
+    .qt-pill.done .qt-noc { text-decoration: none; display: inline-block; font-weight: 600; color: var(--good); margin-left: 2px; }
+
     .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12.5px; color: var(--muted); align-items: center; }
     .leg-item { display: inline-flex; align-items: center; gap: 6px; }
     .leg-swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
@@ -105,9 +197,10 @@
     /* Lista de seriação */
     .board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
     .board ol { list-style: none; margin: 0; padding: 0; }
-    .head, .rowgrid { display: grid; grid-template-columns: 44px minmax(160px, 1.5fr) minmax(0, 3.8fr) 96px 175px; gap: 0 12px; align-items: center; padding: 10px 16px; }
+    .head, .rowgrid { display: grid; grid-template-columns: 44px minmax(175px, 1.55fr) minmax(0, 3.75fr) 96px 175px; gap: 0 12px; align-items: center; padding: 10px 16px; }
     .head { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); align-items: end; }
     .cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .cells.c5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .cells.c6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     .cells.c7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
     .hcell { display: flex; flex-direction: column; gap: 1px; text-transform: none; letter-spacing: 0; }
@@ -118,19 +211,33 @@
     .dot.live { background: var(--accent); }
 
     .row { border-top: 1px solid var(--line); }
-    .row.st-crit1 { background: color-mix(in srgb, var(--blue-soft) 32%, var(--surface)); }
+    .row.st-crit1 { background: color-mix(in srgb, var(--blue-soft) 34%, var(--surface)); }
     .row.st-safe  { background: color-mix(in srgb, var(--good-soft) 28%, var(--surface)); }
     .row.st-bubble { background: color-mix(in srgb, var(--warn-soft) 35%, var(--surface)); }
     .row.st-por   { box-shadow: inset 3px 0 0 var(--accent); }
 
     .rowgrid { width: 100%; min-height: 58px; }
     .rk { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1; color: var(--ink); }
-    .row.out .rk { color: var(--muted); font-size: 22px; }
+    .rk.crit1 { color: var(--blue); }
+    .rk.nocfull, .row.out .rk { color: var(--muted); font-size: 22px; }
+
     .who { display: flex; flex-direction: column; min-width: 0; }
     .who b { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .who small { color: var(--muted); font-size: 12px; }
-    .noc-tag { font-size: 10.5px; font-weight: 600; letter-spacing: .04em; padding: 1px 6px; border-radius: 4px; background: var(--surface-2); color: var(--muted); }
+    .noc-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
     .noc-tag.por { background: var(--accent-soft); color: var(--accent); }
+    .noc-flag { width: 14px; height: 10px; object-fit: cover; border-radius: 1.5px; box-shadow: 0 0 0 1px rgb(0 0 0 / .12); }
 
     .cell {
       padding: 5px 7px;
@@ -155,10 +262,12 @@
     .cell.ok { box-shadow: inset 0 0 0 1px var(--muted); color: var(--ink); }
     .cell.nc .val { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
     .cell.sim { background: var(--sim-soft); box-shadow: inset 0 0 0 1.5px var(--sim); }
+    .cell.faded { opacity: 0.42; }
     .cell .subrk { font-size: 10.5px; opacity: 0.78; font-weight: 400; }
 
     .tot { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
     .tot b { font-family: var(--f-display); font-size: 25px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+    .tot.faded { opacity: 0.42; }
     .tot small { font-size: 11px; color: var(--muted); }
 
     .st { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
@@ -257,6 +366,15 @@
       100% { box-shadow: 0 0 0 0 transparent; }
     }
 
+    @media (max-width: 980px) {
+      .shell { grid-template-columns: 1fr; gap: 16px; }
+      .sidebar { position: static; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 10px 12px; }
+      .sb-brand { border-bottom: 0; padding-bottom: 0; }
+      .sb-nav { flex-direction: row; flex-wrap: wrap; }
+      .sb-btn { width: auto; padding: 7px 12px; }
+      .sb-btn small { display: none; }
+    }
+
     @media (max-width: 840px) {
       .head { display: none; }
       .rowgrid {
@@ -269,7 +387,7 @@
       .who { grid-area: who; }
       .tot { grid-area: tot; }
       .st { grid-area: st; flex-direction: row; flex-wrap: wrap; }
-      .cells, .cells.c6, .cells.c7 { grid-area: cells; grid-template-columns: repeat(2, 1fr); }
+      .cells, .cells.c5, .cells.c6, .cells.c7 { grid-area: cells; grid-template-columns: repeat(2, 1fr); }
       .cell { flex-wrap: wrap; justify-content: flex-start; }
       .cell::before { display: inline; }
       .detail { padding: 10px 14px 14px; }
@@ -287,47 +405,51 @@
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="eyebrow">Rankings · Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
-      <h1 id="titulo">Jogos Europeus 2027</h1>
-      <p class="sub" id="sub"></p>
-    </header>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Competições">
+      <div class="sb-brand">Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
+      <nav class="sb-nav" id="navComp"></nav>
+    </aside>
 
-    <div class="controls">
-      <div class="seg" role="tablist" aria-label="Competição" id="tabsComp">
-        <button role="tab" type="button" data-comp="eg27" aria-selected="true">Jogos Europeus 2027</button>
-        <button role="tab" type="button" data-comp="la28" aria-selected="false">Jogos Olímpicos 2028</button>
+    <div class="main">
+      <header>
+        <div class="eyebrow" id="eyebrow">Rankings · Trampolins</div>
+        <h1 id="titulo">Rankings Trampolins</h1>
+        <p class="sub" id="sub"></p>
+      </header>
+
+      <div class="controls">
+        <div class="seg" role="tablist" aria-label="Sub-vista" id="tabsSub"></div>
+        <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
       </div>
-      <div class="seg" role="tablist" aria-label="Sub-vista" id="tabsSub"></div>
-      <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
-    </div>
 
-    <div class="facts" id="facts"></div>
-    <div id="legendBox"></div>
+      <div class="facts" id="facts"></div>
+      <div id="trackerBox"></div>
+      <div id="legendBox"></div>
 
-    <section class="board" aria-label="Seriação">
-      <div class="head" id="head"></div>
-      <ol id="list"></ol>
-    </section>
+      <section class="board" aria-label="Seriação">
+        <div class="head" id="head"></div>
+        <ol id="list"></ol>
+      </section>
 
-    <section class="panel" aria-labelledby="simh">
-      <div class="pbody" style="padding-top:16px">
-        <h2 id="simh">Simulador</h2>
-        <p class="hint" id="simHint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
-        <div class="simbar">
-          <label for="simAth" class="hint">Ginasta</label>
-          <select id="simAth"></select>
-          <button class="btn" id="simReset" type="button">Repor esta ginasta</button>
-          <button class="btn" id="simResetAll" type="button">Repor tudo</button>
+      <section class="panel" aria-labelledby="simh">
+        <div class="pbody" style="padding-top:16px">
+          <h2 id="simh">Simulador</h2>
+          <p class="hint" id="simHint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
+          <div class="simbar">
+            <label for="simAth" class="hint">Ginasta</label>
+            <select id="simAth"></select>
+            <button class="btn" id="simReset" type="button">Repor esta ginasta</button>
+            <button class="btn" id="simResetAll" type="button">Repor tudo</button>
+          </div>
+          <div class="simrows" id="simRows"></div>
         </div>
-        <div class="simrows" id="simRows"></div>
-      </div>
-    </section>
+      </section>
 
-    <footer>
-      <span>© 2026 <b>Daniel Cavaco</b></span>
-    </footer>
+      <footer>
+        <span>© 2026 <b>Daniel Cavaco</b></span>
+      </footer>
+    </div>
   </div>
 
   <div class="live-pill" id="liveBadge" hidden aria-live="polite">
@@ -341,19 +463,22 @@
       'use strict';
       var A = window.Apuramento;
       var S = {
-        comp: 'eg27', /* 'eg27' | 'la28' */
-        laView: 'fig', /* 'fig' | 'fgp' */
-        cfg: null, ath: [], res: {}, meta: {},
-        laCfg: null,
-        disc: 'TRI', sex: 'F',
+        comps: [],
+        activeId: '',
+        cache: {},      /* { [compId]: { cfg, ath, res, meta } } */
+        laView: 'fig',
+        disc: 'TRI',
+        sex: 'F',
         detail: null,
-        ov: {},
-        laOv: { F: {}, M: {} },
+        ov: {},         /* { [compId]: overrides } */
         simId: ''
       };
       var $ = function (s) { return document.querySelector(s); };
       var nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
       var fmt = function (n) { return n === null || n === undefined ? '—' : nf.format(n); };
+      var nfPts = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      var fmtPts = function (n) { return n === null || n === undefined ? '—' : nfPts.format(n); };
+
       var esc = function (s) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
           return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -361,6 +486,24 @@
       };
       var SEX = { F: 'Feminino', M: 'Masculino' };
       var DISC_ORDER = ['TRI', 'DMT', 'TUM'];
+
+      var NOC_TO_ISO2 = {
+        POR: 'pt', CHN: 'cn', JPN: 'jp', GBR: 'gb', FRA: 'fr', ESP: 'es', GER: 'de',
+        USA: 'us', CAN: 'ca', BRA: 'br', MEX: 'mx', COL: 'co', ARG: 'ar',
+        AUS: 'au', NZL: 'nz', KAZ: 'kz', UZB: 'uz', KOR: 'kr',
+        NED: 'nl', BEL: 'be', SUI: 'ch', AUT: 'at', ITA: 'it', POL: 'pl',
+        UKR: 'ua', AZE: 'az', GEO: 'ge', GRE: 'gr', BUL: 'bg', DEN: 'dk', SWE: 'se',
+        EGY: 'eg', RSA: 'za', ALG: 'dz', MAR: 'ma', TUN: 'tn'
+      };
+
+      function nocBadge(noc, isPor) {
+        var code = (noc || '').toUpperCase();
+        var iso = NOC_TO_ISO2[code];
+        var flagHtml = iso
+          ? '<img src="https://flagcdn.com/' + iso + '.svg" class="noc-flag" alt="' + esc(code) + '" loading="lazy">'
+          : '';
+        return '<span class="noc-tag' + (isPor ? ' por' : '') + '">' + esc(code) + flagHtml + '</span>';
+      }
 
       function today() {
         var d = new Date();
@@ -375,12 +518,6 @@
       }
 
       var STATE_L = { done: 'concluída', live: 'a decorrer', future: 'por realizar' };
-      function hasOv() { return Object.keys(S.ov).some(function (e) { return Object.keys(S.ov[e]).length; }); }
-      function hasLaOv() {
-        return ['F', 'M'].some(function (sx) {
-          return Object.keys(S.laOv[sx]).some(function (ev) { return Object.keys(S.laOv[sx][ev]).length; });
-        });
-      }
 
       function getJSON(u) {
         return fetch(u, { cache: 'no-cache' }).then(function (r) {
@@ -390,62 +527,91 @@
       }
 
       var params = new URLSearchParams(location.search);
-      var resFile = params.get('teste') === '1' ? 'data/test-live.json' : 'data/results.json';
 
-      Promise.all([
-        getJSON('data/config.json'),
-        getJSON('data/athletes.json'),
-        getJSON(resFile),
-        getJSON('data/la28-test.json').catch(function () { return null; })
-      ]).then(function (a) {
-        S.cfg = a[0];
-        S.ath = a[1];
-        S.res = a[2].resultados || {};
-        S.meta = a[2];
-        S.laCfg = a[3];
+      function activeCompMeta() {
+        return S.comps.filter(function (c) { return c.id === S.activeId; })[0] || S.comps[0];
+      }
+
+      function loadCompetition(compMeta) {
+        if (S.cache[compMeta.id]) return Promise.resolve(S.cache[compMeta.id]);
+        var resUrl = (params.get('teste') === '1' && compMeta.testResults) ? compMeta.testResults : compMeta.results;
+        var reqs = [getJSON(compMeta.config), getJSON(resUrl)];
+        if (compMeta.athletes) reqs.push(getJSON(compMeta.athletes));
+        return Promise.all(reqs).then(function (arr) {
+          var pack = {
+            cfg: arr[0],
+            meta: arr[1],
+            res: arr[1].resultados || {},
+            ath: arr[2] || []
+          };
+          S.cache[compMeta.id] = pack;
+          return pack;
+        });
+      }
+
+      getJSON('data/competitions.json').then(function (list) {
+        S.comps = list;
+        if (!S.comps.length) throw new Error('Sem competições configuradas.');
         fromHash();
-        renderAll();
+        var comp = activeCompMeta();
+        S.activeId = comp.id;
+        return loadCompetition(comp).then(renderAll);
       }).catch(function (e) {
         $('#list').innerHTML = '<li class="row"><div class="detail"><p>Não foi possível carregar os dados (' + esc(e.message) + ').</p></div></li>';
       });
 
       function fromHash() {
         var h = (location.hash || '').replace('#', '').toLowerCase().split('-');
-        if (h[0] === 'la28') {
-          S.comp = 'la28';
-          if (h[1] === 'fgp' || h[1] === 'fig') S.laView = h[1];
-          if (h[2] && SEX[h[2].toUpperCase()]) S.sex = h[2].toUpperCase();
-        } else if (h.length === 2 && S.cfg.disciplinas[h[0].toUpperCase()] && SEX[h[1].toUpperCase()]) {
-          S.comp = 'eg27';
+        if (!h[0]) return;
+        var found = S.comps.filter(function (c) { return c.id.toLowerCase() === h[0]; })[0];
+        if (found) {
+          S.activeId = found.id;
+          if (found.engine === 'la28') {
+            if (h[1] === 'fgp' || h[1] === 'fig') S.laView = h[1];
+            if (h[2] && SEX[h[2].toUpperCase()]) S.sex = h[2].toUpperCase();
+          } else {
+            if (h[1]) S.disc = h[1].toUpperCase();
+            if (h[2] && SEX[h[2].toUpperCase()]) S.sex = h[2].toUpperCase();
+          }
+        } else if (h.length === 2 && SEX[h[1].toUpperCase()]) {
+          /* Compatibilidade com hashes antigos #tri-f */
           S.disc = h[0].toUpperCase();
           S.sex = h[1].toUpperCase();
         }
       }
 
       function syncHash() {
-        var hash = S.comp === 'la28'
-          ? ('#la28-' + S.laView + '-' + S.sex.toLowerCase())
-          : ('#' + S.disc.toLowerCase() + '-' + S.sex.toLowerCase());
+        var comp = activeCompMeta();
+        if (!comp) return;
+        var hash = comp.engine === 'la28'
+          ? ('#' + comp.id + '-' + S.laView + '-' + S.sex.toLowerCase())
+          : ('#' + comp.id + '-' + S.disc.toLowerCase() + '-' + S.sex.toLowerCase());
         try { history.replaceState(null, '', hash); }
         catch (e) { location.hash = hash; }
       }
 
-      /* ---------- cabeçalho e separadores ---------- */
-      function renderTop() {
-        document.querySelectorAll('#tabsComp button').forEach(function (b) {
-          b.setAttribute('aria-selected', String(b.dataset.comp === S.comp));
-        });
+      /* ---------- menu lateral, cabeçalho e badge live contextual ---------- */
+      function renderChrome(pack) {
+        var comp = activeCompMeta();
+        var cfg = pack.cfg;
 
-        if (S.comp === 'eg27') {
-          var c = S.cfg;
-          $('#titulo').textContent = 'Jogos Europeus 2027';
-          $('#sub').textContent = c.local + ' · ' + c.datas;
+        $('#navComp').innerHTML = S.comps.map(function (c) {
+          var isCur = c.id === comp.id;
+          return '<button type="button" class="sb-btn" data-compid="' + esc(c.id) + '" aria-current="' + (isCur ? 'page' : 'false') + '">' +
+            '<b>' + esc(c.nome) + '</b><small>' + esc(c.curto) + '</small></button>';
+        }).join('');
+
+        $('#eyebrow').textContent = 'Rankings · ' + comp.curto;
+        $('#titulo').textContent = cfg.titulo || comp.nome;
+
+        if (comp.engine === 'fgp_minimos') {
+          if (!cfg.disciplinas[S.disc]) S.disc = DISC_ORDER[0];
+          $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
           $('#tabsSub').innerHTML = DISC_ORDER.map(function (d) {
-            return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(c.disciplinas[d].nome) + '</span></button>';
+            return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(cfg.disciplinas[d].nome) + '</span></button>';
           }).join('');
         } else {
-          $('#titulo').textContent = 'Jogos Olímpicos 2028';
-          $('#sub').textContent = (S.laCfg ? (S.laCfg.local + ' · ' + S.laCfg.datas) : 'Los Angeles 2028') + ' · Trampolim Individual (TRI)';
+          $('#sub').textContent = cfg.local + ' · ' + cfg.datas + ' · Trampolim Individual (TRI)';
           $('#tabsSub').innerHTML =
             '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG (Vagas)</span><span class="full">Ranking Internacional (FIG)</span></button>' +
             '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP (Nacional)</span><span class="full">Ranking Nacional (FGP)</span></button>';
@@ -455,18 +621,27 @@
           return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex) + '">' + SEX[s] + '</button>';
         }).join('');
 
-        var isLive = Boolean(S.cfg && (S.cfg.liveManual || S.meta.live || params.get('live') === '1' || S.cfg.eventos.some(function (ev) { return evState(ev) === 'live'; })));
+        /* Só mostra "Resultados em direto" se uma prova DESTA competição estiver a decorrer */
+        var hasLiveEvent = Array.isArray(cfg.eventos) && cfg.eventos.some(function (ev) { return evState(ev) === 'live'; });
+        var isLive = Boolean(cfg.liveManual || pack.meta.live || (params.get('live') === '1' && comp.id === 'eg27') || hasLiveEvent);
         $('#liveBadge').hidden = !isLive;
       }
 
       /* =====================================================================
-         RENDERIZAÇÃO JOGOS EUROPEUS 2027
+         MOTOR 1: JOGOS EUROPEUS 2027 (FGP MÍNIMOS)
          ===================================================================== */
-      function computeEG() {
-        var en = S.ath.filter(function (a) { return a.disc === S.disc && a.sexo === S.sex; });
-        var ov = hasOv() ? S.ov : null;
-        var R = A.rank(S.cfg, S.disc, S.sex, en, S.res, ov);
-        var base = ov ? A.rank(S.cfg, S.disc, S.sex, en, S.res, null) : R;
+      function getOvEG(compId) {
+        S.ov[compId] = S.ov[compId] || {};
+        return S.ov[compId];
+      }
+
+      function computeEG(comp, pack) {
+        var en = pack.ath.filter(function (a) { return a.disc === S.disc && a.sexo === S.sex; });
+        var ovObj = getOvEG(comp.id);
+        var hasAnyOv = Object.keys(ovObj).some(function (e) { return Object.keys(ovObj[e]).length; });
+        var ov = hasAnyOv ? ovObj : null;
+        var R = A.rank(pack.cfg, S.disc, S.sex, en, pack.res, ov);
+        var base = ov ? A.rank(pack.cfg, S.disc, S.sex, en, pack.res, null) : R;
         var br = {};
         base.rows.forEach(function (r) { br[r.entry.id] = r.rank; });
         return { R: R, br: br, entries: en };
@@ -501,13 +676,9 @@
               : [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
           } else {
             var allNePhases = [
-              ['q1_1', 'Q1 · Série 1'],
-              ['q1_2', 'Q1 · Série 2'],
-              ['q2', 'Q2'],
-              ['tf', 'Team Final'],
-              ['aa', 'All-Around Team Final'],
-              ['f1', 'Final 1'],
-              ['f2', 'Final 2']
+              ['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2'],
+              ['q2', 'Q2'], ['tf', 'Team Final'], ['aa', 'All-Around Team Final'],
+              ['f1', 'Final 1'], ['f2', 'Final 2']
             ];
             var extraNeKeys = ['q2', 'tf', 'aa'];
             phases = allNePhases.filter(function (ph) {
@@ -568,8 +739,8 @@
         return html;
       }
 
-      function renderBoardEG() {
-        var C = computeEG(), R = C.R, cfg = S.cfg, d = S.disc, dc = cfg.disciplinas[d];
+      function renderBoardEG(comp, pack) {
+        var C = computeEG(comp, pack), R = C.R, cfg = pack.cfg, d = S.disc, dc = cfg.disciplinas[d];
         var m = R.minimos;
         var minTxt = dc.tipo === 'late'
           ? ('Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late))
@@ -578,6 +749,7 @@
         $('#facts').innerHTML =
           '<div class="fact"><span>Vagas</span><b>' + R.vagas + '</b></div>' +
           '<div class="fact"><span>Mínimos</span><b class="tn" style="font-size:16px">' + minTxt + '</b></div>';
+        $('#trackerBox').innerHTML = '';
         $('#legendBox').innerHTML = '';
 
         $('#head').innerHTML = '<span>#</span><span>Ginasta</span><span class="cells">' + R.eventos.map(function (ev) {
@@ -672,7 +844,7 @@
         });
 
         $('#list').innerHTML = html || '<li class="row"><div class="detail"><p class="none">Sem ginastas nesta especialidade.</p></div></li>';
-        renderSimEG(C);
+        renderSimEG(comp, pack, C);
       }
 
       function fieldsForEG(tipo) {
@@ -681,17 +853,18 @@
           : [['q1', 'Q1'], ['f1', 'F1'], ['f2', 'F2'], ['ne', 'Excelência']];
       }
 
-      function renderSimEG(C) {
+      function renderSimEG(comp, pack, C) {
         $('#simHint').textContent = 'Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.';
-        var sel = $('#simAth'), dc = S.cfg.disciplinas[S.disc];
+        var sel = $('#simAth'), dc = pack.cfg.disciplinas[S.disc];
         sel.innerHTML = '<option value="">Escolher…</option>' + C.entries.map(function (e) {
           return '<option value="' + esc(e.id) + '"' + (e.id === S.simId ? ' selected' : '') + '>' + esc(e.nome) + '</option>';
         }).join('');
         var box = $('#simRows');
         if (!S.simId) { box.innerHTML = ''; return; }
-        var evs = S.cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(S.disc) >= 0; });
+        var ovObj = getOvEG(comp.id);
+        var evs = pack.cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(S.disc) >= 0; });
         box.innerHTML = evs.map(function (ev) {
-          var st = evState(ev), rawReal = S.res[ev.id] && S.res[ev.id][S.simId], real = A.hydrateRec(rawReal, dc.tipo), ov = S.ov[ev.id] && S.ov[ev.id][S.simId], cur = ov || real || {}, fs;
+          var st = evState(ev), rawReal = pack.res[ev.id] && pack.res[ev.id][S.simId], real = A.hydrateRec(rawReal, dc.tipo), ov = ovObj[ev.id] && ovObj[ev.id][S.simId], cur = ov || real || {}, fs;
           var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
           if (useAgg) fs = [['agg', 'Valor da prova']];
           else fs = fieldsForEG(dc.tipo);
@@ -710,19 +883,24 @@
       }
 
       /* =====================================================================
-         RENDERIZAÇÃO JOGOS OLÍMPICOS 2028 (FIG + FGP)
+         MOTOR 2: JOGOS OLÍMPICOS 2028 (FIG + FGP)
          ===================================================================== */
-      function computeLA28() {
-        var ov = hasLaOv() ? S.laOv : null;
-        return A.rankLA28(S.laCfg, S.sex, ov);
+      function getOvLA(compId) {
+        S.ov[compId] = S.ov[compId] || { F: {}, M: {} };
+        return S.ov[compId];
       }
 
-      function renderBoardLA28() {
-        if (!S.laCfg) {
-          $('#list').innerHTML = '<li class="row"><div class="detail"><p>Sem dados de apuramento olímpico carregados.</p></div></li>';
-          return;
-        }
-        var R = computeLA28();
+      function computeLA28(comp, pack) {
+        var ovObj = getOvLA(comp.id);
+        var hasAny = ['F', 'M'].some(function (sx) {
+          return Object.keys(ovObj[sx]).some(function (ev) { return Object.keys(ovObj[sx][ev]).length; });
+        });
+        var laData = Object.assign({}, pack.cfg, { resultados: pack.res });
+        return A.rankLA28(laData, S.sex, hasAny ? ovObj : null);
+      }
+
+      function renderBoardLA28(comp, pack) {
+        var R = computeLA28(comp, pack);
         var sum = R.summary;
 
         if (S.laView === 'fig') {
@@ -730,40 +908,64 @@
             '<div class="fact"><span>Vagas Totais</span><b>' + sum.totalQuotas + '</b></div>' +
             '<div class="fact blue"><span>Critério 1 (CM 27)</span><b>' + sum.crit1Count + '</b></div>' +
             '<div class="fact good"><span>Critério 2 Garantidas</span><b>' + sum.safeCrit2Slots + '</b></div>' +
-            '<div class="fact warn"><span>Zona de Corte (Cont./USA)</span><b>' + sum.bubbleCrit2Slots + '</b></div>' +
-            '<div class="fact"><span>Reserva Cont./USA</span><b>' + sum.reservedSlots + '</b></div>';
+            '<div class="fact warn"><span>Zona de Corte (Amarelo)</span><b>' + sum.bubbleCrit2Slots + '</b></div>';
+
+          var pillsHtml = R.continentTrackers.map(function (ct) {
+            if (ct.qualified) {
+              return '<span class="qt-pill done" title="Vaga já garantida por ' + esc(ct.byNoc) + '">' + esc(ct.label) + ' <span class="qt-noc">(' + esc(ct.byNoc) + ')</span></span>';
+            }
+            return '<span class="qt-pill" title="Reserva 1 vaga até um país deste grupo entrar no apuramento">' + esc(ct.label) + '</span>';
+          }).join('');
+
+          $('#trackerBox').innerHTML =
+            '<div class="quota-tracker">' +
+            '<div class="qt-head"><span><b>Vagas reservadas (Critério 3 Continental + Anfitrião):</b> ' + sum.reservedSlots + ' ' + (sum.reservedSlots === 1 ? 'vaga reservada' : 'vagas reservadas') + ' (explicam a zona amarela; rasuram-se ao conquistar vaga)</span></div>' +
+            '<div class="qt-pills">' + pillsHtml + '</div>' +
+            '</div>';
 
           $('#legendBox').innerHTML =
             '<div class="legend">' +
-            '<span class="leg-item"><i class="leg-swatch blue"></i>Critério 1 (Mundial 2027)</span>' +
+            '<span class="leg-item"><i class="leg-swatch blue"></i>Critério 1 (Mundial 2027 — ordenado por Q2)</span>' +
             '<span class="leg-item"><i class="leg-swatch good"></i>Critério 2 Garantido (Taças do Mundo)</span>' +
-            '<span class="leg-item"><i class="leg-swatch warn"></i>Zona de Corte (depende das vagas continentais / USA)</span>' +
+            '<span class="leg-item"><i class="leg-swatch warn"></i>Zona de Corte (dependente das vagas continentais / USA ainda por preencher)</span>' +
             '</div>';
 
-          $('#head').innerHTML = '<span>#</span><span>Ginasta / País</span><span class="cells c6">' + R.wcEvents.map(function (ev) {
-            return '<span class="hcell"><b>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
-          }).join('') + '</span><span style="text-align:right">Pts FIG</span><span>Estado Olímpico</span>';
+          var nWc = R.wcEvents.length;
+          $('#head').innerHTML = '<span>#</span><span>Ginasta / País</span><span class="cells c' + nWc + '">' + R.wcEvents.map(function (ev) {
+            var st = evState(ev);
+            return '<span class="hcell"><b><span class="dot ' + st + '"></span>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
+          }).join('') + '</span><span style="text-align:right">Total</span><span>Estado Olímpico</span>';
 
           var html = '';
           R.figRows.forEach(function (r) {
-            var id = r.ath.id;
             var isPor = r.ath.noc === 'POR';
+            var isCrit1 = Boolean(r.crit1);
+            var isNocFull = r.status === 'noc_full';
+
             var rowCls = 'row' +
               (r.status === 'crit1' ? ' st-crit1' : '') +
               (r.status === 'crit2_safe' ? ' st-safe' : '') +
               (r.status === 'crit2_bubble' ? ' st-bubble' : '') +
+              (isNocFull ? ' out' : '') +
               (isPor ? ' st-por' : '');
+
+            var rkCls = 'rk tn' + (isCrit1 ? ' crit1' : '') + (isNocFull ? ' nocfull' : '');
+            var rkTxt = r.displayRank !== null ? r.displayRank : '–';
 
             var cells = R.wcEvents.map(function (ev) {
               var p = r.per[ev.id];
-              var cl = 'cell';
-              if (p.pts > 0) cl += p.used ? ' cont' : ' ok';
+              var cl = 'cell' + (isCrit1 ? ' faded' : '');
+              if (!isCrit1 && p.pts > 0) cl += p.used ? ' cont' : ' ok';
               if (p.simulated) cl += ' sim';
               var txt = p.pts > 0
-                ? '<span>' + fmt(p.pts) + '</span><span class="subrk">(' + p.rec.rank + 'º)</span>'
+                ? '<span>' + fmtPts(p.pts) + '</span><span class="subrk">(' + p.rec.rank + 'º)</span>'
                 : (p.rec && p.rec.rank ? '<span class="subrk">' + p.rec.rank + 'º</span>' : '—');
               return '<span class="' + cl + '" data-l="' + esc(ev.curto) + '">' + txt + '</span>';
             }).join('');
+
+            var totHtml = isCrit1
+              ? '<span class="tot faded"><b>MUNDIAL</b><small>' + fmtPts(r.total) + ' pts TM</small></span>'
+              : '<span class="tot' + (isNocFull ? ' faded' : '') + '"><b>' + fmtPts(r.total) + '</b><small>pontos</small></span>';
 
             var chipCls = 'chip';
             if (r.status === 'crit1') chipCls += ' crit1';
@@ -776,18 +978,17 @@
 
             html += '<li class="' + rowCls + '">' +
               '<div class="rowgrid">' +
-              '<span class="rk tn">' + r.figRank + '</span>' +
-              '<span class="who"><b>' + esc(r.ath.nome) + '<span class="noc-tag' + (isPor ? ' por' : '') + '">' + esc(r.ath.noc) + '</span></b>' +
-              '<small>' + (r.crit1 ? 'Final CM27: ' + r.crit1.finalRank + 'º lugar' : (r.nCont + ' de 3 provas · máx. 2 em 2027')) + '</small></span>' +
-              '<span class="cells c6">' + cells + '</span>' +
-              '<span class="tot"><b>' + fmt(r.total) + '</b><small>pontos</small></span>' +
+              '<span class="' + rkCls + '">' + rkTxt + '</span>' +
+              '<span class="who"><b>' + esc(r.ath.nome) + nocBadge(r.ath.noc, isPor) + '</b>' +
+              '<small>' + (isCrit1 ? 'Final CM27: ' + r.crit1.finalRank + 'º · Q2: ' + r.crit1.q2Rank + 'º' : (r.nCont + ' de 3 provas · máx. 2 em 2027')) + '</small></span>' +
+              '<span class="cells c' + nWc + '">' + cells + '</span>' +
+              totHtml +
               '<span class="st">' + chips + '</span>' +
               '</div></li>';
           });
 
           $('#list').innerHTML = html || '<li class="row"><div class="detail"><p>Sem resultados registados.</p></div></li>';
         } else {
-          /* Vista Ranking Nacional FGP */
           var porVagasTxt = sum.porQuotasSafe > 0
             ? (sum.porQuotasSafe + ' garantida' + (sum.porQuotasBubble > 0 ? ' + ' + sum.porQuotasBubble + ' zona de corte' : ''))
             : (sum.porQuotasBubble > 0 ? sum.porQuotasBubble + ' (zona de corte)' : '0 (em disputa)');
@@ -796,14 +997,17 @@
             '<div class="fact ' + (sum.porQuotasSafe > 0 ? 'good' : (sum.porQuotasBubble > 0 ? 'warn' : '')) + '"><span>Vagas Portugal</span><b>' + porVagasTxt + '</b></div>' +
             '<div class="fact"><span>Regra</span><b class="tn" style="font-size:15px">3 melhores de 7 provas (máx. 2 em 2027)</b></div>';
 
+          $('#trackerBox').innerHTML = '';
           $('#legendBox').innerHTML =
             '<div class="legend">' +
             '<span class="leg-item"><i class="leg-swatch good"></i>Dentro das vagas garantidas por Portugal</span>' +
             '<span class="leg-item"><i class="leg-swatch warn"></i>Dentro se Portugal segurar vaga na zona de corte</span>' +
             '</div>';
 
-          $('#head').innerHTML = '<span>#</span><span>Ginasta (POR)</span><span class="cells c7">' + R.eventos.map(function (ev) {
-            return '<span class="hcell"><b>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
+          var nAll = R.eventos.length;
+          $('#head').innerHTML = '<span>#</span><span>Ginasta (POR)</span><span class="cells c' + nAll + '">' + R.eventos.map(function (ev) {
+            var st = evState(ev);
+            return '<span class="hcell"><b><span class="dot ' + st + '"></span>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
           }).join('') + '</span><span style="text-align:right">Pts FIG</span><span>Estado Nacional</span>';
 
           var htmlFgp = '', cutSafeDone = false, cutBubbleDone = false;
@@ -817,7 +1021,7 @@
               if (p.pts > 0) cl += p.used ? ' cont' : ' ok';
               if (p.simulated) cl += ' sim';
               var txt = p.pts > 0
-                ? '<span>' + fmt(p.pts) + '</span><span class="subrk">(' + p.rec.rank + 'º)</span>'
+                ? '<span>' + fmtPts(p.pts) + '</span><span class="subrk">(' + p.rec.rank + 'º)</span>'
                 : (p.rec && p.rec.rank ? '<span class="subrk">' + p.rec.rank + 'º</span>' : '—');
               return '<span class="' + cl + '" data-l="' + esc(ev.curto) + '">' + txt + '</span>';
             }).join('');
@@ -834,9 +1038,9 @@
             htmlFgp += '<li class="' + rowCls + '">' +
               '<div class="rowgrid">' +
               '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
-              '<span class="who"><b>' + esc(r.ath.nome) + '</b><small>Melhor série: ' + (r.bestScore ? fmt(r.bestScore) : '—') + ' · D max: ' + (r.bestD ? fmt(r.bestD) : '—') + '</small></span>' +
-              '<span class="cells c7">' + cells + '</span>' +
-              '<span class="tot"><b>' + fmt(r.total) + '</b><small>' + r.nCont + ' provas</small></span>' +
+              '<span class="who"><b>' + esc(r.ath.nome) + nocBadge('POR', true) + '</b><small>Melhor série: ' + (r.bestScore ? fmt(r.bestScore) : '—') + ' · D max: ' + (r.bestD ? fmt(r.bestD) : '—') + '</small></span>' +
+              '<span class="cells c' + nAll + '">' + cells + '</span>' +
+              '<span class="tot"><b>' + fmtPts(r.total) + '</b><small>' + r.nCont + ' provas</small></span>' +
               '<span class="st">' + chips + '</span>' +
               '</div></li>';
 
@@ -854,10 +1058,10 @@
           $('#list').innerHTML = htmlFgp || '<li class="row"><div class="detail"><p>Sem ginastas portugueses com resultados registados.</p></div></li>';
         }
 
-        renderSimLA28(R);
+        renderSimLA28(comp, pack, R);
       }
 
-      function renderSimLA28(R) {
+      function renderSimLA28(comp, pack, R) {
         $('#simHint').textContent = 'Simula classificações (1.º a 30.º) nas Taças do Mundo ou Mundial 2027. Atualiza em simultâneo o Ranking Internacional e o Ranking Nacional.';
         var list = S.laView === 'fgp'
           ? R.fgpRows.map(function (r) { return r.ath; })
@@ -873,40 +1077,46 @@
 
         var athObj = list.filter(function (a) { return a.id === S.simId; })[0];
         if (!athObj) { box.innerHTML = ''; return; }
+        var ovObj = getOvLA(comp.id);
 
         box.innerHTML = R.eventos.map(function (ev) {
-          var real = (S.laCfg.resultados[S.sex][ev.id] && S.laCfg.resultados[S.sex][ev.id][S.simId]) || null;
-          var ov = S.laOv[S.sex][ev.id] && S.laOv[S.sex][ev.id][S.simId];
+          var real = (pack.res[S.sex] && pack.res[S.sex][ev.id] && pack.res[S.sex][ev.id][S.simId]) || null;
+          var ov = ovObj[S.sex][ev.id] && ovObj[S.sex][ev.id][S.simId];
           var cur = ov !== undefined ? (ov || {}) : (real || {});
           var mod = ov !== undefined;
           var ptsNow = cur.rank ? A.pointsFromRank(cur.rank) : 0;
 
-          var extraField = ev.tipo === 'wch'
-            ? '<label class="fld">Lugar Final CM27<input type="text" inputmode="numeric" data-laev="' + ev.id + '" data-laf="finalRank" value="' + (cur.finalRank || '') + '" class="' + (mod ? 'mod' : '') + '" placeholder="1-8"></label>'
+          var extraFields = ev.tipo === 'wch'
+            ? '<label class="fld">Lugar Final CM27<input type="text" inputmode="numeric" data-laev="' + ev.id + '" data-laf="finalRank" value="' + (cur.finalRank || '') + '" class="' + (mod ? 'mod' : '') + '" placeholder="1-8"></label>' +
+              '<label class="fld">Lugar Q2 CM27<input type="text" inputmode="numeric" data-laev="' + ev.id + '" data-laf="q2Rank" value="' + (cur.q2Rank || '') + '" class="' + (mod ? 'mod' : '') + '" placeholder="1-24"></label>'
             : '';
 
           return '<div class="simrow">' +
             '<div class="en">' + esc(ev.nome) + '<small>' + esc(ev.datas) + '</small></div>' +
             '<div><div class="fields">' +
             '<label class="fld">Classificação<input type="text" inputmode="numeric" data-laev="' + ev.id + '" data-laf="rank" value="' + (cur.rank || '') + '" class="' + (mod ? 'mod' : '') + '" placeholder="1-30"></label>' +
-            extraField +
+            extraFields +
             '</div><div class="res tn">' + (ptsNow > 0 ? '<b>' + ptsNow + ' pontos FIG</b>' : 'Sem pontos Top 30') + '</div></div></div>';
         }).join('');
       }
 
       /* =====================================================================
-         EVENTOS GLOBAIS
+         ORQUESTRAÇÃO E EVENTOS
          ===================================================================== */
       function renderAll() {
-        renderTop();
-        if (S.comp === 'eg27') renderBoardEG();
-        else renderBoardLA28();
+        var comp = activeCompMeta();
+        if (!comp) return;
+        loadCompetition(comp).then(function (pack) {
+          renderChrome(pack);
+          if (comp.engine === 'fgp_minimos') renderBoardEG(comp, pack);
+          else renderBoardLA28(comp, pack);
+        });
       }
 
-      $('#tabsComp').addEventListener('click', function (e) {
-        var b = e.target.closest('button[data-comp]');
-        if (!b || b.dataset.comp === S.comp) return;
-        S.comp = b.dataset.comp;
+      $('#navComp').addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-compid]');
+        if (!b || b.dataset.compid === S.activeId) return;
+        S.activeId = b.dataset.compid;
         S.simId = '';
         S.detail = null;
         syncHash();
@@ -948,12 +1158,12 @@
           var athId = btn.dataset.ath, evId = btn.dataset.ev;
           if (S.detail && S.detail.athId === athId && S.detail.evId === evId) S.detail = null;
           else S.detail = { athId: athId, evId: evId };
-          renderBoardEG();
+          renderAll();
           return;
         }
         if (e.target.closest('[data-close-detail]')) {
           S.detail = null;
-          renderBoardEG();
+          renderAll();
         }
       });
 
@@ -964,16 +1174,21 @@
 
       $('#simRows').addEventListener('change', function (e) {
         var t = e.target;
-        if (S.comp === 'eg27') {
+        var comp = activeCompMeta();
+        var pack = S.cache[comp.id];
+        if (!pack) return;
+
+        if (comp.engine === 'fgp_minimos') {
           if (!t.dataset || !t.dataset.ev) return;
           var evId = t.dataset.ev, id = S.simId, rec = {};
-          var dc = S.cfg.disciplinas[S.disc];
+          var dc = pack.cfg.disciplinas[S.disc];
+          var ovObj = getOvEG(comp.id);
           document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
             var s = String(i.value).trim().replace(',', '.');
             var n = parseFloat(s);
             if (s && isFinite(n)) rec[i.dataset.f] = n;
           });
-          var rawReal = S.res[evId] && S.res[evId][id];
+          var rawReal = pack.res[evId] && pack.res[evId][id];
           var real = A.hydrateRec(rawReal, dc.tipo);
           var simFields = fieldsForEG(dc.tipo).map(function (f) { return f[0]; });
           if (real && real.agg !== undefined) simFields = ['agg'];
@@ -982,19 +1197,20 @@
           var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
 
           if (same) {
-            if (S.ov[evId]) delete S.ov[evId][id];
+            if (ovObj[evId]) delete ovObj[evId][id];
           } else if (!real && !recKeys.length) {
-            if (S.ov[evId]) delete S.ov[evId][id];
+            if (ovObj[evId]) delete ovObj[evId][id];
           } else {
             if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
-            (S.ov[evId] = S.ov[evId] || {})[id] = rec;
+            (ovObj[evId] = ovObj[evId] || {})[id] = rec;
           }
           renderAll();
         } else {
           if (!t.dataset || !t.dataset.laev) return;
           var lEv = t.dataset.laev, idL = S.simId;
-          var realL = (S.laCfg.resultados[S.sex][lEv] && S.laCfg.resultados[S.sex][lEv][idL]) || null;
-          var allAths = computeLA28().figRows.map(function (r) { return r.ath; });
+          var ovObjL = getOvLA(comp.id);
+          var realL = (pack.res[S.sex] && pack.res[S.sex][lEv] && pack.res[S.sex][lEv][idL]) || null;
+          var allAths = computeLA28(comp, pack).figRows.map(function (r) { return r.ath; });
           var athMeta = allAths.filter(function (a) { return a.id === idL; })[0] || { nome: idL, noc: 'POR' };
           var patch = Object.assign({}, realL || { nome: athMeta.nome, noc: athMeta.noc });
           var hasAny = false;
@@ -1009,28 +1225,32 @@
             }
           });
 
-          S.laOv[S.sex][lEv] = S.laOv[S.sex][lEv] || {};
+          ovObjL[S.sex][lEv] = ovObjL[S.sex][lEv] || {};
           if (!hasAny) {
-            S.laOv[S.sex][lEv][idL] = null;
+            ovObjL[S.sex][lEv][idL] = null;
           } else {
-            S.laOv[S.sex][lEv][idL] = patch;
+            ovObjL[S.sex][lEv][idL] = patch;
           }
           renderAll();
         }
       });
 
       $('#simReset').addEventListener('click', function () {
-        if (S.comp === 'eg27') {
-          Object.keys(S.ov).forEach(function (ev) { delete S.ov[ev][S.simId]; });
+        var comp = activeCompMeta();
+        if (comp.engine === 'fgp_minimos') {
+          var ovObj = getOvEG(comp.id);
+          Object.keys(ovObj).forEach(function (ev) { delete ovObj[ev][S.simId]; });
         } else {
-          Object.keys(S.laOv[S.sex]).forEach(function (ev) { delete S.laOv[S.sex][ev][S.simId]; });
+          var ovObjL = getOvLA(comp.id);
+          Object.keys(ovObjL[S.sex]).forEach(function (ev) { delete ovObjL[S.sex][ev][S.simId]; });
         }
         renderAll();
       });
 
       $('#simResetAll').addEventListener('click', function () {
-        if (S.comp === 'eg27') S.ov = {};
-        else S.laOv = { F: {}, M: {} };
+        var comp = activeCompMeta();
+        if (comp.engine === 'fgp_minimos') S.ov[comp.id] = {};
+        else S.ov[comp.id] = { F: {}, M: {} };
         renderAll();
       });
     })();
