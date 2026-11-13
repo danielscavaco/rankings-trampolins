@@ -464,12 +464,6 @@
           '<div class="fact"><span>Vagas</span><b>' + R.vagas + '</b></div>' +
           '<div class="fact"><span>Mínimos</span><b class="tn" style="font-size:16px">' + minTxt + '</b></div>';
 
-        var banner = '';
-        if (d !== 'TRI' && R.comMinimos === 0) {
-          banner = '<b>Ainda sem ginastas com mínimos.</b> A vaga só é atribuída a quem cumprir os mínimos; sem ninguém até ao fim do processo, aplica-se a exceção final do manual (1.6).';
-        }
-        $('#banner').innerHTML = banner ? '<div class="note">' + banner + '</div>' : '';
-
         $('#head').innerHTML = '<span>#</span><span>Ginasta</span><span class="cells">' + R.eventos.map(function (ev) {
           var st = evState(ev);
           return '<span class="hcell"><b><span class="dot ' + st + '"></span>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
@@ -510,7 +504,7 @@
           }).join('');
 
           var chips = '';
-          if (r.rank !== null) chips += r.naVaga ? '<span class="chip vaga">Na vaga</span>' : '<span class="chip min">Com mínimos</span>';
+          if (r.rank !== null) chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
           else chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
 
           if (r.tieReason) {
