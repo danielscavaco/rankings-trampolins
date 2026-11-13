@@ -139,6 +139,22 @@
     .sub { color: var(--muted); max-width: 68ch; margin: 0; }
 
     .controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+    .club-filter { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+    .club-group-head {
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border-top: 1px solid var(--line);
+      font-family: var(--f-display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: .02em;
+      color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .club-group-head:first-child { border-top: 0; }
+    .club-group-head small { font-family: var(--f-body); font-size: 11.5px; font-weight: 400; color: var(--muted); }
     .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; }
     .seg button { border: 0; background: transparent; padding: 8px 15px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
     .seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); box-shadow: 0 1px 2px rgb(0 0 0 / .16); }
@@ -420,6 +436,10 @@
       <div class="controls">
         <div class="seg" role="tablist" aria-label="Sub-vista" id="tabsSub"></div>
         <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
+        <div class="club-filter" id="clubFilterBox" hidden>
+          <label for="clubFilter" class="hint">Clube</label>
+          <select id="clubFilter"></select>
+        </div>
       </div>
 
       <div class="facts" id="facts"></div>
@@ -468,6 +488,7 @@
         laView: 'fig',
         disc: 'TRI',
         sex: 'F',
+        club: '',
         detail: null,
         ov: {},
         simId: ''
@@ -658,6 +679,25 @@
           return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex) + '">' + SEX[s] + '</button>';
         }).join('');
 
+        var clubBox = $('#clubFilterBox');
+        if (!isOlympic && Array.isArray(pack.ath)) {
+          var clubs = [];
+          pack.ath.forEach(function (a) {
+            var c = (a.clube || '').trim();
+            if (c && clubs.indexOf(c) < 0) clubs.push(c);
+          });
+          clubs.sort(function (a, b) { return a.localeCompare(b, 'pt'); });
+          if (S.club && clubs.indexOf(S.club) < 0) S.club = '';
+          clubBox.hidden = clubs.length === 0;
+          $('#clubFilter').innerHTML = '<option value="">Todos os clubes (por disciplina)</option>' +
+            clubs.map(function (c) {
+              return '<option value="' + esc(c) + '"' + (c === S.club ? ' selected' : '') + '>' + esc(c) + '</option>';
+            }).join('');
+        } else {
+          S.club = '';
+          clubBox.hidden = true;
+        }
+
         /* Só mostra "Resultados em direto" se uma prova DESTA competição estiver a decorrer */
         var hasLiveEvent = Array.isArray(cfg.eventos) && cfg.eventos.some(function (ev) { return evState(ev) === 'live'; });
         var isLive = Boolean(cfg.liveManual || pack.meta.live || (params.get('live') === '1' && comp.id === 'eg27') || hasLiveEvent);
@@ -777,109 +817,137 @@
       }
 
       function renderBoardEG(comp, pack) {
-        var C = computeEG(comp, pack), R = C.R, cfg = pack.cfg, d = S.disc, dc = cfg.disciplinas[d];
-        var m = R.minimos;
-        var minTxt = dc.tipo === 'late'
-          ? ('Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late))
-          : ('Q1 ou F1+F2 ' + fmt(m.base) + (R.useExcelencia ? ' · Excelência ' + fmt(m.ne) : ''));
+        var cfg = pack.cfg;
 
-        $('#facts').innerHTML =
-          '<div class="fact"><span>Vagas</span><b>' + R.vagas + '</b></div>' +
-          '<div class="fact"><span>Provas a somar</span><b>' + R.provasContam + '</b></div>' +
-          '<div class="fact"><span>Mínimos</span><b class="tn" style="font-size:16px">' + minTxt + '</b></div>';
-        $('#trackerBox').innerHTML = '';
-        $('#legendBox').innerHTML = '';
+        /* --- MODO CLUBE: mostra todos os ginastas do clube em todas as disciplinas/géneros --- */
+        if (S.club) {
+          var dKeys = discKeysFor(cfg);
+          var ovObj = getOvEG(comp.id);
+          var hasAnyOv = Object.keys(ovObj).some(function (e) { return Object.keys(ovObj[e]).length; });
+          var ov = hasAnyOv ? ovObj : null;
 
-        var nEv = R.eventos.length;
-        $('#head').innerHTML = '<span>#</span><span>Ginasta</span><span class="cells" style="--cols:' + nEv + '">' + R.eventos.map(function (ev) {
-          var st = evState(ev);
-          return '<span class="hcell"><b><span class="dot ' + st + '"></span>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
-        }).join('') + '</span><span style="text-align:right">Total</span><span>Estado</span>';
+          var groups = [];
+          var totalAthletes = 0;
+          var totalVagas = 0;
 
-        var html = '', cutDone = false;
-        R.rows.forEach(function (r, i) {
-          var id = r.entry.id, sim = r.simulated;
-          var cnt = r.usedEvMap || {};
+          dKeys.forEach(function (dKey) {
+            ['F', 'M'].forEach(function (sx) {
+              var en = pack.ath.filter(function (a) { return a.disc === dKey && a.sexo === sx; });
+              if (!en.length) return;
+              var R = A.rank(cfg, dKey, sx, en, pack.res, ov);
+              var clubRows = R.rows.filter(function (r) { return (r.entry.clube || '').trim() === S.club; });
+              if (clubRows.length) {
+                totalAthletes += clubRows.length;
+                totalVagas += clubRows.filter(function (r) { return r.naVaga; }).length;
+                groups.push({
+                  disc: dKey,
+                  discNome: cfg.disciplinas[dKey].nome,
+                  dc: cfg.disciplinas[dKey],
+                  sex: sx,
+                  R: R,
+                  rows: clubRows
+                });
+              }
+            });
+          });
 
-          var cells = R.eventos.map(function (ev) {
-            var p = r.per[ev.id], cl = 'cell', v = '—', tip = '', hasData = false;
-            if (p.score > 0) {
-              hasData = true;
-              cl += cnt[ev.id] ? ' cont' : ' ok';
-              v = '<span class="val">' + fmt(p.score) + '</span>';
-              tip = cnt[ev.id] ? 'Conta para o total' : 'Mínimo atingido, fora das melhores';
-            } else if (p.rec && p.items.length && p.items[0].value !== null) {
-              hasData = true;
-              cl += ' nc';
-              v = '<span class="val">' + fmt(p.items[0].value) + '</span>';
-              tip = 'Mínimo não atingido';
-            } else if (p.rec && p.rec.rotinas && Object.keys(p.rec.rotinas).length) {
-              hasData = true;
-            }
-            if (p.simulated) cl += ' sim';
+          $('#facts').innerHTML =
+            '<div class="fact"><span>Clube</span><b>' + esc(S.club) + '</b></div>' +
+            '<div class="fact"><span>Ginastas em apuramento</span><b>' + totalAthletes + '</b></div>' +
+            '<div class="fact good"><span>Dentro das vagas</span><b>' + totalVagas + '</b></div>';
+          $('#trackerBox').innerHTML = '';
+          $('#legendBox').innerHTML = '';
 
-            if (hasData) {
-              var isOpen = S.detail && S.detail.athId === id && S.detail.evId === ev.id;
-              return '<button type="button" class="' + cl + '" data-l="' + esc(ev.curto) + '" data-ath="' + esc(id) + '" data-ev="' + esc(ev.id) + '" aria-expanded="' + Boolean(isOpen) + '" title="' + esc(tip) + '">' + v + '</button>';
-            }
-            return '<span class="' + cl + '" data-l="' + esc(ev.curto) + '">' + v + '</span>';
-          }).join('');
+          var allEvs = cfg.eventos || [];
+          var nEv = allEvs.length;
+          $('#head').innerHTML = '<span>#</span><span>Ginasta</span><span class="cells" style="--cols:' + nEv + '">' + allEvs.map(function (ev) {
+            var st = evState(ev);
+            return '<span class="hcell"><b><span class="dot ' + st + '"></span>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
+          }).join('') + '</span><span style="text-align:right">Total</span><span>Estado</span>';
 
-          var chips = '';
-          if (r.rank !== null) {
-            chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
-          } else {
-            chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
-          }
+          var htmlClub = '';
+          groups.forEach(function (g) {
+            var m = g.R.minimos;
+            var minTxt = g.dc.tipo === 'late'
+              ? ('Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late))
+              : ('Q1 ou F1+F2 ' + fmt(m.base) + (g.R.useExcelencia ? ' · Excelência ' + fmt(m.ne) : ''));
 
-          if (r.tieReason) chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
+            htmlClub += '<li class="club-group-head">' +
+              '<span>' + esc(g.disc) + ' · ' + esc(g.discNome) + ' — ' + SEX[g.sex] + '</span>' +
+              '<small>' + g.R.vagas + (g.R.vagas === 1 ? ' vaga' : ' vagas') + ' · Mínimos: ' + minTxt + '</small>' +
+              '</li>';
 
-          if (sim) {
-            var b = C.br[id], delta = '';
-            if (r.rank !== null && b) delta = b === r.rank ? '' : (b > r.rank ? ' ↑' + (b - r.rank) : ' ↓' + (r.rank - b));
-            else if (r.rank !== null) delta = ' entra';
-            else if (b) delta = ' sai';
-            chips += '<span class="chip simc">Simulado' + delta + '</span>';
-          } else if (r.rank !== null && C.br[id] && C.br[id] !== r.rank) {
-            var b2 = C.br[id];
-            chips += '<span class="chip simc">' + (b2 > r.rank ? '↑' + (b2 - r.rank) : '↓' + (r.rank - b2)) + '</span>';
-          }
+            g.rows.forEach(function (r) {
+              var id = r.entry.id;
+              var cnt = r.usedEvMap || {};
 
-          var sub = esc(r.entry.clube || '');
-          var gap = '';
-          if (r.rank === null) {
-            gap = r.gap !== null && r.gap > 0
-              ? '<span class="gap tn">melhor: ' + fmt(r.bestRaw) + ' · faltam ' + fmt(r.gap) + ' para o mínimo</span>'
-              : (r.bestRaw === null ? '' : '<span class="gap">com mínimos numa fase, mas sem prova válida</span>');
-          }
+              var cells = allEvs.map(function (ev) {
+                if (ev.disciplinas.indexOf(g.disc) < 0) {
+                  return '<span class="cell faded" data-l="' + esc(ev.curto) + '">—</span>';
+                }
+                var p = r.per[ev.id], cl = 'cell', v = '—', tip = '', hasData = false;
+                if (p && p.score > 0) {
+                  hasData = true;
+                  cl += cnt[ev.id] ? ' cont' : ' ok';
+                  v = '<span class="val">' + fmt(p.score) + '</span>';
+                  tip = cnt[ev.id] ? 'Conta para o total' : 'Mínimo atingido, fora das melhores';
+                } else if (p && p.rec && p.items.length && p.items[0].value !== null) {
+                  hasData = true;
+                  cl += ' nc';
+                  v = '<span class="val">' + fmt(p.items[0].value) + '</span>';
+                  tip = 'Mínimo não atingido';
+                } else if (p && p.rec && p.rec.rotinas && Object.keys(p.rec.rotinas).length) {
+                  hasData = true;
+                }
+                if (p && p.simulated) cl += ' sim';
 
-          var tot = r.rank !== null
-            ? '<b>' + fmt(r.total) + '</b><small>' + r.nCont + (r.nCont === 1 ? ' prova' : ' provas') + '</small>'
-            : '<b style="color:var(--muted)">—</b>';
+                if (hasData) {
+                  var isOpen = S.detail && S.detail.athId === id && S.detail.evId === ev.id;
+                  return '<button type="button" class="' + cl + '" data-l="' + esc(ev.curto) + '" data-ath="' + esc(id) + '" data-ev="' + esc(ev.id) + '" aria-expanded="' + Boolean(isOpen) + '" title="' + esc(tip) + '">' + v + '</button>';
+                }
+                return '<span class="' + cl + '" data-l="' + esc(ev.curto) + '">' + v + '</span>';
+              }).join('');
 
-          var openEv = (S.detail && S.detail.athId === id)
-            ? R.eventos.filter(function (e) { return e.id === S.detail.evId; })[0]
-            : null;
+              var chips = '';
+              if (r.rank !== null) {
+                chips += r.naVaga ? '<span class="chip vaga">Dentro (' + r.rank + 'º)</span>' : '<span class="chip min">Com mínimos (' + r.rank + 'º)</span>';
+              } else {
+                chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
+              }
+              if (r.tieReason) chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
 
-          html += '<li class="row' + (r.rank === null ? ' out' : '') + '">' +
-            '<div class="rowgrid">' +
-            '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
-            '<span class="who"><b>' + esc(r.entry.nome) + '</b><small>' + sub + '</small>' + gap + '</span>' +
-            '<span class="cells" style="--cols:' + nEv + '">' + cells + '</span>' +
-            '<span class="tot">' + tot + '</span><span class="st">' + chips + '</span></div>' +
-            (openEv ? renderDetailDrawerEG(r, openEv, dc, R.useExcelencia) : '') +
-            '</li>';
+              var gap = '';
+              if (r.rank === null && r.gap !== null && r.gap > 0) {
+                gap = '<span class="gap tn">melhor: ' + fmt(r.bestRaw) + ' · faltam ' + fmt(r.gap) + '</span>';
+              }
 
-          var next = R.rows[i + 1];
-          if (r.naVaga && next && !next.naVaga && !cutDone) {
-            cutDone = true;
-            html += '<li class="cut" aria-hidden="true"><span>Limite das vagas</span><span>' + R.vagas + (R.vagas === 1 ? ' vaga' : ' vagas') + '</span></li>';
-          }
-        });
+              var tot = r.rank !== null
+                ? '<b>' + fmt(r.total) + '</b><small>' + r.nCont + (r.nCont === 1 ? ' prova' : ' provas') + '</small>'
+                : '<b style="color:var(--muted)">—</b>';
 
-        $('#list').innerHTML = html || '<li class="row"><div class="detail"><p class="none">Sem ginastas nesta especialidade.</p></div></li>';
-        renderSimEG(comp, pack, C);
-      }
+              var openEv = (S.detail && S.detail.athId === id)
+                ? g.R.eventos.filter(function (e) { return e.id === S.detail.evId; })[0]
+                : null;
+
+              htmlClub += '<li class="row' + (r.rank === null ? ' out' : '') + '">' +
+                '<div class="rowgrid">' +
+                '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
+                '<span class="who"><b>' + esc(r.entry.nome) + '</b>' + gap + '</span>' +
+                '<span class="cells" style="--cols:' + nEv + '">' + cells + '</span>' +
+                '<span class="tot">' + tot + '</span><span class="st">' + chips + '</span></div>' +
+                (openEv ? renderDetailDrawerEG(r, openEv, g.dc, g.R.useExcelencia) : '') +
+                '</li>';
+            });
+          });
+
+          $('#list').innerHTML = htmlClub || '<li class="row"><div class="detail"><p>Sem ginastas registados para este clube.</p></div></li>';
+          renderSimEG(comp, pack, computeEG(comp, pack));
+          return;
+        }
+
+        /* --- MODO NORMAL (POR DISCIPLINA / GÉNERO) --- */
+        var C = computeEG(comp, pack), R = C.R, d = S.disc, dc = cfg.disciplinas[d];
+        // ... mantém o resto da função renderBoardEG igual ...
 
       function fieldsForEG(tipo, useExcelencia) {
         if (tipo === 'late') return [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
@@ -1312,6 +1380,12 @@
         renderAll();
       });
     })();
+
+    $('#clubFilter').addEventListener('change', function (e) {
+        S.club = e.target.value;
+        S.detail = null;
+        renderAll();
+      });
   </script>
 </body>
 </html>
