@@ -5,7 +5,7 @@
 
   var isNum = function (x) { return typeof x === 'number' && isFinite(x); };
   var r3 = function (x) { return Math.round(x * 1000) / 1000; };
-  var nfPt = new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+  var nfPt = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
   var fmtPt = function (n) { return nfPt.format(n); };
 
   function resolveQ1Key(rec) {
