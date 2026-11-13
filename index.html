@@ -529,8 +529,14 @@
 
       function getJSON(u) {
         return fetch(u, { cache: 'no-cache' }).then(function (r) {
-          if (!r.ok) throw new Error(u);
-          return r.json();
+          if (!r.ok) throw new Error('HTTP ' + r.status + ' ao abrir ' + u);
+          return r.text().then(function (txt) {
+            try {
+              return JSON.parse(txt);
+            } catch (err) {
+              throw new Error('JSON inválido em ' + u + ': ' + err.message);
+            }
+          });
         });
       }
 
