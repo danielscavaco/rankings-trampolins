@@ -1,0 +1,24 @@
+{
+  "titulo": "Jogos Olímpicos Los Angeles 2028",
+  "local": "Los Angeles (USA)",
+  "datas": "14 a 30 de julho de 2028",
+  "liveManual": false,
+  "eventos": [
+    { "id": "wc27_1", "nome": "Taça do Mundo (Baku, AZE)", "curto": "Baku 2027", "ano": 2027, "tipo": "wc", "datas": "Mai 2027", "inicio": "2027-05-28", "fim": "2027-05-30" },
+    { "id": "wc27_2", "nome": "Taça do Mundo (Metz, FRA)", "curto": "Metz 2027", "ano": 2027, "tipo": "wc", "datas": "Jun 2027", "inicio": "2027-06-11", "fim": "2027-06-13" },
+    { "id": "wc27_3", "nome": "Taça do Mundo (Riccione, ITA)", "curto": "Riccione 2027", "ano": 2027, "tipo": "wc", "datas": "Out 2027", "inicio": "2027-10-01", "fim": "2027-10-03" },
+    { "id": "wch27",  "nome": "Campeonato do Mundo (Sofia, BUL)", "curto": "Sofia 2027", "ano": 2027, "tipo": "wch", "datas": "Nov 2027", "inicio": "2027-11-10", "fim": "2027-11-13" },
+    { "id": "wc28_1", "nome": "Taça do Mundo (Ishikawa, JPN)", "curto": "Ishikawa 2028", "ano": 2028, "tipo": "wc", "datas": "Mar 2028", "inicio": "2028-03-10", "fim": "2028-03-13" },
+    { "id": "wc28_2", "nome": "Taça do Mundo (Alkmaar, NED)", "curto": "Alkmaar 2028", "ano": 2028, "tipo": "wc", "datas": "Mar 2028", "inicio": "2028-03-23", "fim": "2028-03-25" },
+    { "id": "wc28_3", "nome": "Taça do Mundo (Changsha, CHN)", "curto": "Changsha 2028", "ano": 2028, "tipo": "wc", "datas": "Abr 2028", "inicio": "2028-04-21", "fim": "2028-04-23" }
+  ],
+  "nocContinents": {
+    "CHN": "AS", "JPN": "AS", "KAZ": "AS", "UZB": "AS", "KOR": "AS",
+    "GBR": "EU", "POR": "EU", "FRA": "EU", "ESP": "EU", "GER": "EU", "NED": "EU",
+    "AUT": "EU", "UKR": "EU", "AZE": "EU", "GEO": "EU", "GRE": "EU", "BUL": "EU",
+    "BLR": "EU", "RUS": "EU", "AIN": "EU",
+    "USA": "AM", "CAN": "AM", "BRA": "AM", "MEX": "AM", "COL": "AM",
+    "AUS": "OC", "NZL": "OC",
+    "EGY": "AF", "RSA": "AF", "ALG": "AF"
+  }
+}
