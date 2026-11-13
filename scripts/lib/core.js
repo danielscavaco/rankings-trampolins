@@ -183,12 +183,14 @@ function applyStagesToTarget({ target, stageList, nowStr, isCheckOnly, logLines,
   let updatedScores = 0;
 
   for (const ath of athletes) {
+    const normDisc = d => (d === 'TRA' ? 'TRI' : d);
+
     const relevantStages = stageList.filter(st => {
-      if (st.disc !== ath.disc) return false;
+      if (normDisc(st.disc) !== normDisc(ath.disc)) return false;
       if (st.sexo && st.sexo !== ath.sexo) return false;
       if (!st.escaloes.includes(ath.escalao)) return false;
       return true;
-    });
+    });;
 
     if (relevantStages.length === 0) {
       missingCount++;
