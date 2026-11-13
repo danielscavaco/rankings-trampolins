@@ -1,5 +1,6 @@
-/* Motor de cálculo do apuramento (regras do manual FGP, secção 1).
-   Calcula automaticamente totais por série, por ronda e nota de excelência a partir de rotinas. */
+/* Motor de cálculo do apuramento:
+   1) Jogos Europeus 2027 (FGP Secção 1)
+   2) Jogos Olímpicos Los Angeles 2028 (FIG Qualification System + FGP Secção 2) */
 (function (root) {
   'use strict';
 
@@ -20,7 +21,16 @@
     aa: 'All-Around Team Final'
   };
 
-  /* Calcula o total de uma série a partir de D, E, HD, ToF e Penalização (ou usa total explícito se existir) */
+  /* Tabela de Pontos FIG Taças do Mundo (Art. 16) */
+  var FIG_WC_POINTS = {
+    1: 60, 2: 55, 3: 50, 4: 44, 5: 38, 6: 32, 7: 28, 8: 25, 9: 22, 10: 21,
+    11: 20, 12: 19, 13: 18, 14: 17, 15: 16, 16: 15, 17: 14, 18: 13, 19: 12, 20: 11,
+    21: 10, 22: 9, 23: 8, 24: 7, 25: 6, 26: 5, 27: 4, 28: 3, 29: 2, 30: 1
+  };
+
+  /* =========================================================================
+     PARTE 1: JOGOS EUROPEUS 2027
+     ========================================================================= */
   function calcRoutineTotal(rt) {
     if (!rt) return null;
     if (isNum(rt.total)) return r3(rt.total);
@@ -33,7 +43,6 @@
     return r3(sum);
   }
 
-  /* Normaliza um registo de prova, preenchendo totais de séries, rondas (q1, q2, f, f1, f2) e ne */
   function hydrateRec(rec, tipo) {
     if (!rec) return null;
     var rotSrc = rec.rotinas || {};
@@ -53,7 +62,6 @@
     if (hasRot) out.rotinas = rot;
 
     if (tipo === 'late') {
-      /* TRI: Q1 é a melhor série entre q1_1 e q1_2 */
       var t1 = rot.q1_1 ? rot.q1_1.total : null;
       var t2 = rot.q1_2 ? rot.q1_2.total : null;
       if (!isNum(out.q1)) {
@@ -65,7 +73,6 @@
       if (!isNum(out.q2) && rot.q2 && isNum(rot.q2.total)) out.q2 = rot.q2.total;
       if (!isNum(out.f) && rot.f && isNum(rot.f.total)) out.f = rot.f.total;
     } else {
-      /* TUM e DMT: Q1 = q1_1 + q1_2; Finais = f1 + f2; NE = maior série individual de toda a prova */
       var qt1 = rot.q1_1 ? rot.q1_1.total : null;
       var qt2 = rot.q1_2 ? rot.q1_2.total : null;
       if (!isNum(out.q1)) {
@@ -79,7 +86,6 @@
         var maxSingle = null;
         var maxKey = null;
         Object.keys(rot).forEach(function (k) {
-          /* Ignora eventual chave agregada 'q1' se existirem séries individuais */
           if (k === 'q1' && (rot.q1_1 || rot.q1_2)) return;
           var val = rot[k] ? rot[k].total : null;
           if (isNum(val) && (maxSingle === null || val > maxSingle)) {
@@ -165,8 +171,6 @@
       return out;
     }
 
-    /* tipo 'ne': TUM e DMT
-       Q1 ou F1+F2 (maior entre as duas fases) + Nota de Excelência (desde que tenha obtido mínimos na Q1) */
     var minBase = m.base, minNe = m.ne;
     var cand = [];
     var q1Ok = false;
@@ -340,7 +344,458 @@
     return { rows: ranked.concat(rest), vagas: dcfg.vagas, comMinimos: ranked.length, minBase: minBase, minimos: m, eventos: evs };
   }
 
-  var api = { scoreEvent: scoreEvent, rank: rank, hydrateRec: hydrateRec };
+  /* =========================================================================
+     PARTE 2: JOGOS OLÍMPICOS LOS ANGELES 2028 (FIG + FGP)
+     ========================================================================= */
+  function pointsFromRank(rk) {
+    if (!isNum(rk) || rk < 1 || rk > 30) return 0;
+    return FIG_WC_POINTS[Math.floor(rk)] || 0;
+  }
+
+  /* Calcula os pontos de cada prova respeitando empates num mesmo lugar (Art. 16) */
+  function computeEventPointsMap(evId, sexResults) {
+    var evRes = sexResults[evId] || {};
+    var byRank = {};
+    Object.keys(evRes).forEach(function (athId) {
+      var r = evRes[athId];
+      if (!r || !isNum(r.rank) || r.valid === false) return;
+      var rk = Math.floor(r.rank);
+      (byRank[rk] = byRank[rk] || []).push(athId);
+    });
+    var ptsMap = {};
+    Object.keys(byRank).forEach(function (rkStr) {
+      var rk = Number(rkStr);
+      var group = byRank[rk];
+      var sum = 0;
+      for (var i = 0; i < group.length; i++) {
+        sum += pointsFromRank(rk + i);
+      }
+      var avg = r3(sum / group.length);
+      group.forEach(function (id) { ptsMap[id] = avg; });
+    });
+    return ptsMap;
+  }
+
+  /* Seleciona até 3 resultados, respeitando o máximo de 2 resultados em 2027 */
+  function selectBest3Max2_2027(items) {
+    var sorted = items.slice().sort(function (a, b) {
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      return (a.rank || 999) - (b.rank || 999);
+    });
+    var chosen = [];
+    var count2027 = 0;
+    sorted.forEach(function (it) {
+      if (chosen.length >= 3) return;
+      if (it.ano === 2027 && count2027 >= 2) return;
+      chosen.push(it);
+      if (it.ano === 2027) count2027++;
+    });
+    var total = r3(chosen.reduce(function (acc, x) { return acc + x.pts; }, 0));
+    var usedMap = {};
+    chosen.forEach(function (x) { usedMap[x.evId] = true; });
+    return { total: total, chosen: chosen, usedMap: usedMap };
+  }
+
+  /* Desempate FIG World Cup Series (Art. 17) */
+  function compareFigTie(a, b) {
+    if (a.sumRanks !== b.sumRanks) {
+      return { diff: a.sumRanks - b.sumRanks, reason: 'Desempate FIG: soma lugares (' + a.sumRanks + ' vs ' + b.sumRanks + ')' };
+    }
+    if (a.finalsCount !== b.finalsCount) {
+      return { diff: b.finalsCount - a.finalsCount, reason: 'Desempate FIG: n.º de finais (' + b.finalsCount + ' vs ' + a.finalsCount + ')' };
+    }
+    if (a.bestRank !== b.bestRank) {
+      return { diff: a.bestRank - b.bestRank, reason: 'Desempate FIG: melhor lugar (' + a.bestRank + 'º vs ' + b.bestRank + 'º)' };
+    }
+    if (a.sumQ1_2 !== b.sumQ1_2) {
+      return { diff: b.sumQ1_2 - a.sumQ1_2, reason: 'Desempate FIG: soma 2.ª série Q1 (' + fmtPt(b.sumQ1_2) + ' vs ' + fmtPt(a.sumQ1_2) + ')' };
+    }
+    return { diff: 0, reason: 'Empate FIG' };
+  }
+
+  /* Desempate FGP Nacional (Secção 2.6) */
+  function compareFgpTie(a, b) {
+    if (a.bestScore !== b.bestScore) {
+      return { diff: b.bestScore - a.bestScore, reason: 'Desempate FGP: nota mais alta (' + fmtPt(Math.max(a.bestScore, b.bestScore)) + ' vs ' + fmtPt(Math.min(a.bestScore, b.bestScore)) + ')' };
+    }
+    if (a.bestD !== b.bestD) {
+      return { diff: b.bestD - a.bestD, reason: 'Desempate FGP: D mais alta (' + fmtPt(Math.max(a.bestD, b.bestD)) + ' vs ' + fmtPt(Math.min(a.bestD, b.bestD)) + ')' };
+    }
+    if (a.sumD !== b.sumD) {
+      return { diff: b.sumD - a.sumD, reason: 'Desempate FGP: soma D (' + fmtPt(Math.max(a.sumD, b.sumD)) + ' vs ' + fmtPt(Math.min(a.sumD, b.sumD)) + ')' };
+    }
+    if (a.bestE !== b.bestE) {
+      return { diff: b.bestE - a.bestE, reason: 'Desempate FGP: E mais alta (' + fmtPt(Math.max(a.bestE, b.bestE)) + ' vs ' + fmtPt(Math.min(a.bestE, b.bestE)) + ')' };
+    }
+    if (a.sumE !== b.sumE) {
+      return { diff: b.sumE - a.sumE, reason: 'Desempate FGP: soma E (' + fmtPt(Math.max(a.sumE, b.sumE)) + ' vs ' + fmtPt(Math.min(a.sumE, b.sumE)) + ')' };
+    }
+    if (a.secondScore !== b.secondScore) {
+      return { diff: b.secondScore - a.secondScore, reason: 'Desempate FGP: 2.ª nota mais alta' };
+    }
+    if (a.thirdScore !== b.thirdScore) {
+      return { diff: b.thirdScore - a.thirdScore, reason: 'Desempate FGP: 3.ª nota mais alta' };
+    }
+    return { diff: 0, reason: 'Empate FGP' };
+  }
+
+  function rankLA28(laCfg, sex, overrides) {
+    var baseRes = (laCfg.resultados && laCfg.resultados[sex]) || {};
+    var sexRes = {};
+    laCfg.eventos.forEach(function (ev) {
+      sexRes[ev.id] = Object.assign({}, baseRes[ev.id] || {});
+      if (overrides && overrides[sex] && overrides[sex][ev.id]) {
+        Object.keys(overrides[sex][ev.id]).forEach(function (athId) {
+          var ovRec = overrides[sex][ev.id][athId];
+          if (ovRec === null) delete sexRes[ev.id][athId];
+          else sexRes[ev.id][athId] = Object.assign({}, sexRes[ev.id][athId] || {}, ovRec);
+        });
+      }
+    });
+
+    var continentsMap = laCfg.nocContinents || {};
+    var ptsByEv = {};
+    laCfg.eventos.forEach(function (ev) {
+      ptsByEv[ev.id] = computeEventPointsMap(ev.id, sexRes);
+    });
+
+    /* 1) Recolher todos os atletas que aparecem em qualquer evento */
+    var athletes = {};
+    laCfg.eventos.forEach(function (ev) {
+      var evR = sexRes[ev.id] || {};
+      Object.keys(evR).forEach(function (athId) {
+        var rec = evR[athId];
+        if (!rec) return;
+        if (!athletes[athId]) {
+          athletes[athId] = { id: athId, nome: rec.nome || athId, noc: (rec.noc || '').toUpperCase() };
+        }
+      });
+    });
+
+    /* 2) Critério 1: Campeonato do Mundo 2027 (Top 8 da Final, máx. 1 por NOC, desempate por Q2) */
+    var wchEv = laCfg.eventos.filter(function (e) { return e.tipo === 'wch'; })[0];
+    var crit1ByAth = {};
+    var crit1Nocs = {};
+    if (wchEv && sexRes[wchEv.id]) {
+      var wchR = sexRes[wchEv.id];
+      var finalists = Object.keys(wchR).map(function (id) {
+        return { id: id, rec: wchR[id] };
+      }).filter(function (x) {
+        return isNum(x.rec.finalRank) && x.rec.finalRank >= 1 && x.rec.finalRank <= 8;
+      });
+
+      /* Se 2 atletas do mesmo NOC estão na final, fica apenas o melhor na Q2 */
+      var bestFinalistByNoc = {};
+      finalists.forEach(function (f) {
+        var noc = (f.rec.noc || '').toUpperCase();
+        var prev = bestFinalistByNoc[noc];
+        if (!prev) {
+          bestFinalistByNoc[noc] = f;
+        } else {
+          var qPrev = isNum(prev.rec.q2Rank) ? prev.rec.q2Rank : prev.rec.finalRank;
+          var qCurr = isNum(f.rec.q2Rank) ? f.rec.q2Rank : f.rec.finalRank;
+          if (qCurr < qPrev) bestFinalistByNoc[noc] = f;
+        }
+      });
+
+      var eligibleCrit1 = Object.keys(bestFinalistByNoc).map(function (noc) {
+        return bestFinalistByNoc[noc];
+      }).sort(function (a, b) {
+        return a.rec.finalRank - b.rec.finalRank;
+      }).slice(0, 8);
+
+      eligibleCrit1.forEach(function (item, idx) {
+        var noc = (item.rec.noc || '').toUpperCase();
+        crit1ByAth[item.id] = { quotaRank: idx + 1, finalRank: item.rec.finalRank };
+        crit1Nocs[noc] = item.id;
+      });
+    }
+
+    /* 3) Ranking Internacional FIG (apenas as 6 Taças do Mundo) */
+    var wcEvents = laCfg.eventos.filter(function (e) { return e.tipo === 'wc'; });
+    var figRows = Object.keys(athletes).map(function (athId) {
+      var ath = athletes[athId];
+      var per = {};
+      var validItems = [];
+      var isSim = false;
+
+      wcEvents.forEach(function (ev) {
+        var rec = (sexRes[ev.id] && sexRes[ev.id][athId]) || null;
+        var ovFlag = Boolean(overrides && overrides[sex] && overrides[sex][ev.id] && overrides[sex][ev.id][athId] !== undefined);
+        if (ovFlag) isSim = true;
+        var pts = ptsByEv[ev.id][athId] || 0;
+        per[ev.id] = { rec: rec, pts: pts, used: false, simulated: ovFlag };
+        if (rec && pts > 0) {
+          validItems.push({
+            evId: ev.id,
+            ano: ev.ano,
+            pts: pts,
+            rank: rec.rank || 999,
+            final: Boolean(rec.final || (isNum(rec.rank) && rec.rank <= 8)),
+            q1_2: isNum(rec.q1_2) ? rec.q1_2 : 0
+          });
+        }
+      });
+
+      var sel = selectBest3Max2_2027(validItems);
+      Object.keys(sel.usedMap).forEach(function (evId) { per[evId].used = true; });
+
+      var sumRanks = sel.chosen.reduce(function (a, x) { return a + x.rank; }, 0);
+      var finalsCount = sel.chosen.reduce(function (a, x) { return a + (x.final ? 1 : 0); }, 0);
+      var bestRank = sel.chosen.length ? Math.min.apply(null, sel.chosen.map(function (x) { return x.rank; })) : 999;
+      var sumQ1_2 = r3(sel.chosen.reduce(function (a, x) { return a + x.q1_2; }, 0));
+
+      return {
+        ath: ath,
+        per: per,
+        total: sel.total,
+        nCont: sel.chosen.length,
+        sumRanks: sumRanks,
+        finalsCount: finalsCount,
+        bestRank: bestRank,
+        sumQ1_2: sumQ1_2,
+        crit1: crit1ByAth[athId] || null,
+        nocHasCrit1: Boolean(crit1Nocs[ath.noc]),
+        simulated: isSim,
+        figRank: null,
+        status: 'out', /* 'crit1' (azul) | 'crit2_safe' (verde) | 'crit2_bubble' (amarelo) | 'noc_full' | 'out' */
+        statusLabel: '',
+        tieReason: ''
+      };
+    });
+
+    /* Ordenar lista FIG: quem tem pontos > 0 ou Critério 1 */
+    var figActive = figRows.filter(function (r) { return r.total > 0 || r.crit1; });
+    figActive.sort(function (a, b) {
+      if (b.total !== a.total) return b.total - a.total;
+      if (a.nCont > 0 && b.nCont > 0) {
+        var cmp = compareFigTie(a, b);
+        if (cmp.diff !== 0) return cmp.diff;
+      }
+      if (a.crit1 && !b.crit1) return -1;
+      if (!a.crit1 && b.crit1) return 1;
+      return a.ath.nome.localeCompare(b.ath.nome, 'pt');
+    });
+
+    figActive.forEach(function (r, i) {
+      if (i > 0 && figActive[i - 1].total === r.total && r.total > 0) {
+        var cmp = compareFigTie(figActive[i - 1], r);
+        if (cmp.diff !== 0) {
+          r.tieReason = cmp.reason;
+          if (!figActive[i - 1].tieReason) figActive[i - 1].tieReason = cmp.reason;
+        }
+      }
+      r.figRank = i + 1;
+    });
+
+    /* 4) Simulação Dinâmica de Alocação de Vagas Olímpicas (16 vagas totais) */
+    var TOTAL_QUOTAS = 16;
+    var crit1Count = Object.keys(crit1ByAth).length;
+
+    /* Atribuir primeiro as vagas do Critério 1 */
+    figActive.forEach(function (r) {
+      if (r.crit1) {
+        r.status = 'crit1';
+        r.statusLabel = 'Critério 1 · CM 2027 (' + r.crit1.finalRank + 'º)';
+      }
+    });
+
+    /* Percorrer elegíveis do Critério 2 (excluindo quem já ganhou vaga no Critério 1) */
+    var eligibleCrit2 = figActive.filter(function (r) { return !r.crit1 && r.total > 0; });
+    var nocQuotas = {};
+    Object.keys(crit1Nocs).forEach(function (noc) { nocQuotas[noc] = 1; });
+    var secondQuotaCountries = 0;
+
+    var crit2Candidates = [];
+    eligibleCrit2.forEach(function (r, idx) {
+      var noc = r.ath.noc;
+      var currentNocQ = nocQuotas[noc] || 0;
+      var worldCupPos = idx + 1; /* Posição entre os elegíveis do circuito de Taças do Mundo */
+
+      if (currentNocQ === 0) {
+        nocQuotas[noc] = 1;
+        crit2Candidates.push(r);
+      } else if (currentNocQ === 1 && crit1Nocs[noc] && worldCupPos <= 3 && secondQuotaCountries < 3) {
+        /* Top 3 do ranking de Taças do Mundo pode dar 2.ª vaga a país com vaga no CM 2027 */
+        nocQuotas[noc] = 2;
+        secondQuotaCountries++;
+        r.isSecondQuota = true;
+        crit2Candidates.push(r);
+      } else {
+        r.status = 'noc_full';
+        r.statusLabel = 'País já com vaga';
+      }
+    });
+
+    /* Calcular quantas vagas ficam reservadas para Critério 3 (Continental) + Anfitrião (USA)
+       no cenário máximo (Verde) vs cenário mínimo / realocação (Amarelo) */
+    function countReservedSlots(qualifiedNocsList) {
+      var repContinents = {};
+      var hasUsa = false;
+      qualifiedNocsList.forEach(function (noc) {
+        if (noc === 'USA') hasUsa = true;
+        var cont = continentsMap[noc];
+        if (cont) repContinents[cont] = true;
+      });
+      var allContinents = ['EU', 'AS', 'AM', 'AF', 'OC'];
+      var missingContinents = allContinents.filter(function (c) { return !repContinents[c]; }).length;
+      var hostReserve = hasUsa ? 0 : 1;
+      /* Universalidade assume-se sempre realocada ao Critério 2 */
+      return {
+        missingContinents: missingContinents,
+        hostReserve: hostReserve,
+        totalReserved: missingContinents + hostReserve
+      };
+    }
+
+    /* Atribuir estado Verde (garantido) vs Amarelo (dependente das vagas continentais/USA) */
+    var maxPool = TOTAL_QUOTAS - crit1Count; /* Máximo de vagas possíveis no Critério 2 (se tudo realocar) */
+    var acceptedNocsSoFar = Object.keys(crit1Nocs);
+
+    crit2Candidates.forEach(function (r, cIdx) {
+      var slotNum = cIdx + 1; /* 1.ª, 2.ª, 3.ª... vaga atribuída via Critério 2 */
+      if (slotNum > maxPool) {
+        r.status = 'out';
+        r.statusLabel = 'Fora das vagas';
+        return;
+      }
+      var nextNocs = acceptedNocsSoFar.concat([r.ath.noc]);
+      var resInfo = countReservedSlots(nextNocs);
+      var safePool = TOTAL_QUOTAS - crit1Count - resInfo.totalReserved;
+
+      if (slotNum <= safePool) {
+        r.status = 'crit2_safe';
+        r.statusLabel = r.isSecondQuota ? 'Critério 2 · 2.ª vaga' : 'Critério 2 · Garantido';
+        acceptedNocsSoFar = nextNocs;
+      } else {
+        r.status = 'crit2_bubble';
+        r.statusLabel = 'Zona de corte (dep. Cont./USA)';
+        acceptedNocsSoFar = nextNocs;
+      }
+    });
+
+    /* Resumo dinâmico de vagas e situação de Portugal (POR) */
+    var finalResInfo = countReservedSlots(acceptedNocsSoFar);
+    var safeCrit2Slots = Math.max(0, TOTAL_QUOTAS - crit1Count - finalResInfo.totalReserved);
+    var bubbleCrit2Slots = Math.max(0, maxPool - safeCrit2Slots);
+
+    var porFigRows = figActive.filter(function (r) { return r.ath.noc === 'POR'; });
+    var porQuotasSafe = porFigRows.filter(function (r) { return r.status === 'crit1' || r.status === 'crit2_safe'; }).length;
+    var porQuotasBubble = porFigRows.filter(function (r) { return r.status === 'crit2_bubble'; }).length;
+
+    /* 5) Ranking Nacional FGP (7 provas: 6 Taças do Mundo + CM 2027, máx. 2 de 2027, apenas atletas POR) */
+    var allEvents = laCfg.eventos;
+    var porIds = Object.keys(athletes).filter(function (id) { return athletes[id].noc === 'POR'; });
+    var fgpRows = porIds.map(function (athId) {
+      var ath = athletes[athId];
+      var per = {};
+      var validItems = [];
+      var allScores = [];
+      var bestD = 0, bestE = 0;
+      var isSim = false;
+
+      allEvents.forEach(function (ev) {
+        var rec = (sexRes[ev.id] && sexRes[ev.id][athId]) || null;
+        var ovFlag = Boolean(overrides && overrides[sex] && overrides[sex][ev.id] && overrides[sex][ev.id][athId] !== undefined);
+        if (ovFlag) isSim = true;
+        var pts = ptsByEv[ev.id][athId] || 0;
+        per[ev.id] = { rec: rec, pts: pts, used: false, simulated: ovFlag };
+        if (rec) {
+          var sc = isNum(rec.bestScore) ? rec.bestScore : 0;
+          var dVal = isNum(rec.bestD) ? rec.bestD : 0;
+          var eVal = isNum(rec.bestE) ? rec.bestE : 0;
+          if (sc > 0) allScores.push(sc);
+          if (dVal > bestD) bestD = dVal;
+          if (eVal > bestE) bestE = eVal;
+          if (pts > 0) {
+            validItems.push({
+              evId: ev.id,
+              ano: ev.ano,
+              pts: pts,
+              rank: rec.rank || 999,
+              bestScore: sc,
+              bestD: dVal,
+              bestE: eVal
+            });
+          }
+        }
+      });
+
+      var sel = selectBest3Max2_2027(validItems);
+      Object.keys(sel.usedMap).forEach(function (evId) { per[evId].used = true; });
+
+      allScores.sort(function (a, b) { return b - a; });
+      var sumD = r3(sel.chosen.reduce(function (a, x) { return a + x.bestD; }, 0));
+      var sumE = r3(sel.chosen.reduce(function (a, x) { return a + x.bestE; }, 0));
+
+      return {
+        ath: ath,
+        per: per,
+        total: sel.total,
+        nCont: sel.chosen.length,
+        bestScore: allScores[0] || 0,
+        secondScore: allScores[1] || 0,
+        thirdScore: allScores[2] || 0,
+        bestD: bestD,
+        sumD: sumD,
+        bestE: bestE,
+        sumE: sumE,
+        simulated: isSim,
+        rank: null,
+        tieReason: '',
+        quotaState: 'out' /* 'safe' | 'bubble' | 'out' */
+      };
+    });
+
+    fgpRows.sort(function (a, b) {
+      if (b.total !== a.total) return b.total - a.total;
+      var cmp = compareFgpTie(a, b);
+      if (cmp.diff !== 0) return cmp.diff;
+      return a.ath.nome.localeCompare(b.ath.nome, 'pt');
+    });
+
+    fgpRows.forEach(function (r, i) {
+      if (i > 0 && fgpRows[i - 1].total === r.total && r.total > 0) {
+        var cmp = compareFgpTie(fgpRows[i - 1], r);
+        if (cmp.diff !== 0) {
+          r.tieReason = cmp.reason;
+          if (!fgpRows[i - 1].tieReason) fgpRows[i - 1].tieReason = cmp.reason;
+        }
+      }
+      r.rank = r.total > 0 ? (i + 1) : null;
+      if (r.rank !== null) {
+        if (r.rank <= porQuotasSafe) r.quotaState = 'safe';
+        else if (r.rank <= (porQuotasSafe + porQuotasBubble)) r.quotaState = 'bubble';
+      }
+    });
+
+    return {
+      eventos: allEvents,
+      wcEvents: wcEvents,
+      wchEvent: wchEv,
+      figRows: figActive,
+      fgpRows: fgpRows,
+      summary: {
+        totalQuotas: TOTAL_QUOTAS,
+        crit1Count: crit1Count,
+        safeCrit2Slots: safeCrit2Slots,
+        bubbleCrit2Slots: bubbleCrit2Slots,
+        reservedSlots: finalResInfo.totalReserved,
+        missingContinents: finalResInfo.missingContinents,
+        hostReserve: finalResInfo.hostReserve,
+        porQuotasSafe: porQuotasSafe,
+        porQuotasBubble: porQuotasBubble
+      }
+    };
+  }
+
+  var api = {
+    scoreEvent: scoreEvent,
+    rank: rank,
+    hydrateRec: hydrateRec,
+    rankLA28: rankLA28,
+    pointsFromRank: pointsFromRank
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Apuramento = api;
 })(typeof self !== 'undefined' ? self : this);
