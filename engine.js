@@ -624,7 +624,7 @@
     crit1Group.forEach(function (r, idx) {
       r.displayRank = idx + 1;
       r.status = 'crit1';
-      r.statusLabel = 'Critério 1 · CM 2027 (Q2: ' + r.crit1.q2Rank + 'º)';
+      r.statusLabel = 'Critério 1 · CM 2027';
     });
 
     var nocQuotas = {};
@@ -688,11 +688,11 @@
 
       if (slotNum <= safePool) {
         r.status = 'crit2_safe';
-        r.statusLabel = r.isSecondQuota ? 'Critério 2 · 2.ª vaga' : 'Critério 2 · Garantido';
+        r.statusLabel = r.isSecondQuota ? 'Critério 2 · 2ª vaga' : 'Critério 2 · Garantido';
         qualifiedEntries = nextEntries;
       } else {
         r.status = 'crit2_bubble';
-        r.statusLabel = 'Zona de corte (dep. Uniões/' + HOST_NOC + ')';
+        r.statusLabel = 'Zona de corte';
         qualifiedEntries = nextEntries;
       }
     });
