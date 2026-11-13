@@ -1,6 +1,6 @@
 {
   "live": true,
-  "atualizadoEm": "2026-11-13 13:10:34",
+  "atualizadoEm": "2026-11-13 13:17:04",
   "resultados": {
     "cn_teste": {
       "tri_1112_f_maria_caridade": {
@@ -1488,6 +1488,28 @@
         },
         "q1": 72.88,
         "late": 43.375
+      },
+      "tri_1721_f_matilde_nobre": {
+        "rotinas": {
+          "q1_1": {
+            "e": 7.2,
+            "d": 0.6,
+            "hd": 3.7,
+            "tof": 6.22,
+            "p": 0,
+            "total": 17.72
+          },
+          "q1_2": {
+            "e": 7.5,
+            "d": 4.8,
+            "hd": 5.3,
+            "tof": 7.4,
+            "p": 0,
+            "total": 25
+          }
+        },
+        "q1": 42.72,
+        "late": 25
       }
     }
   }
