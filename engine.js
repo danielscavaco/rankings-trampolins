@@ -124,7 +124,8 @@
     var m = (minimos[disc] || {})[sex] || {};
     var items = [];
     var out = {
-      score: 0, items: items, base: null, baseOk: false, neValid: false,
+      score: 0, items: items, base: null, baseOk: false,
+      neReached: false, neValid: false, nePhase: null,
       usedPhases: [], stats: { e: 0, d: 0, hasDetail: false }, hydrated: rec
     };
     if (!rec) return out;
@@ -133,10 +134,7 @@
       var minQ1 = m.q1, minLate = m.late;
       if (isNum(rec.agg)) {
         var ok = rec.agg >= minQ1;
-        items.push({
-          label: 'Valor da prova (Q1 + melhor fase seguinte)', value: rec.agg, ok: ok,
-          note: ''
-        });
+        items.push({ label: 'Valor da prova (Q1 + melhor fase seguinte)', value: rec.agg, ok: ok, note: '' });
         out.base = rec.agg;
         out.score = ok ? rec.agg : 0;
         return out;
@@ -144,10 +142,7 @@
       if (!isNum(rec.q1)) return out;
       out.base = rec.q1;
       var q1ok = rec.q1 >= minQ1;
-      items.push({
-        label: 'Q1 (melhor série)', value: rec.q1, ok: q1ok,
-        note: ''
-      });
+      items.push({ label: 'Q1 (melhor série)', value: rec.q1, ok: q1ok, note: '' });
 
       var prevOk = q1ok, best = null, bestKey = null;
       [['q2', 'Q2'], ['f', 'Final']].forEach(function (p) {
@@ -177,19 +172,13 @@
 
     if (isNum(rec.agg)) {
       var okA = rec.agg >= minBase;
-      items.push({
-        label: 'Valor da prova (Q1 ou F1+F2)', value: rec.agg, ok: okA,
-        note: ''
-      });
+      items.push({ label: 'Valor da prova (Q1 ou F1+F2)', value: rec.agg, ok: okA, note: '' });
       out.base = rec.agg;
       if (okA) cand.push({ val: rec.agg, keys: [] });
     } else {
       if (isNum(rec.q1)) {
         q1Ok = rec.q1 >= minBase;
-        items.push({
-          label: 'Q1', value: rec.q1, ok: q1Ok,
-          note: ''
-        });
+        items.push({ label: 'Q1', value: rec.q1, ok: q1Ok, note: '' });
         out.base = rec.q1;
         if (q1Ok) cand.push({ val: rec.q1, keys: ['q1_1', 'q1_2'] });
       }
@@ -197,11 +186,8 @@
         var ff = r3(rec.f1 + rec.f2);
         var meetsF = ff >= minBase;
         var okF = q1Ok && meetsF;
-        var noteF = (meetsF && !q1Ok) ? 'Q1 sem mínimos' : '';
-        items.push({
-          label: 'F1 + F2', value: ff, ok: okF,
-          note: noteF
-        });
+        var noteF = (meetsF && !q1Ok) ? 'fase anterior sem mínimos' : '';
+        items.push({ label: 'F1 + F2', value: ff, ok: okF, note: noteF });
         if (q1Ok && (out.base === null || ff > out.base)) out.base = ff;
         if (okF) cand.push({ val: ff, keys: ['f1', 'f2'] });
       }
@@ -224,24 +210,15 @@
       var phaseLabel = rec.nePhase ? (PHASE_NAMES[rec.nePhase] || rec.nePhase) : '';
       var noteParts = [];
       if (phaseLabel) noteParts.push(phaseLabel);
-      if (meetsNe && !allowed) {
-        noteParts.push('exige o mínimo numa prova');
-      }
-      items.push({
-        label: 'Nota de excelência', value: rec.ne, ok: okN,
-        note: noteParts.join(' · ')
-      });
-      if (okN) {
-        out.neValid = true;
-        if (rec.nePhase && out.usedPhases.indexOf(rec.nePhase) < 0) {
-          out.usedPhases = out.usedPhases.concat([rec.nePhase]);
-        }
-      }
+      if (meetsNe && !allowed) noteParts.push('exige o mínimo numa prova');
+      items.push({ label: 'Nota de excelência', value: rec.ne, ok: okN, note: noteParts.join(' · ') });
+      out.nePhase = rec.nePhase || null;
+      if (meetsNe) out.neReached = true;
+      if (okN) out.neValid = true;
     } else if (rec.neFlag) {
-      items.push({
-        label: 'Nota de excelência', value: null, ok: false, pending: true,
-        note: 'obtida, valor por introduzir'
-      });
+      items.push({ label: 'Nota de excelência', value: null, ok: false, pending: true, note: 'obtida, valor por introduzir' });
+      out.neReached = true;
+      if (allowed) out.neValid = true;
     }
 
     /* A nota de excelência não soma à pontuação da prova */
@@ -252,38 +229,23 @@
   function compareTied(a, b) {
     if (a.best !== b.best) {
       var hi = Math.max(a.best, b.best), lo = Math.min(a.best, b.best);
-      return {
-        diff: b.best - a.best,
-        reason: 'Desempate: prova mais alta (' + fmtPt(hi) + ' vs ' + fmtPt(lo) + ')'
-      };
+      return { diff: b.best - a.best, reason: 'Desempate: prova mais alta (' + fmtPt(hi) + ' vs ' + fmtPt(lo) + ')' };
     }
     if (a.hasDetail && b.hasDetail) {
       if (a.sumD !== b.sumD) {
         var hiD = Math.max(a.sumD, b.sumD), loD = Math.min(a.sumD, b.sumD);
-        return {
-          diff: b.sumD - a.sumD,
-          reason: 'Desempate: dificuldade (' + fmtPt(hiD) + ' vs ' + fmtPt(loD) + ')'
-        };
+        return { diff: b.sumD - a.sumD, reason: 'Desempate: dificuldade (' + fmtPt(hiD) + ' vs ' + fmtPt(loD) + ')' };
       }
       if (a.sumE !== b.sumE) {
         var hiE = Math.max(a.sumE, b.sumE), loE = Math.min(a.sumE, b.sumE);
-        return {
-          diff: b.sumE - a.sumE,
-          reason: 'Desempate: execução (' + fmtPt(hiE) + ' vs ' + fmtPt(loE) + ')'
-        };
+        return { diff: b.sumE - a.sumE, reason: 'Desempate: execução (' + fmtPt(hiE) + ' vs ' + fmtPt(loE) + ')' };
       }
     }
     if (a.second !== b.second) {
       var hi2 = Math.max(a.second, b.second), lo2 = Math.min(a.second, b.second);
-      return {
-        diff: b.second - a.second,
-        reason: 'Desempate: 2.ª melhor prova (' + fmtPt(hi2) + ' vs ' + fmtPt(lo2) + ')'
-      };
+      return { diff: b.second - a.second, reason: 'Desempate: 2.ª melhor prova (' + fmtPt(hi2) + ' vs ' + fmtPt(lo2) + ')' };
     }
-    return {
-      diff: 0,
-      reason: (!a.hasDetail || !b.hasDetail) ? 'Empate (aguarda detalhe D/E)' : 'Empate técnico'
-    };
+    return { diff: 0, reason: (!a.hasDetail || !b.hasDetail) ? 'Empate (aguarda detalhe D/E)' : 'Empate técnico' };
   }
 
   function rank(cfg, disc, sex, entries, results, overrides) {
@@ -313,13 +275,13 @@
           score: s.score,
           items: s.items,
           simulated: rr.ov,
+          neReached: s.neReached,
           neValid: s.neValid,
+          nePhase: s.nePhase,
           usedPhases: s.usedPhases,
           stats: s.stats
         };
-        if (s.score > 0) {
-          scoredList.push({ evId: ev.id, score: s.score, stats: s.stats });
-        }
+        if (s.score > 0) scoredList.push({ evId: ev.id, score: s.score, stats: s.stats });
         if (s.base !== null && (bestRaw === null || s.base > bestRaw)) bestRaw = s.base;
       });
 
@@ -330,31 +292,16 @@
       var sumD = 0, sumE = 0, hasDetail = top2.length > 0;
       top2.forEach(function (x) {
         if (!x.stats || !x.stats.hasDetail) hasDetail = false;
-        else {
-          sumD = r3(sumD + x.stats.d);
-          sumE = r3(sumE + x.stats.e);
-        }
+        else { sumD = r3(sumD + x.stats.d); sumE = r3(sumE + x.stats.e); }
       });
 
       return {
-        entry: en,
-        per: per,
-        total: total,
-        hasValidNe: hasValidNe,
-        nCont: top2.length,
-        nProvas: scoredList.length,
-        best: top2[0] ? top2[0].score : 0,
-        second: top2[1] ? top2[1].score : 0,
-        sumD: sumD,
-        sumE: sumE,
-        hasDetail: hasDetail,
-        bestRaw: bestRaw,
-        gap: bestRaw !== null && minBase ? r3(minBase - bestRaw) : null,
-        simulated: sim,
-        rank: null,
-        tie: false,
-        tieReason: '',
-        naVaga: false
+        entry: en, per: per, total: total, hasValidNe: hasValidNe,
+        nCont: top2.length, nProvas: scoredList.length,
+        best: top2[0] ? top2[0].score : 0, second: top2[1] ? top2[1].score : 0,
+        sumD: sumD, sumE: sumE, hasDetail: hasDetail,
+        bestRaw: bestRaw, gap: bestRaw !== null && minBase ? r3(minBase - bestRaw) : null,
+        simulated: sim, rank: null, tie: false, tieReason: '', naVaga: false
       };
     });
 
@@ -362,7 +309,6 @@
     var rest = rows.filter(function (r) { return r.total <= 0; });
 
     ranked.sort(function (a, b) {
-      /* Quem tem Nota de Excelência válida fica num patamar prioritário acima de quem não tem */
       if (a.hasValidNe !== b.hasValidNe) return a.hasValidNe ? -1 : 1;
       if (b.total !== a.total) return b.total - a.total;
       var cmp = compareTied(a, b);
@@ -395,14 +341,7 @@
       return (bv - av) || a.entry.nome.localeCompare(b.entry.nome, 'pt');
     });
 
-    return {
-      rows: ranked.concat(rest),
-      vagas: dcfg.vagas,
-      comMinimos: ranked.length,
-      minBase: minBase,
-      minimos: m,
-      eventos: evs
-    };
+    return { rows: ranked.concat(rest), vagas: dcfg.vagas, comMinimos: ranked.length, minBase: minBase, minimos: m, eventos: evs };
   }
 
   var api = { scoreEvent: scoreEvent, rank: rank, hydrateRec: hydrateRec };
