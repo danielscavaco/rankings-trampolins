@@ -636,7 +636,7 @@
             return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(cfg.disciplinas[d].nome) + '</span></button>';
           }).join('');
         } else {
-          $('#sub').textContent = cfg.local + ' · ' + cfg.datas + ' · Trampolim Individual (TRI)';
+          $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
           $('#tabsSub').innerHTML =
             '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG (Vagas)</span><span class="full">Ranking Internacional (FIG)</span></button>' +
             '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP (Nacional)</span><span class="full">Ranking Nacional (FGP)</span></button>';
