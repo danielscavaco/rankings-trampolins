@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO SPORTTECH OVS (LIVE SYNC) — 2026-11-13 12:57:10
+RELATÓRIO SPORTTECH OVS (LIVE SYNC) — 2026-11-13 13:10:34
 API: https://sporttech.io/events/56c681e4-f2c2-45df-787d-ea9164169d95/ovs/api/
 ====================================================================
 
@@ -27,7 +27,7 @@ Stages competitivos carregados da Sporttech (1D/Elite; Q2/Finais só SEN): 22
   • [32] Sen 1D F (17+ years) -> SYN | Escalões: [17-21] | Sexo: F | Fase: q1 (6 inscritos)
   • [33] Sen 1D M (17+ years) -> SYN | Escalões: [17-21] | Sexo: M | Fase: q1 (10 inscritos)
 
---- CRUZAMENTO DE GINASTAS (78 no JSON) ---
+--- CRUZAMENTO DE GINASTAS (82 no JSON) ---
 [OK] Maria Caridade (TRI · 11-12 · F) -> "Inic 1D F (11-12 years)" [q1] via Nome (1.º + Último) | Nota apuramento: 67.5 (séries: 26.165 + 41.335)
 [OK] Madalena Costa (TRI · 11-12 · F) -> "Inic 1D F (11-12 years)" [q1] via Nome (1.º + Último) | Nota apuramento: 85.665 (séries: 39.24 + 46.425)
 [OK] Maria Verças (TRI · 11-12 · F) -> "Inic 1D F (11-12 years)" [q1] via Nome (1.º + Último) | Nota apuramento: 77.765 (séries: 35.745 + 42.02)
@@ -112,5 +112,9 @@ Stages competitivos carregados da Sporttech (1D/Elite; Q2/Finais só SEN): 22
 [ERRO - NÃO ENCONTRADO] Zé Ninguém Inexistente (TRI · SEN · M · SCP) -> Não aparece em "Sen Elite M (Senior) / Sen Elite M (Senior)".
 [ERRO - NÃO ENCONTRADO] Gabriel Albuquerque (TRI · 11-12 · M · APAGL) -> Não aparece em "Inic 1D M (11-12 years)".
 [ERRO - NÃO ENCONTRADO] Atleta Fantasma A / Atleta Fantasma B (SYN · 13-14 · F · GCN / AAC) -> Não aparece em "Jun 1D F (15-16 years) / Juv 1D F (13-14 years)".
+[OK] Anna Likhonina (TRI · 17-21 · F) -> "Sen 1D F (17+ years)" [q1] via Nome (1.º + Último) | Nota apuramento: 54.505 (séries: 7.8 + 46.705)
+[OK] Margarida Pinheiro (TRI · 17-21 · F) -> "Sen 1D F (17+ years)" [q1] via Nome (1.º + Último) | Nota apuramento: 61.975 (séries: 38.435 + 23.54)
+[OK] Rita Vieira (TRI · 17-21 · F) -> "Sen 1D F (17+ years)" [q1] via Nome (1.º + Último) | Nota apuramento: 72.88 (séries: 43.375 + 29.505)
+[OK] Matilde Nobre (TRI · 17-21 · F) -> "Sen 1D F (17+ years)" [q1] via Nome (1.º + Último) | Nota apuramento: 42.72 (séries: 17.72 + 25)
 
-RESUMO: 73 encontrados | 5 com erro/não encontrados | 71 fases atualizadas.
+RESUMO: 77 encontrados | 5 com erro/não encontrados | 75 fases atualizadas.
