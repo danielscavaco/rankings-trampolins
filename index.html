@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Apuramento Jogos Europeus 2027</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    :root {
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      --bg: #F2F5F3;
+      --surface: #FFFFFF;
+      --surface-2: #EAF0ED;
+      --ink: #14211D;
+      --muted: #566862;
+      --line: #D9E2DE;
+      --accent: #0B5C8A;
+      --accent-soft: #DCEBF4;
+      --on-accent: #FFFFFF;
+      --good: #14703C;
+      --good-soft: #DDF1E4;
+      --warn: #8F5600;
+      --warn-soft: #F8EBD2;
+      --bad: #AE2A1F;
+      --sim: #5B3AB8;
+      --sim-soft: #E9E2F8;
+      --f-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      --f-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0E1815;
+        --surface: #15231F;
+        --surface-2: #1C2D28;
+        --ink: #E7EFEB;
+        --muted: #94A69F;
+        --line: #273933;
+        --accent: #6DB7E6;
+        --accent-soft: #17384B;
+        --on-accent: #08202F;
+        --good: #5ED08C;
+        --good-soft: #173A27;
+        --warn: #E5B351;
+        --warn-soft: #3A2D12;
+        --bad: #F38B80;
+        --sim: #B9A0FF;
+        --sim-soft: #2A2145;
+        color-scheme: dark;
+      }
+    }
+    html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.45 var(--f-body);
+      padding-block: 20px 64px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+    }
+    [hidden] { display: none !important; }
+    .wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    h1, h2, h3 { font-family: var(--f-display); font-weight: 600; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+    button, select, input { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    .tn { font-variant-numeric: tabular-nums; }
+
+    header { display: flex; flex-direction: column; gap: 6px; }
+    .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1; }
+    .sub { color: var(--muted); max-width: 68ch; margin: 0; }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+    .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; }
+    .seg button { border: 0; background: transparent; padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
+    .seg button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .14); }
+    .seg .full { display: none; }
+    @media (min-width: 560px) { .seg .full { display: inline; } .seg .short { display: none; } }
+
+    .facts { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+    .fact { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; display: flex; gap: 8px; align-items: baseline; }
+    .fact span { font-size: 12px; color: var(--muted); }
+    .fact b { font-family: var(--f-display); font-size: 20px; font-weight: 600; line-height: 1; }
+
+    .note { border-radius: 8px; padding: 10px 14px; background: var(--warn-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent); }
+    .note b { color: var(--warn); }
+
+    /* Lista de seriação */
+    .board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .board ol { list-style: none; margin: 0; padding: 0; }
+    .head, .rowgrid { display: grid; grid-template-columns: 44px minmax(150px, 1.5fr) minmax(0, 3.6fr) 104px 146px; gap: 0 12px; align-items: center; padding: 10px 16px; }
+    .head { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); align-items: end; }
+    .cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .hcell { display: flex; flex-direction: column; gap: 1px; text-transform: none; letter-spacing: 0; }
+    .hcell b { font-weight: 600; color: var(--ink); font-size: 12.5px; }
+    .hcell i { font-style: normal; font-size: 11px; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; background: var(--muted); }
+    .dot.done { background: var(--good); }
+    .dot.live { background: var(--accent); }
+
+    .row { border-top: 1px solid var(--line); }
+    .rowgrid { width: 100%; min-height: 60px; }
+    .rk { font-family: var(--f-display); font-size: 28px; font-weight: 600; line-height: 1; color: var(--ink); }
+    .row.out .rk { color: var(--muted); font-size: 22px; }
+    .who { display: flex; flex-direction: column; min-width: 0; }
+    .who b { font-weight: 600; overflow-wrap: anywhere; }
+    .who small { color: var(--muted); font-size: 12px; }
+
+    .cell {
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+    button.cell { cursor: pointer; transition: transform .08s, box-shadow .12s; }
+    button.cell:hover { filter: brightness(0.96); }
+    button.cell[aria-expanded="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .cell::before { content: attr(data-l); display: none; font-size: 11px; margin-right: 6px; color: var(--muted); }
+    .cell.cont { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+    .cell.ok { box-shadow: inset 0 0 0 1px var(--muted); color: var(--ink); }
+    .cell sup { font-size: 9.5px; margin-left: 3px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
+    .cell.nc { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+    .cell.sim { box-shadow: inset 0 0 0 1.5px var(--sim); }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 12.5px; color: var(--muted); }
+    .legend > span { display: flex; align-items: center; gap: 8px; }
+    .legend .cell { min-height: 0; padding: 1px 8px; }
+
+    .tot { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+    .tot b { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+    .tot small { font-size: 11.5px; color: var(--muted); }
+
+    .st { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 9px; font-size: 11.5px; font-weight: 500; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+    .chip.vaga { background: var(--good-soft); color: var(--good); }
+    .chip.min { background: var(--accent-soft); color: var(--accent); }
+    .chip.simc { background: var(--sim-soft); color: var(--sim); }
+    .chip.tie { background: var(--warn-soft); color: var(--warn); white-space: normal; line-height: 1.25; border-radius: 6px; padding: 3px 8px; }
+
+    .cut { padding: 6px 16px; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--good); background: var(--good-soft); border-top: 1px solid var(--line); display: flex; justify-content: space-between; }
+    .gap { font-size: 12px; color: var(--muted); }
+
+    /* Gaveta de detalhe técnico por prova */
+    .detail { padding: 12px 16px 16px 72px; display: flex; flex-direction: column; gap: 10px; background: var(--surface-2); border-top: 1px dashed var(--line); }
+    .detail-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .detail-head h3 { font-size: 17px; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); }
+    .detail-close { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 3px 10px; font-size: 12px; cursor: pointer; color: var(--muted); }
+    .detail-close:hover { color: var(--ink); }
+
+    .rut-table { width: 100%; max-width: 640px; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    .rut-table th, .rut-table td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .rut-table th:first-child, .rut-table td:first-child { text-align: left; font-weight: 600; }
+    .rut-table th { background: color-mix(in srgb, var(--surface-2) 60%, var(--surface)); color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+    .rut-table tr:last-child td { border-bottom: 0; }
+    .rut-table tr.used td:first-child { color: var(--accent); }
+    .rut-badge { display: inline-block; font-size: 10px; text-transform: uppercase; padding: 1px 5px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); margin-left: 6px; vertical-align: middle; }
+
+    .detail-notes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; }
+    .detail-notes li.ok b { color: var(--good); }
+    .detail-notes li.no b { color: var(--bad); }
+    .detail-notes li.pend b { color: var(--warn); }
+
+    /* Painéis e simulador */
+    details.panel, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    details.panel > summary { cursor: pointer; padding: 14px 16px; font-family: var(--f-display); font-size: 20px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    details.panel > summary::-webkit-details-marker { display: none; }
+    details.panel > summary::after { content: '+'; font-family: var(--f-body); color: var(--muted); font-size: 20px; }
+    details.panel[open] > summary::after { content: '−'; }
+    .pbody { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .pbody p { margin: 0; max-width: 75ch; }
+
+    .simbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    select { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 38px; max-width: 100%; }
+    .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; cursor: pointer; min-height: 38px; font-weight: 500; }
+    .btn:hover { background: var(--surface-2); }
+    .simrows { display: flex; flex-direction: column; gap: 10px; }
+    .simrow { display: grid; grid-template-columns: 160px 1fr; gap: 6px 14px; align-items: start; padding-top: 10px; border-top: 1px solid var(--line); }
+    .simrow .en { font-weight: 600; }
+    .simrow .en small { display: block; font-weight: 400; color: var(--muted); }
+    .fields { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+    .fld { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+    .fld input { width: 88px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-variant-numeric: tabular-nums; }
+    .fld input.mod { border-color: var(--sim); box-shadow: inset 0 0 0 1px var(--sim); }
+    .hint { font-size: 12.5px; color: var(--muted); }
+    .res { font-size: 13px; margin-top: 4px; }
+    footer { font-size: 12.5px; color: var(--muted); max-width: 75ch; }
+
+    /* Indicador não-clicável de atualização em direto */
+    .live-pill {
+      position: fixed;
+      right: max(16px, env(safe-area-inset-right, 0px));
+      bottom: max(16px, env(safe-area-inset-bottom, 0px));
+      z-index: 50;
+      pointer-events: none;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid color-mix(in srgb, var(--good) 45%, var(--line));
+      box-shadow: 0 4px 14px rgb(0 0 0 / .14);
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    .live-pulse {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 65%, transparent);
+      animation: pulseLive 1.8s infinite;
+    }
+    @keyframes pulseLive {
+      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 65%, transparent); }
+      70% { box-shadow: 0 0 0 7px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    @media (max-width: 760px) {
+      .head { display: none; }
+      .rowgrid {
+        grid-template-columns: 36px minmax(0, 1fr) auto;
+        grid-template-areas: "rk who tot" "cells cells cells" "st st st";
+        gap: 6px 10px;
+        padding: 12px 14px;
+      }
+      .rk { grid-area: rk; align-self: start; }
+      .who { grid-area: who; }
+      .tot { grid-area: tot; }
+      .st { grid-area: st; flex-direction: row; flex-wrap: wrap; }
+      .cells { grid-area: cells; grid-template-columns: 1fr 1fr; }
+      .cell { flex-wrap: wrap; }
+      .cell::before { display: inline; }
+      .detail { padding: 10px 14px 14px; }
+      .simrow { grid-template-columns: 1fr; }
+      .cut { padding: 6px 14px; }
+      .rut-table th, .rut-table td { padding: 6px 8px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Trampolins · Ranking de apuramento</div>
+      <h1 id="titulo">Apuramento Jogos Europeus 2027</h1>
+      <p class="sub" id="sub"></p>
+    </header>
+
+    <div class="controls">
+      <div class="seg" role="tablist" aria-label="Especialidade" id="tabsDisc"></div>
+      <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
+    </div>
+
+    <div class="facts" id="facts"></div>
+    <div id="banner"></div>
+
+    <div class="legend" aria-label="Legenda">
+      <span><span class="cell cont">52,25</span>conta para o total (duas melhores provas)</span>
+      <span><span class="cell ok">52,00</span>mínimo atingido, fora das duas melhores</span>
+      <span><span class="cell nc">59,23</span>mínimo não atingido</span>
+      <span>Carrega numa pontuação para ver o detalhe por série</span>
+    </div>
+
+    <section class="board" aria-label="Seriação">
+      <div class="head" id="head"></div>
+      <div id="cut0"></div>
+      <ol id="list"></ol>
+    </section>
+
+    <section class="panel" aria-labelledby="simh">
+      <div class="pbody" style="padding-top:16px">
+        <h2 id="simh">Simulador</h2>
+        <p class="hint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo. Nada é guardado: ao recarregar a página volta tudo aos dados reais.</p>
+        <div class="simbar">
+          <label for="simAth" class="hint">Ginasta</label>
+          <select id="simAth"></select>
+          <button class="btn" id="simReset" type="button">Repor esta ginasta</button>
+          <button class="btn" id="simResetAll" type="button">Repor tudo</button>
+        </div>
+        <div class="simrows" id="simRows"></div>
+      </div>
+    </section>
+
+    <footer id="foot"></footer>
+  </div>
+
+  <div class="live-pill" id="liveBadge" hidden aria-live="polite">
+    <span class="live-pulse" aria-hidden="true"></span>
+    <span>Resultados a ser atualizados em direto</span>
+  </div>
+
+  <script src="engine.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var A = window.Apuramento;
+      var S = { cfg: null, ath: [], res: {}, meta: {}, disc: 'TRI', sex: 'F', detail: null, ov: {}, simId: '' };
+      var $ = function (s) { return document.querySelector(s); };
+      var nf = new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+      var fmt = function (n) { return n === null || n === undefined ? '—' : nf.format(n); };
+      var esc = function (s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      };
+      var SEX = { F: 'Feminino', M: 'Masculino' };
+      var DISC_ORDER = ['TRI', 'DMT', 'TUM'];
+
+      function today() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+
+      function evState(ev) {
+        var t = today();
+        if (ev.fim && t > ev.fim) return 'done';
+        if (ev.inicio && t >= ev.inicio && t <= ev.fim) return 'live';
+        return 'future';
+      }
+
+      var STATE_L = { done: 'concluída', live: 'a decorrer', future: 'por realizar' };
+      function dpt(iso) { if (!iso) return ''; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+      function hasOv() { return Object.keys(S.ov).some(function (e) { return Object.keys(S.ov[e]).length; }); }
+
+      /* ---------- dados ---------- */
+      function getJSON(u) {
+        return fetch(u, { cache: 'no-cache' }).then(function (r) {
+          if (!r.ok) throw new Error(u);
+          return r.json();
+        });
+      }
+
+      var params = new URLSearchParams(location.search);
+      var resFile = params.get('teste') === '1' ? 'data/test-live.json' : 'data/results.json';
+
+      Promise.all([getJSON('data/config.json'), getJSON('data/athletes.json'), getJSON(resFile)]).then(function (a) {
+        S.cfg = a[0];
+        S.ath = a[1];
+        S.res = a[2].resultados || {};
+        S.meta = a[2];
+        fromHash();
+        renderAll();
+      }).catch(function (e) {
+        $('#list').innerHTML = '<li class="row"><div class="detail"><p>Não foi possível carregar os dados (' + esc(e.message) + '). Recarrega a página; se continuar, os ficheiros em data/ não estão acessíveis.</p></div></li>';
+      });
+
+      function fromHash() {
+        var h = (location.hash || '').replace('#', '').toLowerCase().split('-');
+        if (h.length === 2 && S.cfg.disciplinas[h[0].toUpperCase()] && SEX[h[1].toUpperCase()]) {
+          S.disc = h[0].toUpperCase();
+          S.sex = h[1].toUpperCase();
+        }
+      }
+
+      window.addEventListener('hashchange', function () {
+        fromHash();
+        S.simId = '';
+        S.detail = null;
+        renderAll();
+      });
+
+      function setView(d, s) {
+        S.disc = d;
+        S.sex = s;
+        S.simId = '';
+        S.detail = null;
+        try { history.replaceState(null, '', '#' + d.toLowerCase() + '-' + s.toLowerCase()); }
+        catch (e) { location.hash = d.toLowerCase() + '-' + s.toLowerCase(); }
+        renderAll();
+      }
+
+      function compute() {
+        var en = S.ath.filter(function (a) { return a.disc === S.disc && a.sexo === S.sex; });
+        var ov = hasOv() ? S.ov : null;
+        var R = A.rank(S.cfg, S.disc, S.sex, en, S.res, ov);
+        var base = ov ? A.rank(S.cfg, S.disc, S.sex, en, S.res, null) : R;
+        var br = {};
+        base.rows.forEach(function (r) { br[r.entry.id] = r.rank; });
+        return { R: R, br: br, entries: en };
+      }
+
+      /* ---------- cabeçalho, separadores e badge live ---------- */
+      function renderTop() {
+        var c = S.cfg;
+        $('#sub').textContent = c.local + ' · ' + c.datas + '. Ferramenta de consulta: a convocatória é decidida pela Direção da FGP.';
+        $('#tabsDisc').innerHTML = DISC_ORDER.map(function (d) {
+          return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc) + '"><span class="short">' + d + '</span><span class="full">' + d + ' · ' + esc(c.disciplinas[d].nome) + '</span></button>';
+        }).join('');
+        $('#tabsSex').innerHTML = ['F', 'M'].map(function (s) {
+          return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex) + '">' + SEX[s] + '</button>';
+        }).join('');
+        $('#foot').textContent = 'Regras: ' + c.fonteRegras + ', secção 1 (Jogos Europeus). Esta página calcula a seriação; não substitui a decisão formal de convocatória.';
+
+        var isLive = Boolean(c.liveManual || S.meta.live || params.get('live') === '1' || c.eventos.some(function (ev) { return evState(ev) === 'live'; }));
+        $('#liveBadge').hidden = !isLive;
+      }
+
+      /* ---------- detalhe técnico por prova (tabela de rotinas) ---------- */
+      function renderDetailDrawer(r, ev, dc) {
+        var p = r.per[ev.id];
+        var rec = p.rec || {};
+        var rot = rec.rotinas || {};
+        var html = '<div class="detail" role="region" aria-label="Detalhe de ' + esc(r.entry.nome) + ' em ' + esc(ev.curto) + '">';
+        html += '<div class="detail-head"><h3>' + esc(r.entry.nome) + ' — ' + esc(ev.nome) + ' (' + esc(ev.curto) + ')</h3>';
+        html += '<button type="button" class="detail-close" data-close-detail="1">Fechar</button></div>';
+
+        var phases = dc.tipo === 'late'
+          ? [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']]
+          : [['q1_1', 'Qual. Série 1'], ['q1_2', 'Qual. Série 2'], ['f1', 'Final 1'], ['f2', 'Final 2']];
+
+        var activePhases = phases.filter(function (ph) { return rot[ph[0]]; });
+
+        if (activePhases.length) {
+          html += '<table class="rut-table"><thead><tr>';
+          if (dc.tipo === 'late') {
+            html += '<th>Fase</th><th>E</th><th>D</th><th>HD</th><th>ToF</th><th>Pen.</th><th>Total</th>';
+          } else {
+            html += '<th>Série</th><th>E</th><th>D</th><th>Pen.</th><th>Total</th>';
+          }
+          html += '</tr></thead><tbody>';
+
+          activePhases.forEach(function (ph) {
+            var k = ph[0], label = ph[1], rt = rot[k];
+            var used = p.usedPhases && p.usedPhases.indexOf(k) >= 0;
+            html += '<tr class="' + (used ? 'used' : '') + '">';
+            html += '<td>' + esc(label) + (used ? '<span class="rut-badge">conta</span>' : '') + '</td>';
+            html += '<td>' + fmt(rt.e) + '</td>';
+            html += '<td>' + fmt(rt.d) + '</td>';
+            if (dc.tipo === 'late') {
+              html += '<td>' + fmt(rt.hd) + '</td>';
+              html += '<td>' + fmt(rt.tof) + '</td>';
+            }
+            html += '<td>' + (rt.p ? fmt(rt.p) : '0,00') + '</td>';
+            html += '<td><b>' + fmt(rt.total) + '</b></td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+        }
+
+        if (p.items && p.items.length) {
+          html += '<ul class="detail-notes">';
+          p.items.forEach(function (it) {
+            var cls = it.pending ? 'pend' : (it.ok ? 'ok' : 'no');
+            html += '<li class="' + cls + '">' + esc(it.label) + ': <b>' + (it.value !== null ? fmt(it.value) : '—') + '</b>' + (it.note ? ' (' + esc(it.note) + ')' : '') + '</li>';
+          });
+          html += '</ul>';
+        } else if (!activePhases.length) {
+          html += '<p class="hint" style="margin:0">Sem detalhe por série registado para esta prova.</p>';
+        }
+
+        html += '</div>';
+        return html;
+      }
+
+      /* ---------- lista ---------- */
+      function renderBoard() {
+        var C = compute(), R = C.R, cfg = S.cfg, d = S.disc, dc = cfg.disciplinas[d];
+        var m = R.minimos;
+        var minTxt = dc.tipo === 'late'
+          ? ('Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late))
+          : ('Q1 ou F1+F2 ' + fmt(m.base) + ' · Excelência ' + fmt(m.ne));
+
+        $('#facts').innerHTML =
+          '<div class="fact"><span>Vagas</span><b>' + R.vagas + '</b></div>' +
+          '<div class="fact"><span>Com mínimos</span><b>' + R.comMinimos + '</b><span>de ' + C.entries.length + '</span></div>' +
+          '<div class="fact"><span>Mínimos</span><b class="tn" style="font-size:16px">' + minTxt + '</b></div>';
+
+        var banner = '';
+        if (d !== 'TRI' && R.comMinimos === 0) {
+          banner = '<b>Ainda sem ginastas com mínimos.</b> A vaga só é atribuída a quem cumprir os mínimos; sem ninguém até ao fim do processo, aplica-se a exceção final do manual (1.6).';
+        }
+        $('#banner').innerHTML = banner ? '<div class="note">' + banner + '</div>' : '';
+
+        $('#head').innerHTML = '<span>#</span><span>Ginasta</span><span class="cells">' + R.eventos.map(function (ev) {
+          var st = evState(ev);
+          return '<span class="hcell"><b><span class="dot ' + st + '"></span>' + esc(ev.curto) + '</b><i>' + esc(ev.datas) + '</i></span>';
+        }).join('') + '</span><span style="text-align:right">Total</span><span>Estado</span>';
+
+        var html = '', cutDone = false;
+        R.rows.forEach(function (r, i) {
+          var id = r.entry.id, sim = r.simulated;
+          var cnt = {};
+          R.eventos.map(function (ev) { return { id: ev.id, s: r.per[ev.id].score }; })
+            .filter(function (x) { return x.s > 0; })
+            .sort(function (a, b) { return b.s - a.s; })
+            .slice(0, 2)
+            .forEach(function (x) { cnt[x.id] = true; });
+
+          var cells = R.eventos.map(function (ev) {
+            var p = r.per[ev.id], cl = 'cell', v = '—', tip = '', hasData = false;
+            if (p.score > 0) {
+              hasData = true;
+              cl += cnt[ev.id] ? ' cont' : ' ok';
+              v = fmt(p.score) + (p.neAdd ? '<sup>exc</sup>' : '');
+              tip = cnt[ev.id] ? 'Conta para o total (carrega para ver séries)' : 'Mínimo atingido, fora das duas melhores';
+            } else if (p.rec && p.items.length && p.items[0].value !== null) {
+              hasData = true;
+              cl += ' nc';
+              v = fmt(p.items[0].value);
+              tip = 'Mínimo não atingido (carrega para ver séries)';
+            } else if (p.rec && p.rec.rotinas && Object.keys(p.rec.rotinas).length) {
+              hasData = true;
+            }
+            if (p.simulated) cl += ' sim';
+
+            if (hasData) {
+              var isOpen = S.detail && S.detail.athId === id && S.detail.evId === ev.id;
+              return '<button type="button" class="' + cl + '" data-l="' + esc(ev.curto) + '" data-ath="' + esc(id) + '" data-ev="' + esc(ev.id) + '" aria-expanded="' + Boolean(isOpen) + '" title="' + esc(tip) + '">' + v + '</button>';
+            }
+            return '<span class="' + cl + '" data-l="' + esc(ev.curto) + '">' + v + '</span>';
+          }).join('');
+
+          var chips = '';
+          if (r.rank !== null) chips += r.naVaga ? '<span class="chip vaga">Na vaga</span>' : '<span class="chip min">Com mínimos</span>';
+          else chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
+
+          if (r.tieReason) {
+            chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
+          }
+
+          if (sim) {
+            var b = C.br[id], delta = '';
+            if (r.rank !== null && b) delta = b === r.rank ? '' : (b > r.rank ? ' ↑' + (b - r.rank) : ' ↓' + (r.rank - b));
+            else if (r.rank !== null) delta = ' entra';
+            else if (b) delta = ' sai';
+            chips += '<span class="chip simc">Simulado' + delta + '</span>';
+          } else if (r.rank !== null && C.br[id] && C.br[id] !== r.rank) {
+            var b2 = C.br[id];
+            chips += '<span class="chip simc">' + (b2 > r.rank ? '↑' + (b2 - r.rank) : '↓' + (r.rank - b2)) + '</span>';
+          }
+
+          var sub = esc(r.entry.clube || '');
+          var gap = '';
+          if (r.rank === null) {
+            gap = r.gap !== null && r.gap > 0
+              ? '<span class="gap tn">melhor: ' + fmt(r.bestRaw) + ' · faltam ' + fmt(r.gap) + ' para o mínimo</span>'
+              : (r.bestRaw === null ? '' : '<span class="gap">com mínimos numa fase, mas sem prova válida</span>');
+          }
+
+          var tot = r.rank !== null
+            ? '<b>' + fmt(r.total) + '</b><small>' + (r.nProvas >= 2 ? 'duas melhores' : '1 prova') + '</small>'
+            : '<b style="color:var(--muted)">—</b>';
+
+          var openEv = (S.detail && S.detail.athId === id)
+            ? R.eventos.filter(function (e) { return e.id === S.detail.evId; })[0]
+            : null;
+
+          html += '<li class="row' + (r.rank === null ? ' out' : '') + '">' +
+            '<div class="rowgrid">' +
+            '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
+            '<span class="who"><b>' + esc(r.entry.nome) + '</b><small>' + sub + '</small>' + gap + '</span>' +
+            '<span class="cells">' + cells + '</span>' +
+            '<span class="tot">' + tot + '</span><span class="st">' + chips + '</span></div>' +
+            (openEv ? renderDetailDrawer(r, openEv, dc) : '') +
+            '</li>';
+
+          var next = R.rows[i + 1];
+          if (r.naVaga && next && !next.naVaga && !cutDone) {
+            cutDone = true;
+            html += '<li class="cut" aria-hidden="true"><span>Limite das vagas</span><span>' + R.vagas + (R.vagas === 1 ? ' vaga' : ' vagas') + '</span></li>';
+          }
+        });
+
+        $('#list').innerHTML = html || '<li class="row"><div class="detail"><p class="none">Sem ginastas nesta especialidade.</p></div></li>';
+      }
+
+      /* ---------- simulador ---------- */
+      function fieldsFor(tipo) {
+        return tipo === 'late'
+          ? [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']]
+          : [['q1', 'Q1'], ['f1', 'F1'], ['f2', 'F2'], ['ne', 'Excelência']];
+      }
+
+      function renderSim(C) {
+        C = C || compute();
+        var sel = $('#simAth'), dc = S.cfg.disciplinas[S.disc];
+        sel.innerHTML = '<option value="">Escolher…</option>' + C.entries.map(function (e) {
+          return '<option value="' + esc(e.id) + '"' + (e.id === S.simId ? ' selected' : '') + '>' + esc(e.nome) + '</option>';
+        }).join('');
+        var box = $('#simRows');
+        if (!S.simId) { box.innerHTML = ''; return; }
+        var evs = S.cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(S.disc) >= 0; });
+        box.innerHTML = evs.map(function (ev) {
+          var st = evState(ev), real = S.res[ev.id] && S.res[ev.id][S.simId], ov = S.ov[ev.id] && S.ov[ev.id][S.simId], cur = ov || real || {}, fs;
+          var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
+          if (useAgg) fs = [['agg', 'Valor da prova']];
+          else fs = fieldsFor(dc.tipo);
+          var fields = fs.map(function (f) {
+            var v = cur[f[0]], mod = ov && ov[f[0]] !== undefined && (!real || ov[f[0]] !== real[f[0]]);
+            return '<label class="fld">' + f[1] + '<input type="text" inputmode="decimal" autocomplete="off" id="sim-' + ev.id + '-' + f[0] + '" data-ev="' + ev.id + '" data-f="' + f[0] + '" value="' + (v === undefined ? '' : String(v).replace('.', ',')) + '" class="' + (mod ? 'mod' : '') + '" placeholder="—"></label>';
+          }).join('');
+          var res = '';
+          var rowObj = C.R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
+          if (rowObj && rowObj.per[ev.id].rec) {
+            var p = rowObj.per[ev.id];
+            res = '<div class="res tn">' + (p.score > 0 ? '<b>' + fmt(p.score) + ' pontos</b> na prova' : 'Não conta (' + (p.items.filter(function (i) { return !i.ok && !i.pending; }).map(function (i) { return i.note; })[0] || 'sem mínimos') + ')') + '</div>';
+          }
+          return '<div class="simrow"><div class="en">' + esc(ev.nome) + ' · ' + esc(ev.curto) + '<small>' + esc(ev.datas) + ' · ' + STATE_L[st] + '</small></div><div><div class="fields">' + fields + '</div>' + res + (real && real.neFlag && !useAgg || (real && real.neFlag && dc.tipo === 'ne') ? '<div class="hint">Nota de excelência já obtida nesta prova; falta o valor.</div>' : '') + '</div></div>';
+        }).join('');
+      }
+
+      function parseNum(s) {
+        s = String(s).trim().replace(',', '.');
+        if (!s) return undefined;
+        var n = parseFloat(s);
+        return isFinite(n) ? n : undefined;
+      }
+
+      function onSimChange(e) {
+        var t = e.target;
+        if (!t.dataset || !t.dataset.ev) return;
+        var evId = t.dataset.ev, id = S.simId, rec = {};
+        document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
+          var v = parseNum(i.value);
+          if (v !== undefined) rec[i.dataset.f] = v;
+        });
+        var real = S.res[evId] && S.res[evId][id];
+        if (real && real.rotinas) rec.rotinas = real.rotinas;
+
+        var realKeys = real ? Object.keys(real).filter(function (k) { return k !== 'src' && k !== 'neFlag' && k !== 'rotinas'; }) : [];
+        var recKeys = Object.keys(rec).filter(function (k) { return k !== 'rotinas'; });
+        var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
+
+        if (same) {
+          if (S.ov[evId]) delete S.ov[evId][id];
+        } else {
+          if (!real && !recKeys.length) {
+            if (S.ov[evId]) delete S.ov[evId][id];
+          } else {
+            if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
+            (S.ov[evId] = S.ov[evId] || {})[id] = rec;
+          }
+        }
+        var C = compute();
+        renderBoard();
+        renderSimResults(C);
+        t.classList.toggle('mod', !same);
+      }
+
+      function renderSimResults(C) {
+        var rowObj = C.R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
+        if (!rowObj) return;
+        document.querySelectorAll('#simRows .simrow').forEach(function (el, i) {
+          var ev = C.R.eventos[i], p = rowObj.per[ev.id], r = el.querySelector('.res');
+          var txt = !p.rec ? '' : (p.score > 0 ? '<b>' + fmt(p.score) + ' pontos</b> na prova' : 'Não conta (' + (p.items.filter(function (x) { return !x.ok && !x.pending; }).map(function (x) { return x.note; })[0] || 'sem mínimos') + ')');
+          if (r) { r.innerHTML = txt; if (!txt) r.remove(); }
+          else if (txt) {
+            var d = document.createElement('div');
+            d.className = 'res tn';
+            d.innerHTML = txt;
+            el.children[1].insertBefore(d, el.querySelector('.hint'));
+          }
+        });
+      }
+
+      /* ---------- eventos ---------- */
+      function renderAll() {
+        renderTop();
+        var C = compute();
+        renderBoard();
+        renderSim(C);
+      }
+
+      $('#tabsDisc').addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-d]');
+        if (b) setView(b.dataset.d, S.sex);
+      });
+      $('#tabsSex').addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-s]');
+        if (b) setView(S.disc, b.dataset.s);
+      });
+      $('#list').addEventListener('click', function (e) {
+        var btn = e.target.closest('button.cell[data-ath]');
+        if (btn) {
+          var athId = btn.dataset.ath, evId = btn.dataset.ev;
+          if (S.detail && S.detail.athId === athId && S.detail.evId === evId) S.detail = null;
+          else S.detail = { athId: athId, evId: evId };
+          renderBoard();
+          return;
+        }
+        if (e.target.closest('[data-close-detail]')) {
+          S.detail = null;
+          renderBoard();
+        }
+      });
+      $('#simAth').addEventListener('change', function (e) { S.simId = e.target.value; renderSim(); });
+      $('#simRows').addEventListener('change', onSimChange);
+      $('#simReset').addEventListener('click', function () {
+        Object.keys(S.ov).forEach(function (ev) { delete S.ov[ev][S.simId]; });
+        renderBoard();
+        renderSim();
+      });
+      $('#simResetAll').addEventListener('click', function () {
+        S.ov = {};
+        renderBoard();
+        renderSim();
+      });
+    })();
+  </script>
+</body>
+</html>
