@@ -1,19 +1,60 @@
 ====================================================================
-RELATÓRIO SPORTTECH (VERIFICAÇÃO START LIST) — 2026-11-13 12:16:52
-URL: https://sporttech.io/events/56c681e4-f2c2-45df-787d-ea9164169d95/ovs/event/TRA
+RELATÓRIO SPORTTECH OVS (LIVE SYNC) — 2026-11-13 12:35:29
+API: https://sporttech.io/events/56c681e4-f2c2-45df-787d-ea9164169d95/ovs/api/
 ====================================================================
 
-Provas/Stages detetados na Sporttech: 0
+Stages carregados da Sporttech: 38
+  • [1] Inic Base F (11-12 years) -> TRI | Escalões: [11-12] | Sexo: F | Fase: q1 (58 inscritos)
+  • [2] Inic 1D F (11-12 years) -> TRI | Escalões: [11-12] | Sexo: F | Fase: q1 (22 inscritos)
+  • [3] Inic 1D M (11-12 years) -> TRI | Escalões: [11-12] | Sexo: M | Fase: q1 (12 inscritos)
+  • [4] Inic Base M (11-12 years) -> TRI | Escalões: [11-12] | Sexo: M | Fase: q1 (38 inscritos)
+  • [5] Jun 1D F (15-16 years) -> TRI | Escalões: [JUN, 13-14] | Sexo: F | Fase: q1 (17 inscritos)
+  • [6] Jun 1D M (15-16 years) -> TRI | Escalões: [JUN, 13-14] | Sexo: M | Fase: q1 (7 inscritos)
+  • [7] Jun Base F (15-16 years) -> TRI | Escalões: [JUN, 13-14] | Sexo: F | Fase: q1 (49 inscritos)
+  • [8] Jun Base M (15-16 years) -> TRI | Escalões: [JUN, 13-14] | Sexo: M | Fase: q1 (6 inscritos)
+  • [9] Jun Elite F (Junior) -> TRI | Escalões: [JUN, 13-14] | Sexo: F | Fase: q1 (8 inscritos)
+  • [35] Jun Elite F (Junior) -> TRI | Escalões: [JUN, 13-14] | Sexo: F | Fase: f (8 inscritos)
+  • [10] Jun Elite M (Junior) -> TRI | Escalões: [JUN, 13-14] | Sexo: M | Fase: q1 (3 inscritos)
+  • [36] Jun Elite M (Junior) -> TRI | Escalões: [JUN, 13-14] | Sexo: M | Fase: f (3 inscritos)
+  • [11] Juv 1D F (13-14 years) -> TRI | Escalões: [13-14] | Sexo: F | Fase: q1 (33 inscritos)
+  • [12] Juv 1D M (13-14 years) -> TRI | Escalões: [13-14] | Sexo: M | Fase: q1 (12 inscritos)
+  • [13] Juv Base F (13-14 years) -> TRI | Escalões: [13-14] | Sexo: F | Fase: q1 (44 inscritos)
+  • [14] Juv Base M (13-14 years) -> TRI | Escalões: [13-14] | Sexo: M | Fase: q1 (23 inscritos)
+  • [15] Sen 1D F (17+ years) -> TRI | Escalões: [17-21] | Sexo: F | Fase: q1 (16 inscritos)
+  • [16] Sen Base M (17+ years) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (8 inscritos)
+  • [17] Sen Base F (17+ years) -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (10 inscritos)
+  • [18] Sen Elite F (Senior) -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (9 inscritos)
+  • [39] Sen Elite F (Senior) -> TRI | Escalões: [SEN] | Sexo: F | Fase: f (7 inscritos)
+  • [19] Sen 1D M (17+ years) -> TRI | Escalões: [17-21] | Sexo: M | Fase: q1 (13 inscritos)
+  • [20] Sen Elite M (Senior) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (14 inscritos)
+  • [38] Sen Elite M (Senior) -> TRI | Escalões: [SEN] | Sexo: M | Fase: f (8 inscritos)
+  • [21] Inic 1D F (11-12 years) -> SYN | Escalões: [11-12] | Sexo: F | Fase: q1 (7 inscritos)
+  • [22] Inic 1D M (11-12 years) -> SYN | Escalões: [11-12] | Sexo: M | Fase: q1 (3 inscritos)
+  • [23] Inic Base F (11-12 years) -> SYN | Escalões: [11-12] | Sexo: F | Fase: q1 (36 inscritos)
+  • [24] Inic Base M (11-12 years) -> SYN | Escalões: [11-12] | Sexo: M | Fase: q1 (10 inscritos)
+  • [25] Jun 1D F (15-16 years) -> SYN | Escalões: [JUN, 13-14] | Sexo: F | Fase: q1 (10 inscritos)
+  • [26] Jun 1D M (15-16 years) -> SYN | Escalões: [JUN, 13-14] | Sexo: M | Fase: q1 (2 inscritos)
+  • [27] Jun Base F (15-16 years) -> SYN | Escalões: [JUN, 13-14] | Sexo: F | Fase: q1 (12 inscritos)
+  • [28] Juv 1D F (13-14 years) -> SYN | Escalões: [13-14] | Sexo: F | Fase: q1 (13 inscritos)
+  • [29] Juv 1D M (13-14 years) -> SYN | Escalões: [13-14] | Sexo: M | Fase: q1 (4 inscritos)
+  • [30] Juv Base F (13-14 years) -> SYN | Escalões: [13-14] | Sexo: F | Fase: q1 (17 inscritos)
+  • [31] Juv Base M (13-14 years) -> SYN | Escalões: [13-14] | Sexo: M | Fase: q1 (7 inscritos)
+  • [32] Sen 1D F (17+ years) -> SYN | Escalões: [17-21] | Sexo: F | Fase: q1 (6 inscritos)
+  • [33] Sen 1D M (17+ years) -> SYN | Escalões: [17-21] | Sexo: M | Fase: q1 (10 inscritos)
+  • [34] Sen Base F (17+ years) -> SYN | Escalões: [SEN] | Sexo: F | Fase: q1 (8 inscritos)
 
 --- CRUZAMENTO DE GINASTAS (9 no JSON) ---
-[ERRO - SEM PROVA] Diogo Abreu (TRI · SEN · M · SCP) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Pedro Ferreira (TRI · SEN · M · SCP) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Sofia Correia (TRI · SEN · F · LGC) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Mariana Carvalho (TRI · JUN · F · LGC) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Diogo Abreu / Pedro Ferreira (SYN · SEN · M · SCP / SCP) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Ingrid Maior / Sofia Correia (SYN · SEN · F · LGC / LGC) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Zé Ninguém Inexistente (TRI · SEN · M · SCP) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Diogo Abreu (TRI · 11-12 · M · SCP) -> Nenhuma prova correspondente encontrada na Sporttech.
-[ERRO - SEM PROVA] Atleta Fantasma A / Atleta Fantasma B (SYN · 13-14 · F · GCN / AAC) -> Nenhuma prova correspondente encontrada na Sporttech.
+[OK] Diogo Abreu (TRI · SEN · M) -> "Sen Elite M (Senior)" [q1] via Nome (1.º + Último) | Total: 60.49
+[OK] Diogo Abreu (TRI · SEN · M) -> "Sen Elite M (Senior)" [f] via Nome (1.º + Último) | Total: 12.865
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Sen Elite M (Senior)" [q1] via Nome (1.º + Último) | Total: 61.27
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Sen Elite M (Senior)" [f] via Nome (1.º + Último) | Total: 59.88
+[OK] Sofia Correia (TRI · SEN · F) -> "Sen Elite F (Senior)" [q1] via Nome (1.º + Último) | Total: 54.955
+[OK] Sofia Correia (TRI · SEN · F) -> "Sen Elite F (Senior)" [f] via Nome (1.º + Último) | Total: 87.68
+[ERRO - NÃO ENCONTRADO] Mariana Carvalho (TRI · JUN · F · LGC) -> Não aparece em "Jun 1D F (15-16 years) / Jun Base F (15-16 years) / Jun Elite F (Junior) / Jun Elite F (Junior)".
+[ERRO - SEM PROVA] Diogo Abreu / Pedro Ferreira (SYN · SEN · M · SCP / SCP) -> Nenhuma prova correspondente na Sporttech.
+[ERRO - NÃO ENCONTRADO] Ingrid Maior / Sofia Correia (SYN · SEN · F · LGC / LGC) -> Não aparece em "Sen Base F (17+ years)".
+[ERRO - NÃO ENCONTRADO] Zé Ninguém Inexistente (TRI · SEN · M · SCP) -> Não aparece em "Sen Base M (17+ years) / Sen Elite M (Senior) / Sen Elite M (Senior)".
+[ERRO - NÃO ENCONTRADO] Diogo Abreu (TRI · 11-12 · M · SCP) -> Não aparece em "Inic 1D M (11-12 years) / Inic Base M (11-12 years)".
+[ERRO - NÃO ENCONTRADO] Atleta Fantasma A / Atleta Fantasma B (SYN · 13-14 · F · GCN / AAC) -> Não aparece em "Jun 1D F (15-16 years) / Jun Base F (15-16 years) / Juv 1D F (13-14 years) / Juv Base F (13-14 years)".
 
-RESUMO: 0 encontrados | 9 com erro/não encontrados | 0 notas atualizadas.
+RESUMO: 3 encontrados | 6 com erro/não encontrados | 6 fases atualizadas.
