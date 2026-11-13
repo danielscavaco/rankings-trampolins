@@ -11,8 +11,6 @@
     :root {
       color-scheme: light;
       box-sizing: border-box;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
       --bg: #F6F3F3;
       --surface: #FFFFFF;
       --surface-2: #EFE8E8;
@@ -20,6 +18,8 @@
       --muted: #6B5759;
       --line: #E2D5D6;
       --accent: #8B1A22;
+      --sidebar-bg: #8B1A22;
+      --sidebar-ink: #FFFFFF;
       --accent-soft: #F7DFE1;
       --on-accent: #FFFFFF;
       --good: #146B3A;
@@ -43,6 +43,8 @@
         --muted: #AC9698;
         --line: #3E2A2D;
         --accent: #E26B74;
+        --sidebar-bg: #691218;
+        --sidebar-ink: #FFF5F5;
         --accent-soft: #461B20;
         --on-accent: #24090B;
         --good: #5ED08C;
@@ -64,9 +66,6 @@
       background: var(--bg);
       color: var(--ink);
       font: 14px/1.45 var(--f-body);
-      padding-block: 20px 64px;
-      padding-left: max(16px, env(safe-area-inset-left, 0px));
-      padding-right: max(16px, env(safe-area-inset-right, 0px));
     }
     [hidden] { display: none !important; }
     #trackerBox:empty,
@@ -77,39 +76,48 @@
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
     .tn { font-variant-numeric: tabular-nums; }
 
-    /* Layout com Menu Lateral Esquerdo */
+    /* Layout com Menu Lateral Fixo Encostado à Esquerda */
     .shell {
-      max-width: 1320px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 224px minmax(0, 1fr);
-      gap: 24px;
-      align-items: start;
+      display: flex;
+      min-height: 100dvh;
     }
     .sidebar {
-      position: sticky;
-      top: 20px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 244px;
+      z-index: 40;
+      background: var(--sidebar-bg);
+      color: var(--sidebar-ink);
+      padding-top: max(22px, env(safe-area-inset-top, 0px));
+      padding-bottom: max(18px, env(safe-area-inset-bottom, 0px));
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
+      box-shadow: 2px 0 14px rgb(0 0 0 / .14);
     }
     .sb-brand {
-      font-size: 11.5px;
+      font-size: 12px;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--sidebar-ink);
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--line);
+      gap: 6px;
+      padding: 0 4px 12px;
+      border-bottom: 1px solid rgb(255 255 255 / .18);
     }
-    .sb-nav { display: flex; flex-direction: column; gap: 4px; }
+    .sb-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      overflow-y: auto;
+    }
     .sb-btn {
       display: flex;
       flex-direction: column;
@@ -119,22 +127,47 @@
       text-align: left;
       border: 0;
       background: transparent;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border-radius: 8px;
       cursor: pointer;
-      color: var(--muted);
+      color: rgb(255 255 255 / .82);
       transition: background .12s, color .12s;
     }
-    .sb-btn:hover { background: var(--surface-2); color: var(--ink); }
+    .sb-btn:hover { background: rgb(255 255 255 / .12); color: #FFFFFF; }
     .sb-btn[aria-current="page"] {
-      background: var(--accent);
-      color: var(--on-accent);
-      box-shadow: 0 1px 3px rgb(0 0 0 / .16);
+      background: #FFFFFF;
+      color: #8B1A22;
+      box-shadow: 0 2px 6px rgb(0 0 0 / .18);
     }
-    .sb-btn b { font-weight: 600; font-size: 13.5px; line-height: 1.25; }
-    .sb-btn small { font-size: 11px; opacity: 0.82; }
+    .sb-btn b { font-weight: 600; font-size: 14px; line-height: 1.25; }
+    .sb-btn small { font-size: 11px; opacity: 0.85; }
+    .sb-btn:focus-visible { outline-color: #FFFFFF; }
 
-    .main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+    .sb-footer {
+      padding: 12px 4px 0;
+      border-top: 1px solid rgb(255 255 255 / .18);
+      font-size: 12px;
+      color: rgb(255 255 255 / .78);
+    }
+    .sb-footer b { color: #FFFFFF; font-weight: 600; }
+
+    .main-wrap {
+      flex: 1;
+      min-width: 0;
+      margin-left: 244px;
+      padding-top: max(24px, env(safe-area-inset-top, 0px));
+      padding-bottom: max(64px, env(safe-area-inset-bottom, 0px));
+      padding-left: 28px;
+      padding-right: max(28px, env(safe-area-inset-right, 0px));
+    }
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
 
     header { display: flex; flex-direction: column; gap: 6px; }
     .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
@@ -143,8 +176,10 @@
 
     .controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
     .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; }
-    .seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
+    .seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; transition: opacity .15s, background .12s; }
     .seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); box-shadow: 0 1px 2px rgb(0 0 0 / .16); }
+    .seg button.is-na { opacity: 0.42; }
+    .seg button.is-na:hover { opacity: 0.72; }
     .seg .full { display: none; }
     @media (min-width: 560px) { .seg .full { display: inline; } .seg .short { display: none; } }
 
@@ -168,9 +203,9 @@
     .club-group-head small { font-family: var(--f-body); font-size: 11.5px; font-weight: 400; color: var(--muted); }
 
     .facts { display: flex; flex-wrap: wrap; gap: 8px 10px; }
-    .fact { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; display: flex; gap: 8px; align-items: baseline; }
-    .fact span { font-size: 12px; color: var(--muted); }
-    .fact b { font-family: var(--f-display); font-size: 20px; font-weight: 600; line-height: 1; }
+    .fact { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; display: flex; gap: 8px; align-items: center; min-height: 38px; }
+    .fact span { font-size: 12px; color: var(--muted); line-height: 1.1; }
+    .fact b { font-family: var(--f-display); font-size: 20px; font-weight: 600; line-height: 1.1; }
     .fact.blue b { color: var(--blue); }
     .fact.good b { color: var(--good); }
     .fact.warn b { color: var(--warn); }
@@ -342,8 +377,9 @@
     .hint { font-size: 12.5px; color: var(--muted); }
     .res { font-size: 13px; margin-top: 4px; }
 
-    /* Rodapé */
-    footer {
+    /* Rodapé móvel (só visível quando a barra passa para o topo em telemóvel) */
+    .mobile-footer {
+      display: none;
       margin-top: 8px;
       padding-top: 14px;
       border-top: 1px solid var(--line);
@@ -351,7 +387,7 @@
       color: var(--muted);
       text-align: center;
     }
-    footer b { color: var(--ink); font-weight: 500; }
+    .mobile-footer b { color: var(--ink); font-weight: 500; }
 
     /* Indicador não-clicável de atualização em direto */
     .live-pill {
@@ -388,12 +424,36 @@
     }
 
     @media (max-width: 980px) {
-      .shell { grid-template-columns: 1fr; gap: 16px; }
-      .sidebar { position: static; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 10px 12px; }
-      .sb-brand { border-bottom: 0; padding-bottom: 0; }
-      .sb-nav { flex-direction: row; flex-wrap: wrap; }
-      .sb-btn { width: auto; padding: 7px 12px; }
+      .shell { flex-direction: column; }
+      .sidebar {
+        position: sticky;
+        top: 0;
+        bottom: auto;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        padding-top: max(10px, env(safe-area-inset-top, 0px));
+        padding-bottom: 10px;
+        padding-left: max(16px, env(safe-area-inset-left, 0px));
+        padding-right: max(16px, env(safe-area-inset-right, 0px));
+        box-shadow: 0 2px 10px rgb(0 0 0 / .16);
+      }
+      .sb-brand { border-bottom: 0; padding: 0; }
+      .sb-nav { flex-direction: row; flex-wrap: wrap; flex: 0 1 auto; }
+      .sb-btn { width: auto; padding: 6px 11px; }
       .sb-btn small { display: none; }
+      .sb-footer { display: none; }
+      .mobile-footer { display: block; }
+      .main-wrap {
+        margin-left: 0;
+        padding-top: 18px;
+        padding-left: max(16px, env(safe-area-inset-left, 0px));
+        padding-right: max(16px, env(safe-area-inset-right, 0px));
+      }
     }
 
     @media (max-width: 840px) {
@@ -422,7 +482,7 @@
       height: 1em;
       width: auto;
       vertical-align: -0.15em;
-      margin-left: 3px;
+      margin-left: 2px;
     }
   </style>
 </head>
@@ -431,51 +491,54 @@
     <aside class="sidebar" aria-label="Competições">
       <div class="sb-brand">Trampolins <img src="https://flagcdn.com/pt.svg" class="flag-pt" alt="Portugal"></div>
       <nav class="sb-nav" id="navComp"></nav>
+      <div class="sb-footer">© 2026 <b>Daniel Cavaco</b></div>
     </aside>
 
-    <div class="main">
-      <header>
-        <div class="eyebrow" id="eyebrow">Rankings · Trampolins</div>
-        <h1 id="titulo">Rankings Trampolins</h1>
-        <p class="sub" id="sub"></p>
-      </header>
+    <div class="main-wrap">
+      <div class="main">
+        <header>
+          <div class="eyebrow" id="eyebrow">Rankings · Trampolins</div>
+          <h1 id="titulo">Rankings Trampolins</h1>
+          <p class="sub" id="sub"></p>
+        </header>
 
-      <div class="controls">
-        <div class="seg" role="tablist" aria-label="Sub-vista" id="tabsSub"></div>
-        <div class="seg" role="tablist" aria-label="Escalão" id="tabsAge" hidden></div>
-        <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
-        <div class="club-filter" id="clubFilterBox" hidden>
-          <label for="clubFilter" class="hint">Clube</label>
-          <select id="clubFilter"></select>
-        </div>
-      </div>
-
-      <div class="facts" id="facts"></div>
-      <div id="trackerBox"></div>
-      <div id="legendBox"></div>
-
-      <section class="board" aria-label="Seriação">
-        <div class="head" id="head"></div>
-        <ol id="list"></ol>
-      </section>
-
-      <section class="panel" aria-labelledby="simh">
-        <div class="pbody" style="padding-top:16px">
-          <h2 id="simh">Simulador</h2>
-          <p class="hint" id="simHint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
-          <div class="simbar">
-            <label for="simAth" class="hint">Ginasta</label>
-            <select id="simAth"></select>
-            <button class="btn" id="simReset" type="button">Repor esta ginasta</button>
-            <button class="btn" id="simResetAll" type="button">Repor tudo</button>
+        <div class="controls">
+          <div class="seg" role="tablist" aria-label="Sub-vista" id="tabsSub"></div>
+          <div class="seg" role="tablist" aria-label="Escalão" id="tabsAge" hidden></div>
+          <div class="seg" role="tablist" aria-label="Género" id="tabsSex"></div>
+          <div class="club-filter" id="clubFilterBox" hidden>
+            <label for="clubFilter" class="hint">Clube</label>
+            <select id="clubFilter"></select>
           </div>
-          <div class="simrows" id="simRows"></div>
         </div>
-      </section>
 
-      <footer>
-        <span>© 2026 <b>Daniel Cavaco</b></span>
-      </footer>
+        <div class="facts" id="facts"></div>
+        <div id="trackerBox"></div>
+        <div id="legendBox"></div>
+
+        <section class="board" aria-label="Seriação">
+          <div class="head" id="head"></div>
+          <ol id="list"></ol>
+        </section>
+
+        <section class="panel" aria-labelledby="simh">
+          <div class="pbody" style="padding-top:16px">
+            <h2 id="simh">Simulador</h2>
+            <p class="hint" id="simHint">Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.</p>
+            <div class="simbar">
+              <label for="simAth" class="hint">Ginasta</label>
+              <select id="simAth"></select>
+              <button class="btn" id="simReset" type="button">Repor esta ginasta</button>
+              <button class="btn" id="simResetAll" type="button">Repor tudo</button>
+            </div>
+            <div class="simrows" id="simRows"></div>
+          </div>
+        </section>
+
+        <footer class="mobile-footer">
+          <span>© 2026 <b>Daniel Cavaco</b></span>
+        </footer>
+      </div>
     </div>
   </div>
 
@@ -514,10 +577,17 @@
         });
       };
 
-      var SEX = { F: 'Feminino', M: 'Masculino' };
+      var SEX = { F: 'Feminino', M: 'Masculino', Mix: 'Misto' };
+      var SEX_ORDER = ['F', 'M', 'Mix'];
       var DEFAULT_DISC_ORDER = ['TRI', 'TRA', 'SYN', 'DMT', 'TUM'];
       var DISC_SHORT = { TRI: 'TRA', TRA: 'TRA', SYN: 'SYN', DMT: 'DMT', TUM: 'TUM' };
       var AGE_ORDER = ['11-12', '13-14', 'JUN', '17-21', 'SEN'];
+
+      function normSex(s) {
+        var v = String(s || '').trim();
+        if (/^mix$/i.test(v)) return 'Mix';
+        return v.toUpperCase();
+      }
 
       /* Formata pares de Sincronizado: Ginasta 1, Ginasta 2 (ordem alfabética) e Clube 1 · Clube 2 */
       function formatEntryIdentity(entry, disc, hideClub) {
@@ -692,21 +762,21 @@
         });
 
       function fromHash() {
-        var h = (location.hash || '').replace('#', '').toLowerCase().split('-');
+        var h = (location.hash || '').replace('#', '').split('-');
         if (!h[0]) return;
-        var found = S.comps.filter(function (c) { return c.id.toLowerCase() === h[0]; })[0];
+        var found = S.comps.filter(function (c) { return c.id.toLowerCase() === h[0].toLowerCase(); })[0];
         if (found) {
           S.activeId = found.id;
           if (found.engine === 'fig_olympic' || found.engine === 'la28') {
-            if (h[1] === 'fgp' || h[1] === 'fig') S.laView = h[1];
-            if (h[2] && SEX[h[2].toUpperCase()]) S.sex = h[2].toUpperCase();
+            if (h[1] && (h[1].toLowerCase() === 'fgp' || h[1].toLowerCase() === 'fig')) S.laView = h[1].toLowerCase();
+            if (h[2] && SEX[normSex(h[2])]) S.sex = normSex(h[2]);
           } else {
             if (h[1]) S.disc = h[1].toUpperCase();
-            if (h[2] && SEX[h[2].toUpperCase()]) S.sex = h[2].toUpperCase();
+            if (h[2] && SEX[normSex(h[2])]) S.sex = normSex(h[2]);
           }
-        } else if (h.length === 2 && SEX[h[1].toUpperCase()]) {
+        } else if (h.length === 2 && SEX[normSex(h[1])]) {
           S.disc = h[0].toUpperCase();
-          S.sex = h[1].toUpperCase();
+          S.sex = normSex(h[1]);
         }
       }
 
@@ -727,24 +797,78 @@
           .concat(keys.filter(function (k) { return DEFAULT_DISC_ORDER.indexOf(k) < 0; }));
       }
 
-      function agesFor(cfg, athList) {
-        var ages = [];
-        if (Array.isArray(cfg.escaloes) && cfg.escaloes.length) {
-          ages = cfg.escaloes.slice();
-        } else if (Array.isArray(athList)) {
-          athList.forEach(function (a) {
-            var escVal = (a.escalao || a.age || '').trim().toUpperCase();
-            if (escVal && ages.indexOf(escVal) < 0) ages.push(escVal);
-          });
-        }
-        ages.sort(function (a, b) {
+      function sortAges(list) {
+        return list.slice().sort(function (a, b) {
           var ia = AGE_ORDER.indexOf(a), ib = AGE_ORDER.indexOf(b);
           if (ia >= 0 && ib >= 0) return ia - ib;
           if (ia >= 0) return -1;
           if (ib >= 0) return 1;
           return a.localeCompare(b, 'pt');
         });
-        return ages;
+      }
+
+      /* Todos os escalões configurados na competição */
+      function allAgesFor(cfg, athList) {
+        if (Array.isArray(cfg.escaloes) && cfg.escaloes.length) {
+          return sortAges(cfg.escaloes);
+        }
+        var set = [];
+        Object.keys(cfg.disciplinas || {}).forEach(function (dk) {
+          var pe = cfg.disciplinas[dk].porEscalao;
+          if (pe) Object.keys(pe).forEach(function (ag) { if (set.indexOf(ag) < 0) set.push(ag); });
+        });
+        if (!set.length && Array.isArray(athList)) {
+          athList.forEach(function (a) {
+            var escVal = (a.escalao || a.age || '').trim().toUpperCase();
+            if (escVal && set.indexOf(escVal) < 0) set.push(escVal);
+          });
+        }
+        return sortAges(set);
+      }
+
+      /* Escalões efetivamente válidos para uma disciplina */
+      function agesFor(cfg, disc, athList) {
+        var dcfg = (cfg.disciplinas && cfg.disciplinas[disc]) || {};
+        if (dcfg.porEscalao && Object.keys(dcfg.porEscalao).length) {
+          return sortAges(Object.keys(dcfg.porEscalao));
+        }
+        return allAgesFor(cfg, athList);
+      }
+
+      function sexesFor(cfg, disc, age) {
+        var dcfg = (cfg.disciplinas && cfg.disciplinas[disc]) || {};
+        var minMap = null;
+        if (age && dcfg.porEscalao && dcfg.porEscalao[age] && dcfg.porEscalao[age].minimos) {
+          minMap = dcfg.porEscalao[age].minimos;
+        } else if (cfg.minimos && cfg.minimos[disc]) {
+          if (age && cfg.minimos[disc][age]) minMap = cfg.minimos[disc][age];
+          else minMap = cfg.minimos[disc];
+        }
+        if (minMap && typeof minMap === 'object') {
+          var keys = Object.keys(minMap);
+          var ordered = SEX_ORDER.filter(function (sx) { return keys.indexOf(sx) >= 0; });
+          if (ordered.length) return ordered;
+        }
+        return ['F', 'M'];
+      }
+
+      /* Todos os géneros existentes na competição (para exibir Mix esbatido quando indisponível) */
+      function allSexesFor(cfg) {
+        var hasMix = false;
+        Object.keys(cfg.disciplinas || {}).forEach(function (dk) {
+          var dcfg = cfg.disciplinas[dk];
+          if (dcfg.porEscalao) {
+            Object.keys(dcfg.porEscalao).forEach(function (ag) {
+              if (dcfg.porEscalao[ag].minimos && dcfg.porEscalao[ag].minimos.Mix) hasMix = true;
+            });
+          }
+        });
+        if (cfg.minimos) {
+          Object.keys(cfg.minimos).forEach(function (dk) {
+            if (cfg.minimos[dk] && cfg.minimos[dk].Mix) hasMix = true;
+          });
+        }
+        return hasMix ? ['F', 'M', 'Mix'] : ['F', 'M'];
       }
 
       /* ---------- menu lateral, cabeçalho e badge live contextual ---------- */
@@ -764,6 +888,8 @@
         $('#sub').textContent = cfg.local + ' · ' + cfg.datas;
 
         var tabsAge = $('#tabsAge');
+        var sexes = ['F', 'M'];
+        var validSexes = ['F', 'M'];
 
         if (!isOlympic) {
           var dKeys = discKeysFor(cfg);
@@ -774,18 +900,26 @@
             return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc && !S.club) + '">' + esc(label) + '</button>';
           }).join('');
 
-          var ages = agesFor(cfg, pack.ath);
-          if (ages.length > 1) {
-            if (!S.age || ages.indexOf(S.age) < 0) S.age = ages[0];
+          var allAges = allAgesFor(cfg, pack.ath);
+          var validAges = agesFor(cfg, S.disc, pack.ath);
+
+          if (allAges.length > 0) {
+            if (!S.age || validAges.indexOf(S.age) < 0) S.age = validAges[0] || allAges[0];
             tabsAge.hidden = false;
-            tabsAge.innerHTML = ages.map(function (ag) {
-              return '<button role="tab" type="button" data-age="' + esc(ag) + '" aria-selected="' + (ag === S.age && !S.club) + '">' + esc(ag) + '</button>';
+            tabsAge.innerHTML = allAges.map(function (ag) {
+              var isAvail = validAges.indexOf(ag) >= 0;
+              var cls = isAvail ? '' : ' class="is-na"';
+              var title = isAvail ? '' : ' title="Sem apuramento neste escalão (clica para ir para o escalão disponível)"';
+              return '<button role="tab" type="button" data-age="' + esc(ag) + '"' + cls + title + ' aria-selected="' + (ag === S.age && !S.club) + '">' + esc(ag) + '</button>';
             }).join('');
           } else {
-            S.age = ages[0] || '';
+            S.age = '';
             tabsAge.hidden = true;
             tabsAge.innerHTML = '';
           }
+
+          sexes = allSexesFor(cfg);
+          validSexes = sexesFor(cfg, S.disc, S.age);
         } else {
           S.age = '';
           tabsAge.hidden = true;
@@ -795,17 +929,13 @@
             '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP</span><span class="full">Ranking Nacional (FGP)</span></button>';
         }
 
-        var sexes = ['F', 'M'];
-        if (!isOlympic && Array.isArray(pack.ath) && pack.ath.length) {
-          var foundSexes = ['F', 'M'].filter(function (sx) {
-            return pack.ath.some(function (a) { return a.sexo === sx; });
-          });
-          if (foundSexes.length) sexes = foundSexes;
-        }
-        if (sexes.indexOf(S.sex) < 0) S.sex = sexes[0];
+        if (validSexes.indexOf(S.sex) < 0) S.sex = validSexes[0] || sexes[0];
 
         $('#tabsSex').innerHTML = sexes.map(function (s) {
-          return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex && !S.club) + '">' + s + '</button>';
+          var isAvail = validSexes.indexOf(s) >= 0;
+          var cls = isAvail ? '' : ' class="is-na"';
+          var title = isAvail ? '' : ' title="Disponível apenas em SYN 11-12 (clica para abrir)"';
+          return '<button role="tab" type="button" data-s="' + esc(s) + '"' + cls + title + ' aria-selected="' + (s === S.sex && !S.club) + '">' + esc(s) + '</button>';
         }).join('');
 
         /* Filtro de Clube (separa pares "Clube A / Clube B" pelos clubes individuais) */
@@ -846,7 +976,7 @@
       function computeEG(comp, pack) {
         var en = pack.ath.filter(function (a) {
           var matchAge = !S.age || !a.escalao || a.escalao.toUpperCase() === S.age;
-          return a.disc === S.disc && a.sexo === S.sex && matchAge;
+          return a.disc === S.disc && normSex(a.sexo) === S.sex && matchAge;
         });
         var ovObj = getOvEG(comp.id);
         var hasAnyOv = Object.keys(ovObj).some(function (e) { return Object.keys(ovObj[e]).length; });
@@ -968,8 +1098,6 @@
         /* --- MODO CLUBE: mostra todos os ginastas/pares do clube em todas as disciplinas/escalões/géneros --- */
         if (S.club) {
           var dKeys = discKeysFor(cfg);
-          var ages = agesFor(cfg, pack.ath);
-          var ageSlots = ages.length ? ages : [''];
           var ovObj = getOvEG(comp.id);
           var hasAnyOv = Object.keys(ovObj).some(function (e) { return Object.keys(ovObj[e]).length; });
           var ov = hasAnyOv ? ovObj : null;
@@ -979,11 +1107,14 @@
           var totalVagas = 0;
 
           dKeys.forEach(function (dKey) {
+            var dAges = agesFor(cfg, dKey, pack.ath);
+            var ageSlots = dAges.length ? dAges : [''];
             ageSlots.forEach(function (ag) {
-              ['F', 'M'].forEach(function (sx) {
+              var dSexes = sexesFor(cfg, dKey, ag);
+              dSexes.forEach(function (sx) {
                 var en = pack.ath.filter(function (a) {
                   var matchAge = !ag || !a.escalao || a.escalao.toUpperCase() === ag;
-                  return a.disc === dKey && a.sexo === sx && matchAge;
+                  return a.disc === dKey && normSex(a.sexo) === sx && matchAge;
                 });
                 if (!en.length) return;
                 var R = A.rank(cfg, dKey, sx, en, pack.res, ov, ag);
@@ -1023,7 +1154,7 @@
             var minTxt = formatMinimosText(g.R.tipo, g.R.minimos, g.R.useExcelencia);
             var titleParts = [g.discLabel];
             if (g.age) titleParts.push(g.age);
-            titleParts.push(SEX[g.sex]);
+            titleParts.push(SEX[g.sex] || g.sex);
 
             htmlClub += '<li class="club-group-head">' +
               '<span>' + esc(titleParts.join(' · ')) + '</span>' +
@@ -1083,7 +1214,6 @@
                 ? g.R.eventos.filter(function (e) { return e.id === S.detail.evId; })[0]
                 : null;
 
-              /* No modo clube, mostra os clubes apenas se for um par misto de clubes */
               var isMixedPair = String(r.entry.clube || '').indexOf('/') >= 0;
               var idHtml = formatEntryIdentity(r.entry, g.disc, !isMixedPair);
 
@@ -1526,7 +1656,16 @@
       $('#tabsAge').addEventListener('click', function (e) {
         var b = e.target.closest('button[data-age]');
         if (!b) return;
-        S.age = b.dataset.age;
+        var clickedAge = b.dataset.age;
+        var comp = activeCompMeta();
+        var pack = S.cache[comp.id];
+        if (pack) {
+          var validAges = agesFor(pack.cfg, S.disc, pack.ath);
+          /* Se o escalão não existe na disciplina atual (ex: SEN em SYN), salta para o escalão default dessa disciplina */
+          S.age = validAges.indexOf(clickedAge) >= 0 ? clickedAge : (validAges[0] || clickedAge);
+        } else {
+          S.age = clickedAge;
+        }
         S.club = '';
         S.simId = '';
         S.detail = null;
@@ -1537,7 +1676,40 @@
       $('#tabsSex').addEventListener('click', function (e) {
         var b = e.target.closest('button[data-s]');
         if (!b) return;
-        S.sex = b.dataset.s;
+        var clickedSex = b.dataset.s;
+        var comp = activeCompMeta();
+        var pack = S.cache[comp.id];
+        var isOlympic = comp && (comp.engine === 'fig_olympic' || comp.engine === 'la28');
+
+        if (!isOlympic && pack) {
+          var validSexes = sexesFor(pack.cfg, S.disc, S.age);
+          if (validSexes.indexOf(clickedSex) < 0) {
+            /* Procura a combinação aparelho/escalão onde este género existe (ex: SYN · 11-12 · Mix) */
+            var dKeys = discKeysFor(pack.cfg);
+            var foundCombo = null;
+            for (var i = 0; i < dKeys.length && !foundCombo; i++) {
+              var dk = dKeys[i];
+              var ags = agesFor(pack.cfg, dk, pack.ath);
+              for (var j = 0; j < ags.length && !foundCombo; j++) {
+                if (sexesFor(pack.cfg, dk, ags[j]).indexOf(clickedSex) >= 0) {
+                  foundCombo = { disc: dk, age: ags[j] };
+                }
+              }
+            }
+            if (foundCombo) {
+              S.disc = foundCombo.disc;
+              S.age = foundCombo.age;
+              S.sex = clickedSex;
+            } else {
+              S.sex = validSexes[0] || clickedSex;
+            }
+          } else {
+            S.sex = clickedSex;
+          }
+        } else {
+          S.sex = clickedSex;
+        }
+
         S.club = '';
         S.simId = '';
         S.detail = null;
