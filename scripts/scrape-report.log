@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 19:42:30
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 19:45:55
 Competições alvo: World Championships 2026 (Swiss Timing) | WC Cottbus
 ====================================================================
 
@@ -109,6 +109,7 @@ DESTINO: World Championships 2026 (Swiss Timing) (data/results.json -> "nanjing"
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.1 (séries: 25.1)
 RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 0 fases atualizadas.
 Fonte [Sporttech OVS]: https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/
+[DEBUG Sporttech] Competitions brutas na API: "Men" (Disc:0, Sex:male, Age:SEN) | "Women" (Disc:0, Sex:female, Age:SEN) | "Men" (Disc:1, Sex:male, Age:SEN) | "Women" (Disc:1, Sex:female, Age:SEN) | "Mixed" (Disc:1, Sex:mix, Age:SEN)
 Stages carregados (Sporttech OVS): 0
 
 ====================================================================
