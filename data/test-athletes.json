@@ -622,5 +622,37 @@
     "disc": "SYN",
     "escalao": "13-14",
     "sexo": "F"
+  },
+  {
+    "id": "tri_1721_f_anna_likhonina",
+    "nome": "Anna Likhonina",
+    "clube": "AGSi",
+    "disc": "TRI",
+    "escalao": "17-21",
+    "sexo": "F"
+  },
+  {
+    "id": "tri_1721_f_margarida_pinheiro",
+    "nome": "Margarida Pinheiro",
+    "clube": "CTS",
+    "disc": "TRI",
+    "escalao": "17-21",
+    "sexo": "F"
+  },
+  {
+    "id": "tri_1721_f_rita_vieira",
+    "nome": "Rita Vieira",
+    "clube": "CCRAM",
+    "disc": "TRI",
+    "escalao": "17-21",
+    "sexo": "F"
+  },
+  {
+    "id": "tri_1721_f_matilde_nobre",
+    "nome": "Matilde Nobre",
+    "clube": "CCRAM",
+    "disc": "TRI",
+    "escalao": "17-21",
+    "sexo": "F"
   }
 ]
