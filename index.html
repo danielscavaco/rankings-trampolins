@@ -131,7 +131,10 @@
     .cell.cont { background: var(--good-soft); color: var(--good); font-weight: 600; }
     .cell.ok { box-shadow: inset 0 0 0 1px var(--muted); color: var(--ink); }
     .cell sup { font-size: 9.5px; margin-left: 3px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
+    .cell sup.exc-pend { text-decoration: line-through; opacity: 0.75; }
     .cell.nc { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+    .cell.nc sup { display: inline-block; text-decoration: none; }
+    .cell.nc sup.exc-pend { text-decoration: line-through; opacity: 0.75; }
     .cell.sim { background: var(--sim-soft); box-shadow: inset 0 0 0 1.5px var(--sim); }
 
     .tot { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
@@ -242,7 +245,7 @@
       .cut { padding: 6px 14px; }
       .rut-table th, .rut-table td { padding: 6px 8px; font-size: 12px; }
     }
-    
+
     .flag-pt {
       height: 1em;
       width: auto;
@@ -397,7 +400,7 @@
         $('#liveBadge').hidden = !isLive;
       }
 
-/* ---------- detalhe técnico por prova (tabela de rotinas) ---------- */
+      /* ---------- detalhe técnico por prova (tabela de rotinas) ---------- */
       function renderDetailDrawer(r, ev, dc) {
         var p = r.per[ev.id];
         var rec = p.rec || {};
@@ -427,7 +430,7 @@
               ? [['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2'], ['q2', 'Q2'], ['f', 'Final']]
               : [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
           } else {
-            phases = [
+            var allNePhases = [
               ['q1_1', 'Q1 · Série 1'],
               ['q1_2', 'Q1 · Série 2'],
               ['q2', 'Q2'],
@@ -436,6 +439,14 @@
               ['f1', 'Final 1'],
               ['f2', 'Final 2']
             ];
+            var extraNeKeys = ['q2', 'tf', 'aa'];
+            phases = allNePhases.filter(function (ph) {
+              var k = ph[0];
+              if (extraNeKeys.indexOf(k) >= 0) {
+                return p.neReached && p.nePhase === k;
+              }
+              return true;
+            });
           }
 
           var activePhases = phases.filter(function (ph) { return rot[ph[0]]; });
@@ -452,8 +463,14 @@
             activePhases.forEach(function (ph) {
               var k = ph[0], label = ph[1], rt = rot[k];
               var used = p.usedPhases && p.usedPhases.indexOf(k) >= 0;
-              html += '<tr class="' + (used ? 'used' : '') + '">';
-              html += '<td>' + esc(label) + (used ? '<span class="rut-badge">conta</span>' : '') + '</td>';
+              var isExcRow = p.neReached && p.nePhase === k;
+              var badges = '';
+              if (used) badges += '<span class="rut-badge">conta</span>';
+              if (isExcRow) {
+                badges += '<span class="rut-badge"' + (!p.neValid ? ' style="text-decoration:line-through;opacity:.75"' : '') + '>exc</span>';
+              }
+              html += '<tr class="' + ((used || (isExcRow && p.neValid)) ? 'used' : '') + '">';
+              html += '<td>' + esc(label) + badges + '</td>';
               html += '<td>' + fmt(rt.e) + '</td>';
               html += '<td>' + fmt(rt.d) + '</td>';
               if (dc.tipo === 'late') {
@@ -512,15 +529,18 @@
 
           var cells = R.eventos.map(function (ev) {
             var p = r.per[ev.id], cl = 'cell', v = '—', tip = '', hasData = false;
+            var excTag = p.neReached
+              ? (p.neValid ? '<sup>exc</sup>' : '<sup class="exc-pend">exc</sup>')
+              : '';
             if (p.score > 0) {
               hasData = true;
               cl += cnt[ev.id] ? ' cont' : ' ok';
-              v = fmt(p.score) + (p.neValid ? '<sup>exc</sup>' : '');
+              v = fmt(p.score) + excTag;
               tip = cnt[ev.id] ? 'Conta para o total' : 'Mínimo atingido, fora das duas melhores';
             } else if (p.rec && p.items.length && p.items[0].value !== null) {
               hasData = true;
               cl += ' nc';
-              v = fmt(p.items[0].value);
+              v = fmt(p.items[0].value) + excTag;
               tip = 'Mínimo não atingido';
             } else if (p.rec && p.rec.rotinas && Object.keys(p.rec.rotinas).length) {
               hasData = true;
@@ -535,9 +555,12 @@
           }).join('');
 
           var chips = '';
-          if (r.rank !== null) {chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
-            if (r.hasValidNe) chips += '<span class="chip vaga">Excelência</span>';}
-          else chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
+          if (r.rank !== null) {
+            chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
+            if (r.hasValidNe) chips += '<span class="chip vaga">Excelência</span>';
+          } else {
+            chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
+          }
 
           if (r.tieReason) {
             chips += '<span class="chip tie">' + esc(r.tieReason) + '</span>';
@@ -606,7 +629,8 @@
         if (!S.simId) { box.innerHTML = ''; return; }
         var evs = S.cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(S.disc) >= 0; });
         box.innerHTML = evs.map(function (ev) {
-          var st = evState(ev), rawReal = S.res[ev.id] && S.res[ev.id][S.simId], real = A.hydrateRec(rawReal, dc.tipo), ov = S.ov[ev.id] && S.ov[ev.id][S.simId], cur = ov || real || {}, fs;          var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
+          var st = evState(ev), rawReal = S.res[ev.id] && S.res[ev.id][S.simId], real = A.hydrateRec(rawReal, dc.tipo), ov = S.ov[ev.id] && S.ov[ev.id][S.simId], cur = ov || real || {}, fs;
+          var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
           if (useAgg) fs = [['agg', 'Valor da prova']];
           else fs = fieldsFor(dc.tipo);
           var fields = fs.map(function (f) {
@@ -630,39 +654,39 @@
         return isFinite(n) ? n : undefined;
       }
 
-  function onSimChange(e) {
-     var t = e.target;
-     if (!t.dataset || !t.dataset.ev) return;
-     var evId = t.dataset.ev, id = S.simId, rec = {};
-     var dc = S.cfg.disciplinas[S.disc];
-     document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
-       var v = parseNum(i.value);
-       if (v !== undefined) rec[i.dataset.f] = v;
-     });
-     var rawReal = S.res[evId] && S.res[evId][id];
-     var real = A.hydrateRec(rawReal, dc.tipo);
+      function onSimChange(e) {
+        var t = e.target;
+        if (!t.dataset || !t.dataset.ev) return;
+        var evId = t.dataset.ev, id = S.simId, rec = {};
+        var dc = S.cfg.disciplinas[S.disc];
+        document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
+          var v = parseNum(i.value);
+          if (v !== undefined) rec[i.dataset.f] = v;
+        });
+        var rawReal = S.res[evId] && S.res[evId][id];
+        var real = A.hydrateRec(rawReal, dc.tipo);
 
-     var simFields = fieldsFor(dc.tipo).map(function (f) { return f[0]; });
-     if (real && real.agg !== undefined) simFields = ['agg'];
-     var realKeys = real ? simFields.filter(function (k) { return real[k] !== undefined; }) : [];
-     var recKeys = Object.keys(rec);
-     var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
+        var simFields = fieldsFor(dc.tipo).map(function (f) { return f[0]; });
+        if (real && real.agg !== undefined) simFields = ['agg'];
+        var realKeys = real ? simFields.filter(function (k) { return real[k] !== undefined; }) : [];
+        var recKeys = Object.keys(rec);
+        var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
 
-     if (same) {
-       if (S.ov[evId]) delete S.ov[evId][id];
-     } else {
-       if (!real && !recKeys.length) {
-         if (S.ov[evId]) delete S.ov[evId][id];
-       } else {
-         if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
-         (S.ov[evId] = S.ov[evId] || {})[id] = rec;
-       }
-     }
-     var C = compute();
-     renderBoard();
-     renderSimResults(C);
-     t.classList.toggle('mod', !same);
-   }
+        if (same) {
+          if (S.ov[evId]) delete S.ov[evId][id];
+        } else {
+          if (!real && !recKeys.length) {
+            if (S.ov[evId]) delete S.ov[evId][id];
+          } else {
+            if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
+            (S.ov[evId] = S.ov[evId] || {})[id] = rec;
+          }
+        }
+        var C = compute();
+        renderBoard();
+        renderSimResults(C);
+        t.classList.toggle('mod', !same);
+      }
 
       function renderSimResults(C) {
         var rowObj = C.R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
