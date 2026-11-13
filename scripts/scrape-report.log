@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 19:45:55
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 19:49:01
 Competições alvo: World Championships 2026 (Swiss Timing) | WC Cottbus
 ====================================================================
 
@@ -109,19 +109,34 @@ DESTINO: World Championships 2026 (Swiss Timing) (data/results.json -> "nanjing"
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.1 (séries: 25.1)
 RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 0 fases atualizadas.
 Fonte [Sporttech OVS]: https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/
-[DEBUG Sporttech] Competitions brutas na API: "Men" (Disc:0, Sex:male, Age:SEN) | "Women" (Disc:0, Sex:female, Age:SEN) | "Men" (Disc:1, Sex:male, Age:SEN) | "Women" (Disc:1, Sex:female, Age:SEN) | "Mixed" (Disc:1, Sex:mix, Age:SEN)
-Stages carregados (Sporttech OVS): 0
+Stages carregados (Sporttech OVS): 11
+  • [1] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (44 atletas)
+  • [9] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q2 (24 atletas)
+  • [14] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
+  • [2] Women (SEN) -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (26 atletas)
+  • [8] Women (SEN) -> TRI | Escalões: [SEN] | Sexo: F | Fase: f (8 atletas)
+  • [3] Men (SEN) -> SYN | Escalões: [SEN] | Sexo: M | Fase: q1 (14 atletas)
+  • [12] Men (SEN) -> SYN | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
+  • [4] Women (SEN) -> SYN | Escalões: [SEN] | Sexo: F | Fase: q1 (7 atletas)
+  • [11] Women (SEN) -> SYN | Escalões: [SEN] | Sexo: F | Fase: f (6 atletas)
+  • [5] Mixed (SEN) -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q1 (10 atletas)
+  • [10] Mixed (SEN) -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: f (7 atletas)
 
 ====================================================================
 DESTINO: WC Cottbus (data/results.json -> "cottbus")
 ====================================================================
-[ERRO - SEM PROVA] Catarina Nunes (TRI · SEN · F · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Sofia Correia (TRI · SEN · F · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Inês Reis (TRI · SEN · F · SFRUA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Gabriel Albuquerque (TRI · SEN · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Pedro Ferreira (TRI · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Lucas Santos (TRI · SEN · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Abreu (TRI · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
+[OK] Catarina Nunes (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 52.25 (séries: 52.25 + 51.06)
+[OK] Sofia Correia (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 48.51 (séries: 6.03 + 48.51)
+[OK] Inês Reis (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 37.93 (séries: 10.31 + 37.93)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 64.75 (séries: 64.75 + 13.93)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 64.37 (séries: 64.37)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [f] via Nome | Nota: 7.15 (séries: 7.15)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 61.57 (séries: 61.57)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 60.08 (séries: 60.08)
+[OK] Lucas Santos (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 59.23 (séries: 58.7 + 59.23)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 59.51 (séries: 58.59 + 59.51)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 60.11 (séries: 60.11)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [f] via Nome | Nota: 60.03 (séries: 60.03)
 [ERRO - SEM PROVA] Alexandra Garcia (DMT · SEN · F · AGCM) -> Nenhuma prova correspondente encontrada.
 [ERRO - SEM PROVA] Matilde Nobre (DMT · SEN · F · CCRAM) -> Nenhuma prova correspondente encontrada.
 [ERRO - SEM PROVA] Beatriz Mendes (DMT · SEN · F · CFE) -> Nenhuma prova correspondente encontrada.
@@ -138,4 +153,4 @@ DESTINO: WC Cottbus (data/results.json -> "cottbus")
 [ERRO - SEM PROVA] João Saraiva (TUM · SEN · M · ACM) -> Nenhuma prova correspondente encontrada.
 [ERRO - SEM PROVA] Diogo Gomes (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
 [ERRO - SEM PROVA] João Azinheira (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
-RESUMO (WC Cottbus): 0 encontrados | 23 com erro/não encontrados | 0 fases atualizadas.
+RESUMO (WC Cottbus): 7 encontrados | 16 com erro/não encontrados | 0 fases atualizadas.
