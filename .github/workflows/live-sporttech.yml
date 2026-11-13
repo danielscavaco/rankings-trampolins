@@ -38,8 +38,8 @@ jobs:
         env:
           MODO: ${{ github.event.inputs.modo || 'live_auto' }}
           # Ajusta aqui a janela do evento em UTC (ex: 2026-12-04 08:30 a 2026-12-06 21:00)
-          INICIO_EVENTO: '2026-11-13T08:30:00Z'
-          FIM_EVENTO: '2026-12-06T21:00:00Z'
+          INICIO_EVENTO: '2026-11-10T08:30:00Z'
+          FIM_EVENTO: '2026-11-12T21:00:00Z'
         run: |
           if [ "$MODO" = "check_only" ]; then
             node scripts/scrape-sporttech.js --check
