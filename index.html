@@ -1034,7 +1034,7 @@
         } else {
           var porVagasTxt = sum.porQuotasSafe > 0
             ? (sum.porQuotasSafe + ' garantida' + (sum.porQuotasBubble > 0 ? ' + ' + sum.porQuotasBubble + ' zona de corte' : ''))
-            : (sum.porQuotasBubble > 0 ? sum.porQuotasBubble + ' (zona de corte)' : '0 (em disputa)');
+            : (sum.porQuotasBubble > 0 ? sum.porQuotasBubble + ' (zona de corte)' : '0');
 
           $('#facts').innerHTML =
             '<div class="fact ' + (sum.porQuotasSafe > 0 ? 'good' : (sum.porQuotasBubble > 0 ? 'warn' : '')) + '"><span>Vagas Portugal</span><b>' + porVagasTxt + '</b></div>' +
