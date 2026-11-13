@@ -76,7 +76,7 @@ function scoreEvent(disc, sex, rawRec, minimos, tipo, hasMin) {
         var ff = r3(rec.f1 + rec.f2);
         var meetsF = ff >= minBase;
         var okF = q1Ok && meetsF;
-        var noteF = (meetsF && !q1Ok) ? 'Q1 sem mínimos' : '';
+        var noteF = (meetsF && !q1Ok) ? 'fase anterior sem mínimos' : '';
         items.push({
           label: 'F1 + F2', value: ff, ok: okF,
           note: noteF
