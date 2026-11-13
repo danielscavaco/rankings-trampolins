@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 18:55:03
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (VERIFICAÇÃO START LIST) — 2026-11-13 18:57:02
 Competições alvo: World Championships 2026 (Swiss Timing)
 ====================================================================
 
@@ -40,13 +40,13 @@ Stages carregados (Swiss Timing): 31
 ====================================================================
 DESTINO: World Championships 2026 (Swiss Timing) (data/test-results.json -> "cn_teste")
 ====================================================================
-[ERRO - SEM PROVA] Catarina Nunes (TRA · SEN · F · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Sofia Correia (TRA · SEN · F · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Inês Reis (TRA · SEN · F · SFRUA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Gabriel Albuquerque (TRA · SEN · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Pedro Ferreira (TRA · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Lucas Santos (TRA · SEN · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Abreu (TRA · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
+[ERRO - NÃO ENCONTRADO] Catarina Nunes (TRI · SEN · F · LGC) -> Não aparece em "Women&#x27;s Trampoline - Qualification / Women&#x27;s Trampoline - Qualification Round 2 / Women&#x27;s Trampoline - Individual Final".
+[ERRO - NÃO ENCONTRADO] Sofia Correia (TRI · SEN · F · SCP) -> Não aparece em "Women&#x27;s Trampoline - Qualification / Women&#x27;s Trampoline - Qualification Round 2 / Women&#x27;s Trampoline - Individual Final".
+[ERRO - NÃO ENCONTRADO] Inês Reis (TRI · SEN · F · SFRUA) -> Não aparece em "Women&#x27;s Trampoline - Qualification / Women&#x27;s Trampoline - Qualification Round 2 / Women&#x27;s Trampoline - Individual Final".
+[ERRO - NÃO ENCONTRADO] Gabriel Albuquerque (TRI · SEN · M · APAGL) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
+[ERRO - NÃO ENCONTRADO] Pedro Ferreira (TRI · SEN · M · SCP) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
+[ERRO - NÃO ENCONTRADO] Lucas Santos (TRI · SEN · M · CFE) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
+[ERRO - NÃO ENCONTRADO] Diogo Abreu (TRI · SEN · M · SCP) -> Não aparece em "Men&#x27;s Trampoline - Qualification / Men&#x27;s Trampoline - Qualification Round 2 / Men&#x27;s Trampoline - Individual Final".
 [ERRO - NÃO ENCONTRADO] Alexandra Garcia (DMT · SEN · F · AGCM) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
 [ERRO - NÃO ENCONTRADO] Matilde Nobre (DMT · SEN · F · CCRAM) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
 [ERRO - NÃO ENCONTRADO] Beatriz Mendes (DMT · SEN · F · CFE) -> Não aparece em "Women&#x27;s Double Mini - Qualification / Women&#x27;s Double Mini - Qualification Round 2 / Women&#x27;s Double Mini - Final 1 / Women&#x27;s Double Mini - Final 2".
