@@ -1,0 +1,87 @@
+{
+  "titulo": "CM · CMJ · CMGI 2027",
+  "local": "Sofia (BUL)",
+  "datas": "10 a 20 novembro 2027",
+  "provasContam": 2,
+  "escaloes": ["11-12", "13-14", "JUN", "17-21", "SEN"],
+  "disciplinas": {
+    "TRA": {
+      "nome": "Trampolim Individual",
+      "porEscalao": {
+        "11-12": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 82.00 }, "M": { "base": 83.00 } } },
+        "13-14": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 85.50 }, "M": { "base": 87.00 } } },
+        "JUN":   { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 88.00 }, "M": { "base": 92.50 } } },
+        "17-21": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 91.00 }, "M": { "base": 98.00 } } },
+        "SEN":   { "tipo": "late",    "vagas": 4, "minimos": { "F": { "q1": 51.50, "late": 52.50 }, "M": { "q1": 58.00, "late": 58.50 } } }
+      }
+    },
+    "SYN": {
+      "nome": "Trampolim Sincronizado",
+      "porEscalao": {
+        "11-12": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 39.00 }, "M": { "base": 39.50 } } },
+        "13-14": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 40.00 }, "M": { "base": 41.20 } } },
+        "JUN":   { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 73.80 }, "M": { "base": 75.60 } } },
+        "17-21": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 42.80 }, "M": { "base": 45.80 } } },
+        "SEN":   { "tipo": "q1_only", "vagas": 2, "minimos": { "F": { "base": 45.00 }, "M": { "base": 48.00 } } }
+      }
+    },
+    "DMT": {
+      "nome": "Duplo Mini-Trampolim",
+      "porEscalao": {
+        "11-12": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 40.00 }, "M": { "base": 41.00 } } },
+        "13-14": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 41.50 }, "M": { "base": 42.50 } } },
+        "JUN":   { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 44.00 }, "M": { "base": 47.50 } } },
+        "17-21": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 45.00 }, "M": { "base": 48.00 } } },
+        "SEN":   { "tipo": "ne", "usarExcelencia": true, "vagas": 4, "minimos": { "F": { "base": 48.00, "ne": 27.00 }, "M": { "base": 54.00, "ne": 29.00 } } }
+      }
+    },
+    "TUM": {
+      "nome": "Tumbling",
+      "porEscalao": {
+        "11-12": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 38.20 }, "M": { "base": 38.00 } } },
+        "13-14": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 38.80 }, "M": { "base": 40.00 } } },
+        "JUN":   { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 39.50 }, "M": { "base": 41.00 } } },
+        "17-21": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 41.50 }, "M": { "base": 43.50 } } },
+        "SEN":   { "tipo": "ne", "usarExcelencia": true, "vagas": 4, "minimos": { "F": { "base": 43.00, "ne": 24.00 }, "M": { "base": 47.00, "ne": 27.00 } } }
+      }
+    }
+  },
+  "eventos": [
+    {
+      "id": "cn_dmt_tum_27",
+      "nome": "Campeonato Nacional DMT / TUM",
+      "curto": "CN DMT/TUM",
+      "datas": "abr 2027",
+      "inicio": "2027-04-17",
+      "fim": "2027-04-18",
+      "disciplinas": ["DMT", "TUM"]
+    },
+    {
+      "id": "cn_tra_syn_27",
+      "nome": "Campeonato Nacional TRA",
+      "curto": "CN TRA/SYN",
+      "datas": "mai 2027",
+      "inicio": "2027-05-22",
+      "fim": "2027-05-23",
+      "disciplinas": ["TRA", "SYN"]
+    },
+    {
+      "id": "gymfest_27",
+      "nome": "Coimbra Gymfest",
+      "curto": "Gymfest",
+      "datas": "jul 2027",
+      "inicio": "2027-07-02",
+      "fim": "2027-07-04",
+      "disciplinas": ["TRA", "SYN", "DMT", "TUM"]
+    },
+    {
+      "id": "scalabis_27",
+      "nome": "Scalabis Cup",
+      "curto": "Scalabis Cup",
+      "datas": "jul 2027",
+      "inicio": "2027-07-08",
+      "fim": "2027-07-10",
+      "disciplinas": ["TRA", "SYN", "DMT", "TUM"]
+    }
+  ]
+}
