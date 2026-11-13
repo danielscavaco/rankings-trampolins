@@ -573,7 +573,9 @@
         club: '',
         detail: null,
         ov: {},
-        simId: ''
+        simId: '',
+        liveTimer: null,
+        isLiveActive: false
       };
       var $ = function (s) { return document.querySelector(s); };
       var nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
@@ -599,15 +601,21 @@
         return v.toUpperCase();
       }
 
+      /* Normaliza nomes de clubes internacionais (ex.: "POR, LGC" -> "LGC") */
+      function cleanClubName(c) {
+        return String(c || '').replace(/^POR\s*[,/-]\s*/i, '').trim();
+      }
+
       /* Formata pares de Sincronizado: Ginasta 1, Ginasta 2 (ordem alfabética) e Clube 1 · Clube 2 */
       function formatEntryIdentity(entry, disc, hideClub) {
         var isSyn = disc === 'SYN' || String(entry.nome || '').indexOf('/') >= 0;
         if (!isSyn) {
-          var singleClub = !hideClub && entry.clube ? '<small>' + esc(entry.clube) + '</small>' : '';
+          var clClean = cleanClubName(entry.clube);
+          var singleClub = !hideClub && clClean ? '<small>' + esc(clClean) + '</small>' : '';
           return '<b>' + esc(entry.nome) + '</b>' + singleClub;
         }
         var names = String(entry.nome || '').split('/').map(function (s) { return s.trim(); }).filter(Boolean);
-        var clubs = String(entry.clube || '').split('/').map(function (s) { return s.trim(); }).filter(Boolean);
+        var clubs = String(entry.clube || '').split('/').map(cleanClubName).filter(Boolean);
 
         var pairs = names.map(function (nm, idx) {
           return { nome: nm, clube: clubs[idx] || clubs[0] || '' };
@@ -633,7 +641,7 @@
 
       function entryHasClub(entry, club) {
         if (!club) return true;
-        return String(entry.clube || '').split('/').map(function (s) { return s.trim(); }).indexOf(club) >= 0;
+        return String(entry.clube || '').split('/').map(cleanClubName).indexOf(club) >= 0;
       }
 
       /* Mapa completo NOC (IOC) -> ISO 3166-1 alpha-2 para todas as federações FIG */
@@ -683,7 +691,7 @@
       var STATE_L = { done: 'concluída', live: 'a decorrer', future: 'por realizar' };
 
       function getJSON(u) {
-        return fetch(u, { cache: 'no-cache' }).then(function (r) {
+        return fetch(u, { cache: 'no-store' }).then(function (r) {
           if (!r.ok) throw new Error('HTTP ' + r.status + ' ao abrir ' + u);
           return r.text().then(function (txt) {
             try {
@@ -701,9 +709,13 @@
         return S.comps.filter(function (c) { return c.id === S.activeId; })[0] || S.comps[0];
       }
 
+      function resultsUrlFor(compMeta) {
+        return (params.get('teste') === '1' && compMeta.testResults) ? compMeta.testResults : compMeta.results;
+      }
+
       function loadCompetition(compMeta) {
         if (S.cache[compMeta.id]) return Promise.resolve(S.cache[compMeta.id]);
-        var resUrl = (params.get('teste') === '1' && compMeta.testResults) ? compMeta.testResults : compMeta.results;
+        var resUrl = resultsUrlFor(compMeta);
         var reqs = [getJSON(compMeta.config), getJSON(resUrl)];
         if (compMeta.athletes) reqs.push(getJSON(compMeta.athletes));
         return Promise.all(reqs).then(function (arr) {
@@ -711,12 +723,53 @@
             cfg: arr[0],
             meta: arr[1],
             res: arr[1].resultados || {},
+            rawResText: JSON.stringify(arr[1]),
             ath: arr[2] || []
           };
           S.cache[compMeta.id] = pack;
           return pack;
         });
       }
+
+      /* ---------- Atualização silenciosa a cada 30 segundos em modo live ---------- */
+      function checkLiveUpdate() {
+        if (!S.isLiveActive || document.hidden) return;
+        var comp = activeCompMeta();
+        if (!comp || !S.cache[comp.id]) return;
+
+        var resUrl = resultsUrlFor(comp);
+        getJSON(resUrl)
+          .then(function (freshMeta) {
+            var pack = S.cache[comp.id];
+            if (!pack) return;
+            var freshText = JSON.stringify(freshMeta);
+            if (freshText !== pack.rawResText) {
+              pack.meta = freshMeta;
+              pack.res = freshMeta.resultados || {};
+              pack.rawResText = freshText;
+              renderAll();
+            }
+          })
+          .catch(function () {
+            /* Ignora falhas momentâneas de rede durante o polling silencioso */
+          });
+      }
+
+      function syncLivePoller(shouldPoll) {
+        S.isLiveActive = Boolean(shouldPoll);
+        if (S.isLiveActive && !S.liveTimer) {
+          S.liveTimer = setInterval(checkLiveUpdate, 30000);
+        } else if (!S.isLiveActive && S.liveTimer) {
+          clearInterval(S.liveTimer);
+          S.liveTimer = null;
+        }
+      }
+
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && S.isLiveActive) {
+          checkLiveUpdate();
+        }
+      });
 
       var FALLBACK_COMPS = [
         {
@@ -948,13 +1001,13 @@
           return '<button role="tab" type="button" data-s="' + esc(s) + '"' + cls + title + ' aria-selected="' + (s === S.sex && !S.club) + '">' + esc(s) + '</button>';
         }).join('');
 
-        /* Filtro de Clube (separa pares "Clube A / Clube B" pelos clubes individuais) */
+        /* Filtro de Clube (normaliza "POR, LGC" -> "LGC" e separa pares "Clube A / Clube B") */
         var clubBox = $('#clubFilterBox');
         if (!isOlympic && Array.isArray(pack.ath)) {
           var clubs = [];
           pack.ath.forEach(function (a) {
             String(a.clube || '').split('/').forEach(function (part) {
-              var c = part.trim();
+              var c = cleanClubName(part);
               if (c && clubs.indexOf(c) < 0) clubs.push(c);
             });
           });
@@ -973,6 +1026,7 @@
         var hasLiveEvent = Array.isArray(cfg.eventos) && cfg.eventos.some(function (ev) { return evState(ev) === 'live'; });
         var isLive = Boolean(cfg.liveManual || pack.meta.live || params.get('live') === '1' || hasLiveEvent);
         $('#liveBadge').hidden = !isLive;
+        syncLivePoller(isLive);
       }
 
       /* =====================================================================
