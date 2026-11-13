@@ -8,17 +8,21 @@ const path = require('path');
 // CONFIGURAÇÃO DO ENSAIO SPORTTECH
 // ============================================================================
 const CONFIG = {
-  sporttechUrl: 'https://sporttech.io/events/56c681e4-f2c2-45df-787d-ea9164169d95/ovs/event/TRA',
+  sporttechBaseUrl: 'https://sporttech.io/events/56c681e4-f2c2-45df-787d-ea9164169d95/ovs/',
   eventoId: 'cn_teste',
   athletesFile: path.resolve(__dirname, '../data/test-athletes.json'),
   resultsFile: path.resolve(__dirname, '../data/test-results.json'),
   logFile: path.resolve(__dirname, 'scrape-report.log'),
-  pollIntervalMs: 60000
+  pollIntervalMs: 30000
 };
 
 const args = process.argv.slice(2);
 const IS_CHECK_ONLY = args.includes('--check');
 const IS_LIVE_LOOP = args.includes('--live');
+
+// Mapeamentos nativos da API Sporttech OVS
+const DISC_MAP = { 0: 'TRI', 1: 'SYN', 2: 'DMT', 3: 'TUM' };
+const KIND_MAP = { 0: 'q1', 6: 'q2', 3: 'f', 8: 'f1', 7: 'f2' };
 
 // ============================================================================
 // NORMALIZAÇÃO DE NOMES, CLUBES E ESCALÕES
@@ -35,7 +39,6 @@ function cleanClub(c) {
   return String(c || '').replace(/^POR\s*[,/-]\s*/i, '').trim();
 }
 
-// Extrai "primeiro ultimo" nome normalizado (ex: "Diogo Miguel Abreu" -> "diogo abreu")
 function firstLastKey(fullName) {
   const parts = stripAccents(fullName)
     .replace(/[^a-z\s-]/g, ' ')
@@ -46,238 +49,110 @@ function firstLastKey(fullName) {
   return `${parts[0]} ${parts[parts.length - 1]}`;
 }
 
-// Chave normalizada para pares de Sincronizado (ordena os 2 ginastas alfabeticamente)
 function synNameKey(pairName) {
-  const members = String(pairName || '')
+  return String(pairName || '')
     .split(/[\/&+]/)
     .map(firstLastKey)
     .filter(Boolean)
-    .sort();
-  return members.join(' | ');
+    .sort()
+    .join(' | ');
 }
 
-// Mapeia o título da prova na Sporttech para { disc, escaloes[], sexo, fase }
-function classifyStageTitle(rawTitle) {
-  const t = stripAccents(rawTitle);
+function normalizeSex(sexCat) {
+  const s = stripAccents(sexCat);
+  if (s === 'female' || s === 'f' || s === 'women' || s === 'girls') return 'F';
+  if (s === 'male' || s === 'm' || s === 'men' || s === 'boys') return 'M';
+  if (s === 'mix' || s === 'mixed' || s === 'x') return 'Mix';
+  return String(sexCat || '').toUpperCase();
+}
 
-  // 1. Disciplina
-  let disc = 'TRI';
-  if (/\bsyn\b|sincronizado|synchronised/.test(t)) disc = 'SYN';
-  else if (/\bdmt\b|duplo/.test(t)) disc = 'DMT';
-  else if (/\btum\b|tumbling/.test(t)) disc = 'TUM';
-
-  // 2. Género
-  let sexo = null;
-  if (/\bmix\b|misto|mixed/.test(t)) sexo = 'Mix';
-  else if (/\bfem\b|feminino|women|girls/.test(t)) sexo = 'F';
-  else if (/\bmasc\b|masculino|men|boys/.test(t)) sexo = 'M';
-
-  // 3. Escalão (regras específicas CN Portugal + Internacionais)
-  // Nota: Jun Elite pode alimentar JUN e/ou 13-14 caso o ginasta faça apuramento nos dois
-  let escaloes = [];
-  if (/inic\s*1d|11-12|ag\s*1\b/.test(t)) {
-    escaloes = ['11-12'];
-  } else if (/juv\s*1d|13-14|ag\s*2\b/.test(t)) {
-    escaloes = ['13-14'];
-  } else if (/jun\s*elite|15-16|junior/.test(t)) {
-    escaloes = ['JUN', '13-14'];
-  } else if (/sen\s*1d|17-21|ag\s*4\b/.test(t)) {
-    escaloes = ['17-21'];
-  } else if (/sen\s*elite|senior|open/.test(t)) {
-    escaloes = ['SEN'];
-  }
-
-  // 4. Fase (Q1, Q2, Final, Final 1, Final 2)
-  let fase = 'q1';
-  if (/final\s*2|\bf2\b/.test(t)) fase = 'f2';
-  else if (/final\s*1|\bf1\b/.test(t)) fase = 'f1';
-  else if (/\bfinal\b|\bfin\b/.test(t)) fase = 'f';
-  else if (/\bq2\b|qual.*2|semi/.test(t)) fase = 'q2';
-
-  return { disc, sexo, escaloes, fase, rawTitle };
+// Mapeia o escalão da Sporttech (AgeGroup / Title) para os escalões do site
+function mapEscalao(comp) {
+  const raw = stripAccents(`${comp.AgeGroup || ''} ${comp.Title || ''}`);
+  if (/inic\s*1d|11-12|ag\s*1\b/.test(raw)) return ['11-12'];
+  if (/juv\s*1d|13-14|ag\s*2\b/.test(raw)) return ['13-14'];
+  if (/jun\s*elite|15-16|\bjun\b|junior/.test(raw)) return ['JUN', '13-14'];
+  if (/sen\s*1d|17-21|ag\s*3\b|ag\s*4\b/.test(raw)) return ['17-21'];
+  if (/sen\s*elite|\bsen\b|senior|open/.test(raw)) return ['SEN'];
+  return [];
 }
 
 // ============================================================================
-// LEITURA DA API / HTML DA SPORTTECH
+// CÁLCULO DE DETALHE DA ROTINA (E, D, HD, TOF, PEN, TOTAL)
 // ============================================================================
-function extractEventId(url) {
-  const m = String(url).match(/events\/([a-f0-9-]{36})/i);
-  if (!m) throw new Error('URL da Sporttech inválido (UUID do evento não encontrado).');
-  return m[1];
-}
+function parseFrameDetail(f) {
+  const T = (f.MarkTTT_G || 0) / 1000.0;
+  const E = f.ETotalT_G || 0;
+  const D = (f.DifficultyT_G || 0) / 10.0;
+  const H = f.Displacement_G || 0;
+  const X = f.TimeTMS_G || 0;
+  const P = (f.PenaltyT || 0) / 10.0;
+  const B = (f.BonusT || 0) / 10.0;
 
-async function fetchJsonOrNull(url) {
-  try {
-    const res = await fetch(url, {
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'User-Agent': 'Mozilla/5.0 (RankingsTrampolins-LiveCheck)'
+  const out = {
+    e: 0,
+    d: Number(D.toFixed(3)),
+    hd: 0,
+    tof: 0,
+    p: Number(P.toFixed(3)),
+    total: Number(T.toFixed(3))
+  };
+
+  for (const e of [E / 10.0, E / 1000.0, E / 100.0]) {
+    for (const h of [H / 100.0, H / 10.0, H / 1000.0]) {
+      for (const x of [X / 1000.0, (X * 2) / 100.0, X / 100.0, X / 10.0]) {
+        if (Math.abs(e + D + h + x + B - P - T) < 0.006) {
+          out.e = Number(e.toFixed(3));
+          out.hd = Number(h.toFixed(3));
+          out.tof = Number(x.toFixed(3));
+          return out;
+        }
       }
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
-
-async function fetchSporttechStages(eventUrl) {
-  const eventId = extractEventId(eventUrl);
-
-  // Tenta os endpoints internos da plataforma Sporttech OVS
-  const candidateEndpoints = [
-    `https://sporttech.io/api/events/${eventId}/ovs`,
-    `https://sporttech.io/api/events/${eventId}/stages`,
-    `https://sporttech.io/events/${eventId}/ovs/data.json`
-  ];
-
-  for (const ep of candidateEndpoints) {
-    const data = await fetchJsonOrNull(ep);
-    if (data && (Array.isArray(data.stages) || Array.isArray(data.events) || Array.isArray(data))) {
-      return normalizeApiPayload(eventId, data);
     }
   }
+  return out;
+}
 
-  // Fallback: analisa o HTML da página e extrai links de stages + JSON embutido
-  const htmlRes = await fetch(eventUrl, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (RankingsTrampolins-LiveCheck)' }
-  });
-  if (!htmlRes.ok) {
-    throw new Error(`Erro HTTP ${htmlRes.status} ao aceder à Sporttech.`);
-  }
-  const html = await htmlRes.text();
-
-  // Procura estado SSR / Next / Angular / JSON embutido no HTML
-  const nextDataMatch = html.match(/<script[^>]*id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i);
-  if (nextDataMatch) {
+// ============================================================================
+// CLIENTE API SPORTTECH OVS
+// ============================================================================
+async function fetchApiJson(url) {
+  for (let i = 0; i < 3; i++) {
     try {
-      const parsed = JSON.parse(nextDataMatch[1]);
-      return normalizeApiPayload(eventId, parsed);
-    } catch { /* continua */ }
-  }
-
-  // Extrai links para cada stage presentes no menu da página
-  const stageRegex = /href="([^"]*\/events\/[^"]*\/ovs\/stage\/([^"?#]+)[^"]*)"[^>]*>([^<]+)</gi;
-  const stageLinks = [];
-  let match;
-  while ((match = stageRegex.exec(html)) !== null) {
-    const href = match[1].startsWith('http') ? match[1] : `https://sporttech.io${match[1]}`;
-    const stageId = match[2];
-    const title = match[3].replace(/\s+/g, ' ').trim();
-    if (title && !stageLinks.some(s => s.stageId === stageId)) {
-      stageLinks.push({ stageId, href, title });
-    }
-  }
-
-  const results = [];
-  for (const st of stageLinks) {
-    const stJson = await fetchJsonOrNull(`https://sporttech.io/api/events/${eventId}/stages/${st.stageId}`);
-    if (stJson) {
-      results.push({
-        id: st.stageId,
-        title: st.title,
-        entries: extractEntriesFromStageJson(stJson)
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (RankingsTrampolins Live Relay)',
+          'Accept': 'application/json'
+        }
       });
-    } else {
-      const stHtmlRes = await fetch(st.href);
-      const stHtml = stHtmlRes.ok ? await stHtmlRes.text() : '';
-      results.push({
-        id: st.stageId,
-        title: st.title,
-        entries: parseHtmlResultRows(stHtml)
-      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      if (i === 2) throw err;
+      await new Promise(r => setTimeout(r, 1500 * (i + 1)));
     }
   }
-
-  return results;
-}
-
-function normalizeApiPayload(eventId, raw) {
-  const list = Array.isArray(raw) ? raw : (raw.stages || raw.competitions || []);
-  return list.map((st, idx) => ({
-    id: String(st.id || st.stageId || idx),
-    title: String(st.name || st.title || st.label || ''),
-    entries: extractEntriesFromStageJson(st)
-  }));
-}
-
-function extractEntriesFromStageJson(st) {
-  const rows = st.results || st.entries || st.participants || st.startlist || [];
-  return rows.map(r => {
-    const num = (v) => {
-      const n = parseFloat(String(v ?? '').replace(',', '.'));
-      return Number.isFinite(n) ? n : null;
-    };
-    return {
-      nome: String(r.name || r.athleteName || r.fullName || '').trim(),
-      clube: cleanClub(r.club || r.team || r.noc || ''),
-      filiado: String(r.license || r.federationId || r.nationalId || '').trim(),
-      figId: String(r.figId || r.fig || '').trim(),
-      e: num(r.e ?? r.execution),
-      d: num(r.d ?? r.difficulty),
-      hd: num(r.hd ?? r.horizontal),
-      tof: num(r.tof ?? r.timeOfFlight),
-      p: num(r.p ?? r.penalty) || 0,
-      total: num(r.total ?? r.score ?? r.mark)
-    };
-  }).filter(e => e.nome);
-}
-
-function parseHtmlResultRows(html) {
-  const entries = [];
-  const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-  let trMatch;
-  while ((trMatch = trRegex.exec(html)) !== null) {
-    const cells = [];
-    const tdRegex = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
-    let tdMatch;
-    while ((tdMatch = tdRegex.exec(trMatch[1])) !== null) {
-      cells.push(tdMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
-    }
-    if (cells.length >= 3) {
-      const nums = cells
-        .map(c => parseFloat(c.replace(',', '.')))
-        .filter(n => Number.isFinite(n) && n > 5 && n < 200);
-      const total = nums.length ? nums[nums.length - 1] : null;
-      const textCells = cells.filter(c => /[a-zA-ZÀ-ÿ]{3,}/.test(c));
-      if (textCells.length >= 1) {
-        entries.push({
-          nome: textCells[0],
-          clube: cleanClub(textCells[1] || ''),
-          filiado: '',
-          figId: '',
-          e: null,
-          d: null,
-          hd: null,
-          tof: null,
-          p: 0,
-          total
-        });
-      }
-    }
-  }
-  return entries;
 }
 
 // ============================================================================
-// MATCHING EM CASCATA E GERAÇÃO DE LOG
+// MATCHING EM CASCATA
 // ============================================================================
-function matchAthleteToSporttech(ath, stageEntries) {
+function matchAthlete(ath, stageEntries) {
   const isSyn = ath.disc === 'SYN';
 
-  // 1. Tenta por número de filiado (FGP)
+  // 1. Por número de filiado
   if (ath.filiado) {
-    const byFil = stageEntries.find(e => e.filiado && e.filiado === String(ath.filiado).trim());
+    const byFil = stageEntries.find(e => e.filiados.includes(String(ath.filiado).trim()));
     if (byFil) return { entry: byFil, method: `Filiado (${ath.filiado})` };
   }
 
-  // 2. Tenta por FIG ID
+  // 2. Por FIG ID
   if (ath.figId) {
-    const byFig = stageEntries.find(e => e.figId && e.figId === String(ath.figId).trim());
+    const byFig = stageEntries.find(e => e.figIds.includes(String(ath.figId).trim()));
     if (byFig) return { entry: byFig, method: `FIG ID (${ath.figId})` };
   }
 
-  // 3. Tenta por Nome Normalizado (Primeiro + Último) + Clube
+  // 3. Por Primeiro + Último Nome (ordenado no caso de SYN) + Clube
   const targetKey = isSyn ? synNameKey(ath.nome) : firstLastKey(ath.nome);
   if (!targetKey) return null;
 
@@ -291,16 +166,23 @@ function matchAthleteToSporttech(ath, stageEntries) {
   }
   if (candidates.length > 1) {
     const athClubs = String(ath.clube || '').split('/').map(cleanClub);
-    const byClub = candidates.find(c => athClubs.includes(cleanClub(c.clube)));
-    if (byClub) return { entry: byClub, method: `Nome + Clube (${byClub.clube})` };
-    return { entry: candidates[0], method: 'Nome (ambíguo - 1.º encontrado)' };
+    const byClub = candidates.find(c => c.clubes.some(cl => athClubs.includes(cl)));
+    if (byClub) return { entry: byClub, method: `Nome + Clube (${byClub.clubes.join(' / ')})` };
+    return { entry: candidates[0], method: 'Nome (1.º encontrado)' };
   }
 
   return null;
 }
 
+// ============================================================================
+// EXECUÇÃO PRINCIPAL
+// ============================================================================
+const stageCache = new Map();
+
 async function runSync() {
   const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
+  const apiBase = CONFIG.sporttechBaseUrl.replace(/\/+$/, '') + '/api/';
+
   const athletes = JSON.parse(fs.readFileSync(CONFIG.athletesFile, 'utf8'));
   let resultsDoc = { live: true, atualizadoEm: nowStr, resultados: { [CONFIG.eventoId]: {} } };
   if (fs.existsSync(CONFIG.resultsFile)) {
@@ -311,96 +193,167 @@ async function runSync() {
 
   const logLines = [
     `====================================================================`,
-    `RELATÓRIO SPORTTECH (${IS_CHECK_ONLY ? 'VERIFICAÇÃO START LIST' : 'LIVE SYNC'}) — ${nowStr}`,
-    `URL: ${CONFIG.sporttechUrl}`,
+    `RELATÓRIO SPORTTECH OVS (${IS_CHECK_ONLY ? 'VERIFICAÇÃO START LIST' : 'LIVE SYNC'}) — ${nowStr}`,
+    `API: ${apiBase}`,
     `====================================================================`,
     ``
   ];
 
-  let stages = [];
+  let evData;
   try {
-    stages = await fetchSporttechStages(CONFIG.sporttechUrl);
+    evData = await fetchApiJson(apiBase + 'event?fetch_event_competitions=true&fetch_competition_stages=true');
   } catch (err) {
-    logLines.push(`[ERRO CRÍTICO] Falha ao contactar a Sporttech: ${err.message}`);
+    logLines.push(`[ERRO CRÍTICO] Falha ao ler API Sporttech: ${err.message}`);
     fs.writeFileSync(CONFIG.logFile, logLines.join('\n'), 'utf8');
     console.error(logLines.join('\n'));
     return;
   }
 
-  logLines.push(`Provas/Stages detetados na Sporttech: ${stages.length}`);
-  const classifiedStages = stages.map(st => ({
-    ...st,
-    meta: classifyStageTitle(st.title)
-  }));
+  const comps = evData.Competitions || {};
+  const stages = evData.Stages || {};
+  const stageList = [];
 
-  classifiedStages.forEach(st => {
-    const m = st.meta;
-    logLines.push(`  • [${st.id}] "${st.title}" -> ${m.disc} | Escalões: [${m.escaloes.join(', ') || '?'}] | Sexo: ${m.sexo || '?'} | Fase: ${m.fase} (${st.entries.length} inscritos)`);
+  for (const [cid, c] of Object.entries(comps)) {
+    if ((c.Title || '').toLowerCase() === 'test') continue;
+    const disc = DISC_MAP[c.Discipline];
+    if (!disc) continue;
+    const sexo = normalizeSex(c.SexCategory);
+    const escaloes = mapEscalao(c);
+
+    for (const sid of (c.Stages || [])) {
+      const st = stages[String(sid)] || stages[sid];
+      if (!st) continue;
+      const fase = KIND_MAP[st.Kind] || String(st.Kind);
+      const cacheKey = `${st.LastEdit_G}|${st.FinishedFrames_G}|${st.InProgress_G}`;
+
+      let det = stageCache.get(String(sid));
+      if (!det || det.cacheKey !== cacheKey) {
+        try {
+          const rawDet = await fetchApiJson(
+            `${apiBase}stages/${sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`
+          );
+          det = { cacheKey, data: rawDet };
+          stageCache.set(String(sid), det);
+        } catch (err) {
+          logLines.push(`[AVISO] Erro ao ler stage ${sid} (${c.Title}): ${err.message}`);
+          continue;
+        }
+      }
+
+      const A = det.data.Athletes || {};
+      const P = det.data.Performances || {};
+      const F = det.data.Frames || {};
+      const lim = st.PerfomanceFramesLimit || 2;
+
+      const entries = [];
+      for (const p of Object.values(P)) {
+        const athObjs = (p.Athletes || [])
+          .map(aid => A[String(aid)] || A[aid])
+          .filter(Boolean);
+        if (!athObjs.length) continue;
+
+        const fullNames = athObjs.map(a => `${a.GivenName || ''} ${a.Surname || ''}`.trim());
+        const clubes = athObjs.map(a => cleanClub(a.Club || a.Team || a.Representing || ''));
+        const filiados = athObjs.map(a => String(a.FederationID || a.License || a.NationalID || '').trim()).filter(Boolean);
+        const figIds = athObjs.map(a => String(a.FIGID || a.FigId || a.LicenseFIG || '').trim()).filter(Boolean);
+
+        const routines = [];
+        for (const fid of (p.Frames || []).slice(0, lim)) {
+          const f = F[String(fid)] || F[fid];
+          if (!f) continue;
+          const mk = f.MarkTTT_G || 0;
+          if (mk > 0 && (f.State || 0) >= 3) {
+            routines.push(parseFrameDetail(f));
+          }
+        }
+
+        const totalMk = (p.MarkTTT_G || 0) > 0 ? Number(((p.MarkTTT_G || 0) / 1000.0).toFixed(3)) : null;
+
+        entries.push({
+          nome: fullNames.join(' / '),
+          clubes,
+          filiados,
+          figIds,
+          total: totalMk,
+          routines
+        });
+      }
+
+      stageList.push({
+        sid: String(sid),
+        title: `${c.Title || ''} (${c.AgeGroup || ''})`.trim(),
+        disc,
+        sexo,
+        escaloes,
+        fase,
+        entries
+      });
+    }
+  }
+
+  logLines.push(`Stages carregados da Sporttech: ${stageList.length}`);
+  stageList.forEach(st => {
+    logLines.push(`  • [${st.sid}] ${st.title} -> ${st.disc} | Escalões: [${st.escaloes.join(', ') || '?'}] | Sexo: ${st.sexo} | Fase: ${st.fase} (${st.entries.length} inscritos)`);
   });
   logLines.push(``);
+  logLines.push(`--- CRUZAMENTO DE GINASTAS (${athletes.length} no JSON) ---`);
 
   let matchedCount = 0;
   let missingCount = 0;
   let updatedScores = 0;
 
-  logLines.push(`--- CRUZAMENTO DE GINASTAS (${athletes.length} no JSON) ---`);
-
   for (const ath of athletes) {
-    // Filtra os stages da Sporttech que correspondem à disciplina, género e escalão deste ginasta
-    const relevantStages = classifiedStages.filter(st => {
-      const m = st.meta;
-      if (m.disc !== ath.disc) return false;
-      if (m.sexo && m.sexo !== ath.sexo) return false;
-      if (m.escaloes.length > 0 && !m.escaloes.includes(ath.escalao)) return false;
+    const relevantStages = stageList.filter(st => {
+      if (st.disc !== ath.disc) return false;
+      if (st.sexo && st.sexo !== ath.sexo) return false;
+      if (st.escaloes.length > 0 && !st.escaloes.includes(ath.escalao)) return false;
       return true;
     });
 
     if (relevantStages.length === 0) {
       missingCount++;
-      logLines.push(`[ERRO - SEM PROVA] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube}) -> Nenhuma prova correspondente encontrada na Sporttech.`);
+      logLines.push(`[ERRO - SEM PROVA] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube}) -> Nenhuma prova correspondente na Sporttech.`);
       continue;
     }
 
-    let foundInAnyStage = false;
+    let foundAny = false;
     const evRec = resultsDoc.resultados[CONFIG.eventoId][ath.id] || { rotinas: {} };
     evRec.rotinas = evRec.rotinas || {};
 
     for (const st of relevantStages) {
-      const match = matchAthleteToSporttech(ath, st.entries);
-      if (match) {
-        foundInAnyStage = true;
-        const e = match.entry;
-        const faseKey = st.meta.fase;
-        logLines.push(`[OK] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo}) -> Encontrado em "${st.title}" via ${match.method} | Total: ${e.total ?? 'sem nota'}`);
+      const m = matchAthlete(ath, st.entries);
+      if (m) {
+        foundAny = true;
+        const e = m.entry;
+        const faseKey = st.fase;
+        logLines.push(`[OK] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo}) -> "${st.title}" [${faseKey}] via ${m.method} | Total: ${e.total ?? 'sem nota'}`);
 
         if (!IS_CHECK_ONLY && e.total !== null) {
           evRec[faseKey] = e.total;
-          evRec.rotinas[faseKey] = {
-            e: e.e ?? 0,
-            d: e.d ?? 0,
-            hd: e.hd ?? 0,
-            tof: e.tof ?? 0,
-            p: e.p ?? 0,
-            total: e.total
-          };
+          if (faseKey === 'q1' && e.routines.length > 0) {
+            if (e.routines[0]) evRec.rotinas.q1_1 = e.routines[0];
+            if (e.routines[1]) evRec.rotinas.q1_2 = e.routines[1];
+          } else if (e.routines.length > 0) {
+            evRec.rotinas[faseKey] = e.routines[0];
+          }
           updatedScores++;
         }
       }
     }
 
-    if (foundInAnyStage) {
+    if (foundAny) {
       matchedCount++;
       if (!IS_CHECK_ONLY && Object.keys(evRec.rotinas).length > 0) {
         resultsDoc.resultados[CONFIG.eventoId][ath.id] = evRec;
       }
     } else {
       missingCount++;
-      logLines.push(`[ERRO - NÃO ENCONTRADO] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube} | Filiado: ${ath.filiado || '—'} | FIG: ${ath.figId || '—'}) -> Não aparece nas listas de "${relevantStages.map(s => s.title).join(' / ')}".`);
+      logLines.push(`[ERRO - NÃO ENCONTRADO] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo} · ${ath.clube}) -> Não aparece em "${relevantStages.map(s => s.title).join(' / ')}".`);
     }
   }
 
   logLines.push(``);
-  logLines.push(`RESUMO: ${matchedCount} encontrados | ${missingCount} com erro/não encontrados | ${updatedScores} notas atualizadas.`);
+  logLines.push(`RESUMO: ${matchedCount} encontrados | ${missingCount} com erro/não encontrados | ${updatedScores} fases atualizadas.`);
 
   fs.writeFileSync(CONFIG.logFile, logLines.join('\n'), 'utf8');
   console.log(logLines.join('\n'));
@@ -414,7 +367,6 @@ async function runSync() {
 (async () => {
   await runSync();
   if (IS_LIVE_LOOP) {
-    console.log(`\nModo LIVE ativo: a verificar novamente a cada ${CONFIG.pollIntervalMs / 1000}s...`);
     setInterval(runSync, CONFIG.pollIntervalMs);
   }
 })();
