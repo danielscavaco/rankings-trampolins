@@ -1,5 +1,5 @@
 {
-  "titulo": "CM · CMJ · CMGI 2027",
+  "titulo": "Campeonatos do Mundo 2027",
   "local": "Sofia (BUL)",
   "datas": "10 a 20 novembro 2027",
   "provasContam": 2,
@@ -21,8 +21,7 @@
         "11-12": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 39.00 }, "M": { "base": 39.50 } } },
         "13-14": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 40.00 }, "M": { "base": 41.20 } } },
         "JUN":   { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 73.80 }, "M": { "base": 75.60 } } },
-        "17-21": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 42.80 }, "M": { "base": 45.80 } } },
-        "SEN":   { "tipo": "q1_only", "vagas": 2, "minimos": { "F": { "base": 45.00 }, "M": { "base": 48.00 } } }
+        "17-21": { "tipo": "q1_only", "vagas": 4, "minimos": { "F": { "base": 42.80 }, "M": { "base": 45.80 } } }
       }
     },
     "DMT": {
