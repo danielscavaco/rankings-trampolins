@@ -935,11 +935,23 @@
             '<div class="fact good"><span>Critério 2 Garantidas</span><b>' + sum.safeCrit2Slots + '</b></div>' +
             '<div class="fact warn"><span>Zona de Corte</span><b>' + sum.bubbleCrit2Slots + '</b></div>';
 
-          var pillsHtml = R.continentTrackers.map(function (ct) {
+          var cleanTrackerLabel = function (lbl) {
+            return String(lbl || '').replace(/\s*\([^)]*\)\s*/g, '').trim();
+          };
+
+          var sortedTrackers = R.continentTrackers.slice().sort(function (a, b) {
+            var aHost = /^anfitri[aã]o/i.test(a.label) || a.id === 'HOST';
+            var bHost = /^anfitri[aã]o/i.test(b.label) || b.id === 'HOST';
+            if (aHost !== bHost) return aHost ? 1 : -1;
+            return cleanTrackerLabel(a.label).localeCompare(cleanTrackerLabel(b.label), 'pt');
+          });
+
+          var pillsHtml = sortedTrackers.map(function (ct) {
+            var lbl = cleanTrackerLabel(ct.label);
             if (ct.qualified) {
-              return '<span class="qt-pill done" title="Vaga já garantida por ' + esc(ct.byNoc) + '">' + esc(ct.label) + ' <span class="qt-noc">(' + esc(ct.byNoc) + ')</span></span>';
+              return '<span class="qt-pill done" title="Vaga já garantida por ' + esc(ct.byNoc) + '">' + esc(lbl) + ' <span class="qt-noc">(' + esc(ct.byNoc) + ')</span></span>';
             }
-            return '<span class="qt-pill" title="Reserva 1 vaga até um país deste grupo entrar no apuramento">' + esc(ct.label) + '</span>';
+            return '<span class="qt-pill" title="Reserva 1 vaga até um país deste grupo entrar no apuramento">' + esc(lbl) + '</span>';
           }).join('');
 
           $('#trackerBox').innerHTML =
