@@ -1,5 +1,5 @@
 /* Motor de cálculo do apuramento (regras do manual FGP, secção 1).
-   Sem dependências: corre no browser e em Node. */
+   Calcula automaticamente totais por série, por ronda e nota de excelência a partir de rotinas. */
 (function (root) {
   'use strict';
 
@@ -7,6 +7,83 @@
   var r3 = function (x) { return Math.round(x * 1000) / 1000; };
   var nfPt = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
   var fmtPt = function (n) { return nfPt.format(n); };
+
+  /* Calcula o total de uma série a partir de D, E, HD, ToF e Penalização (ou usa total explícito se existir) */
+  function calcRoutineTotal(rt) {
+    if (!rt) return null;
+    if (isNum(rt.total)) return r3(rt.total);
+    if (!isNum(rt.d) && !isNum(rt.e)) return null;
+    var sum = (isNum(rt.d) ? rt.d : 0) +
+              (isNum(rt.e) ? rt.e : 0) +
+              (isNum(rt.hd) ? rt.hd : 0) +
+              (isNum(rt.tof) ? rt.tof : 0) -
+              (isNum(rt.p) ? rt.p : 0);
+    return r3(sum);
+  }
+
+  /* Normaliza um registo de prova, preenchendo totais de séries, rondas (q1, q2, f, f1, f2) e ne */
+  function hydrateRec(rec, tipo) {
+    if (!rec) return null;
+    var rotSrc = rec.rotinas || {};
+    var rot = {};
+    var hasRot = false;
+
+    Object.keys(rotSrc).forEach(function (k) {
+      var orig = rotSrc[k];
+      if (!orig) return;
+      var t = calcRoutineTotal(orig);
+      rot[k] = Object.assign({}, orig);
+      if (t !== null) rot[k].total = t;
+      hasRot = true;
+    });
+
+    var out = Object.assign({}, rec);
+    if (hasRot) out.rotinas = rot;
+
+    if (tipo === 'late') {
+      /* TRI: Q1 é a melhor série entre q1_1 e q1_2 */
+      var t1 = rot.q1_1 ? rot.q1_1.total : null;
+      var t2 = rot.q1_2 ? rot.q1_2.total : null;
+      if (!isNum(out.q1)) {
+        if (isNum(t1) && isNum(t2)) out.q1 = Math.max(t1, t2);
+        else if (isNum(t1)) out.q1 = t1;
+        else if (isNum(t2)) out.q1 = t2;
+        else if (rot.q1 && isNum(rot.q1.total)) out.q1 = rot.q1.total;
+      }
+      if (!isNum(out.q2) && rot.q2 && isNum(rot.q2.total)) out.q2 = rot.q2.total;
+      if (!isNum(out.f) && rot.f && isNum(rot.f.total)) out.f = rot.f.total;
+    } else {
+      /* TUM e DMT: Q1 = q1_1 + q1_2; Finais = f1 + f2; NE = maior série individual de toda a prova */
+      var qt1 = rot.q1_1 ? rot.q1_1.total : null;
+      var qt2 = rot.q1_2 ? rot.q1_2.total : null;
+      if (!isNum(out.q1)) {
+        if (isNum(qt1) && isNum(qt2)) out.q1 = r3(qt1 + qt2);
+        else if (rot.q1 && isNum(rot.q1.total)) out.q1 = rot.q1.total;
+      }
+      if (!isNum(out.f1) && rot.f1 && isNum(rot.f1.total)) out.f1 = rot.f1.total;
+      if (!isNum(out.f2) && rot.f2 && isNum(rot.f2.total)) out.f2 = rot.f2.total;
+
+      if (!isNum(out.ne) && hasRot) {
+        var maxSingle = null;
+        var maxKey = null;
+        Object.keys(rot).forEach(function (k) {
+          /* Ignora eventual chave agregada 'q1' se existirem séries individuais */
+          if (k === 'q1' && (rot.q1_1 || rot.q1_2)) return;
+          var val = rot[k] ? rot[k].total : null;
+          if (isNum(val) && (maxSingle === null || val > maxSingle)) {
+            maxSingle = val;
+            maxKey = k;
+          }
+        });
+        if (maxSingle !== null) {
+          out.ne = maxSingle;
+          out.nePhase = maxKey;
+        }
+      }
+    }
+
+    return out;
+  }
 
   function resolveQ1Key(rec) {
     if (!rec || !rec.rotinas) return 'q1';
@@ -30,12 +107,13 @@
     return { e: sumE, d: sumD, hasDetail: hasDetail };
   }
 
-  function scoreEvent(disc, sex, rec, minimos, tipo, hasMin) {
+  function scoreEvent(disc, sex, rawRec, minimos, tipo, hasMin) {
+    var rec = hydrateRec(rawRec, tipo);
     var m = (minimos[disc] || {})[sex] || {};
     var items = [];
     var out = {
       score: 0, items: items, base: null, baseOk: false, neAdd: 0,
-      usedPhases: [], stats: { e: 0, d: 0, hasDetail: false }
+      usedPhases: [], stats: { e: 0, d: 0, hasDetail: false }, hydrated: rec
     };
     if (!rec) return out;
 
@@ -130,7 +208,12 @@
         label: 'Nota de excelência', value: rec.ne, ok: okN,
         note: okN ? '' : (!allowed ? 'exige o mínimo numa prova' : 'abaixo do mínimo (' + fmtPt(minNe) + ')')
       });
-      if (okN) neAdd = rec.ne;
+      if (okN) {
+        neAdd = rec.ne;
+        if (rec.nePhase && out.usedPhases.indexOf(rec.nePhase) < 0) {
+          out.usedPhases = out.usedPhases.concat([rec.nePhase]);
+        }
+      }
     } else if (rec.neFlag) {
       items.push({
         label: 'Nota de excelência', value: null, ok: false, pending: true,
@@ -202,7 +285,7 @@
         var rr = recs[ev.id];
         var s = scoreEvent(disc, sex, rr.rec, cfg.minimos, dcfg.tipo, hasMin);
         per[ev.id] = {
-          rec: rr.rec,
+          rec: s.hydrated || rr.rec,
           score: s.score,
           items: s.items,
           simulated: rr.ov,
@@ -295,7 +378,7 @@
     };
   }
 
-  var api = { scoreEvent: scoreEvent, rank: rank };
+  var api = { scoreEvent: scoreEvent, rank: rank, hydrateRec: hydrateRec };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Apuramento = api;
 })(typeof self !== 'undefined' ? self : this);
