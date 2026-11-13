@@ -25,7 +25,7 @@
   "unioes": [
     { "code": "EG",   "label": "Europa (EG)" },
     { "code": "AGU",  "label": "Ásia (AGU)" },
-    { "code": "PAGU", "label": "Américas (PAGU)" },
+    { "code": "PAGU", "label": "América (PAGU)" },
     { "code": "UAG",  "label": "África (UAG)" },
     { "code": "OGU",  "label": "Oceânia (OGU)" }
   ],
