@@ -250,6 +250,19 @@
       vertical-align: -0.15em;
       margin-left: 3px;
     }
+
+    footer {
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    footer b { color: var(--ink); font-weight: 500; }
   </style>
 </head>
 <body>
@@ -287,6 +300,11 @@
         <div class="simrows" id="simRows"></div>
       </div>
     </section>
+
+    <footer>
+      <span>© 2026 <b>Daniel Cavaco</b></span>
+      <span>Rankings não oficiais · Trampolins</span>
+    </footer>
   </div>
 
   <div class="live-pill" id="liveBadge" hidden aria-live="polite">
