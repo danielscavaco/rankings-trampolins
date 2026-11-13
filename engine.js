@@ -119,7 +119,7 @@
     return { e: sumE, d: sumD, hasDetail: hasDetail };
   }
 
-  function scoreEvent(disc, sex, rawRec, minimos, tipo, hasMin) {
+  function scoreEvent(disc, sex, rawRec, minimos, tipo) {
     var rec = hydrateRec(rawRec, tipo);
     var m = (minimos[disc] || {})[sex] || {};
     var items = [];
@@ -165,7 +165,8 @@
       return out;
     }
 
-    /* tipo 'ne': TUM e DMT */
+    /* tipo 'ne': TUM e DMT
+       Q1 ou F1+F2 (maior entre as duas fases) + Nota de Excelência (desde que tenha obtido mínimos na Q1) */
     var minBase = m.base, minNe = m.ne;
     var cand = [];
     var q1Ok = false;
@@ -174,6 +175,7 @@
       var okA = rec.agg >= minBase;
       items.push({ label: 'Valor da prova (Q1 ou F1+F2)', value: rec.agg, ok: okA, note: '' });
       out.base = rec.agg;
+      q1Ok = okA;
       if (okA) cand.push({ val: rec.agg, keys: [] });
     } else {
       if (isNum(rec.q1)) {
@@ -203,26 +205,28 @@
     out.usedPhases = bestCand ? bestCand.keys : [];
     out.stats = extractRoutineStats('ne', rec, out.usedPhases);
 
-    var allowed = hasMin === undefined ? out.baseOk : hasMin;
+    var neAdd = 0;
     if (isNum(rec.ne)) {
       var meetsNe = rec.ne >= minNe;
-      var okN = allowed && meetsNe;
+      var okN = q1Ok && meetsNe;
       var phaseLabel = rec.nePhase ? (PHASE_NAMES[rec.nePhase] || rec.nePhase) : '';
       var noteParts = [];
       if (phaseLabel) noteParts.push(phaseLabel);
-      if (meetsNe && !allowed) noteParts.push('exige o mínimo numa prova');
+      if (meetsNe && !q1Ok) noteParts.push('exige mínimos na Q1');
       items.push({ label: 'Nota de excelência', value: rec.ne, ok: okN, note: noteParts.join(' · ') });
       out.nePhase = rec.nePhase || null;
       if (meetsNe) out.neReached = true;
-      if (okN) out.neValid = true;
+      if (okN) {
+        out.neValid = true;
+        neAdd = rec.ne;
+      }
     } else if (rec.neFlag) {
       items.push({ label: 'Nota de excelência', value: null, ok: false, pending: true, note: 'obtida, valor por introduzir' });
       out.neReached = true;
-      if (allowed) out.neValid = true;
+      if (q1Ok) out.neValid = true;
     }
 
-    /* A nota de excelência não soma à pontuação da prova */
-    out.score = r3(base);
+    out.score = base > 0 ? r3(base + neAdd) : 0;
     return out;
   }
 
@@ -255,26 +259,19 @@
     var minBase = dcfg.tipo === 'late' ? m.q1 : m.base;
 
     var rows = entries.map(function (en) {
-      var per = {}, scoredList = [], sim = false, bestRaw = null, recs = {}, hasMin = false, hasValidNe = false;
+      var per = {}, scoredList = [], sim = false, bestRaw = null, hasValidNe = false;
 
       evs.forEach(function (ev) {
         var ov = overrides && overrides[ev.id] && overrides[ev.id][en.id];
         var rec = ov || (results[ev.id] && results[ev.id][en.id]) || null;
         if (ov) sim = true;
-        recs[ev.id] = { rec: rec, ov: !!ov };
-        var pre = scoreEvent(disc, sex, rec, cfg.minimos, dcfg.tipo);
-        if (dcfg.tipo === 'late' ? pre.score > 0 : pre.baseOk) hasMin = true;
-      });
-
-      evs.forEach(function (ev) {
-        var rr = recs[ev.id];
-        var s = scoreEvent(disc, sex, rr.rec, cfg.minimos, dcfg.tipo, hasMin);
+        var s = scoreEvent(disc, sex, rec, cfg.minimos, dcfg.tipo);
         if (s.neValid) hasValidNe = true;
         per[ev.id] = {
-          rec: s.hydrated || rr.rec,
+          rec: s.hydrated || rec,
           score: s.score,
           items: s.items,
-          simulated: rr.ov,
+          simulated: !!ov,
           neReached: s.neReached,
           neValid: s.neValid,
           nePhase: s.nePhase,
@@ -309,7 +306,6 @@
     var rest = rows.filter(function (r) { return r.total <= 0; });
 
     ranked.sort(function (a, b) {
-      if (a.hasValidNe !== b.hasValidNe) return a.hasValidNe ? -1 : 1;
       if (b.total !== a.total) return b.total - a.total;
       var cmp = compareTied(a, b);
       if (cmp.diff !== 0) return cmp.diff;
@@ -317,7 +313,7 @@
     });
 
     ranked.forEach(function (r, i) {
-      if (i > 0 && ranked[i - 1].hasValidNe === r.hasValidNe && ranked[i - 1].total === r.total) {
+      if (i > 0 && ranked[i - 1].total === r.total) {
         var cmp = compareTied(ranked[i - 1], r);
         if (cmp.diff === 0) {
           r.rank = ranked[i - 1].rank;
