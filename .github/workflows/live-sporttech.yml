@@ -1,0 +1,68 @@
+name: Live Sync Sporttech
+
+on:
+  # Permite-te clicar num botão "Run workflow" no GitHub quando quiseres testar
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'Modo de execução'
+        required: true
+        default: 'sync_once'
+        type: choice
+        options:
+          - check_only
+          - sync_once
+          - live_5min_loop
+
+  # Corre automaticamente a cada 5 minutos (descomenta as 2 linhas abaixo durante os dias da prova)
+  # schedule:
+  #   - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Executar scraper Sporttech
+        run: |
+          MODO="${{ github.event.inputs.modo || 'live_5min_loop' }}"
+          if [ "$MODO" = "check_only" ]; then
+            node scripts/scrape-sporttech.js --check
+          elif [ "$MODO" = "sync_once" ]; then
+            node scripts/scrape-sporttech.js
+          else
+            # Corre de 30 em 30 segundos durante 4m30s (9 ciclos)
+            for i in {1..9}; do
+              echo "--- Ciclo $i de 9 ($(date)) ---"
+              node scripts/scrape-sporttech.js
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              git add data/test-results.json scripts/scrape-report.log
+              if ! git diff --staged --quiet; then
+                git commit -m "Live update Sporttech [skip ci]"
+                git push
+              fi
+              if [ $i -lt 9 ]; then sleep 30; fi
+            done
+          fi
+
+      - name: Guardar resultados e relatório de log (modo manual)
+        if: github.event.inputs.modo == 'check_only' || github.event.inputs.modo == 'sync_once'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/test-results.json scripts/scrape-report.log
+          if ! git diff --staged --quiet; then
+            git commit -m "Atualizar resultados/log Sporttech [skip ci]"
+            git push
+          fi
