@@ -1,29 +1,30 @@
 name: Live Sync Sporttech
 
 on:
-  # Permite-te clicar num botão "Run workflow" no GitHub quando quiseres testar
   workflow_dispatch:
     inputs:
       modo:
         description: 'Modo de execução'
         required: true
-        default: 'sync_once'
+        default: 'live_auto'
         type: choice
         options:
+          - live_auto
           - check_only
           - sync_once
-          - live_5min_loop
-
-  # Corre automaticamente a cada 5 minutos (descomenta as 2 linhas abaixo durante os dias da prova)
-  # schedule:
-  #   - cron: '*/5 * * * *'
 
 permissions:
   contents: write
+  actions: write
+
+concurrency:
+  group: live-sporttech-sync
+  cancel-in-progress: false
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 250
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v4
@@ -33,30 +34,61 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Executar scraper Sporttech
+      - name: Executar scraper Sporttech (ciclo 10s)
+        env:
+          MODO: ${{ github.event.inputs.modo || 'live_auto' }}
+          # Ajusta aqui a janela do evento em UTC (ex: 2026-12-04 08:30 a 2026-12-06 21:00)
+          INICIO_EVENTO: '2026-12-04T08:30:00Z'
+          FIM_EVENTO: '2026-12-06T21:00:00Z'
         run: |
-          MODO="${{ github.event.inputs.modo || 'live_5min_loop' }}"
           if [ "$MODO" = "check_only" ]; then
             node scripts/scrape-sporttech.js --check
           elif [ "$MODO" = "sync_once" ]; then
             node scripts/scrape-sporttech.js
           else
-            # Corre de 30 em 30 segundos durante 4m30s (9 ciclos)
-            for i in {1..9}; do
-              echo "--- Ciclo $i de 9 ($(date)) ---"
+            # Corre em turnos de 3h30m (12600s) lendo a Sporttech de 10 em 10 segundos
+            START_TS=$(date +%s)
+            INICIO_TS=$(date -d "$INICIO_EVENTO" +%s)
+            FIM_TS=$(date -d "$FIM_EVENTO" +%s)
+
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            while true; do
+              NOW_TS=$(date +%s)
+
+              # Termina definitivamente se já passou o fim do evento
+              if [ "$NOW_TS" -gt "$FIM_TS" ]; then
+                echo "Evento terminado ($FIM_EVENTO). A encerrar live sync."
+                break
+              fi
+
+              # Encerra este turno após 3h30m para encadear o próximo turno limpo
+              if [ $((NOW_TS - START_TS)) -ge 12600 ]; then
+                echo "Turno de 3h30m concluído. A passar testemunho ao próximo turno..."
+                break
+              fi
+
+              # Antes do início do evento aguarda em pausas de 60s
+              if [ "$NOW_TS" -lt "$INICIO_TS" ]; then
+                echo "A aguardar início do evento ($INICIO_EVENTO)..."
+                sleep 60
+                continue
+              fi
+
               node scripts/scrape-sporttech.js
-              git config user.name "github-actions[bot]"
-              git config user.email "github-actions[bot]@users.noreply.github.com"
+
               git add data/test-results.json scripts/scrape-report.log
               if ! git diff --staged --quiet; then
                 git commit -m "Live update Sporttech [skip ci]"
-                git push
+                git push || (git pull --rebase -X theirs && git push)
               fi
-              if [ $i -lt 9 ]; then sleep 30; fi
+
+              sleep 10
             done
           fi
 
-      - name: Guardar resultados e relatório de log (modo manual)
+      - name: Guardar ficheiros (modos manuais check_only / sync_once)
         if: github.event.inputs.modo == 'check_only' || github.event.inputs.modo == 'sync_once'
         run: |
           git config user.name "github-actions[bot]"
@@ -65,4 +97,16 @@ jobs:
           if ! git diff --staged --quiet; then
             git commit -m "Atualizar resultados/log Sporttech [skip ci]"
             git push
+          fi
+
+      - name: Encadear próximo turno até ao fim do evento
+        if: ${{ always() && (github.event.inputs.modo == 'live_auto' || github.event.inputs.modo == '') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FIM_EVENTO: '2026-12-06T21:00:00Z'
+        run: |
+          NOW_TS=$(date +%s)
+          FIM_TS=$(date -d "$FIM_EVENTO" +%s)
+          if [ "$NOW_TS" -lt "$FIM_TS" ]; then
+            gh workflow run live-sporttech.yml --repo "$GITHUB_REPOSITORY" --ref main -f modo=live_auto || true
           fi
