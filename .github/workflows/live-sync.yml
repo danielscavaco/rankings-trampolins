@@ -1,4 +1,4 @@
-name: Live Sync Sporttech
+name: Live Sync Resultados
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: live-sporttech-sync
+  group: live-results-sync
   cancel-in-progress: false
 
 jobs:
@@ -58,7 +58,7 @@ jobs:
           echo "status=$STATUS" >> $GITHUB_OUTPUT
           echo "Estado do evento: $STATUS"
 
-      - name: Executar scraper Sporttech (ciclo 10s)
+      - name: Executar scraper multi-sistema (ciclo 10s)
         if: steps.check_active.outputs.status != 'ended' || github.event.inputs.modo != 'live_auto'
         env:
           MODO: ${{ github.event.inputs.modo || 'live_auto' }}
@@ -66,9 +66,9 @@ jobs:
           RESULT_FILES=$(node -e 'const lt = require("./scripts/live-targets.json"); console.log(lt.targets.map(t => t.resultsFile).join(" "));')
 
           if [ "$MODO" = "check_only" ]; then
-            node scripts/scrape-sporttech.js --check
+            node scripts/sync-live.js --check
           elif [ "$MODO" = "sync_once" ]; then
-            node scripts/scrape-sporttech.js
+            node scripts/sync-live.js
           else
             START_TS=$(date +%s)
             git config user.name "github-actions[bot]"
@@ -111,11 +111,11 @@ jobs:
                 continue
               fi
 
-              node scripts/scrape-sporttech.js
+              node scripts/sync-live.js
 
               git add $RESULT_FILES scripts/scrape-report.log
               if ! git diff --staged --quiet; then
-                git commit -m "Live update Sporttech [skip ci]"
+                git commit -m "Live update resultados [skip ci]"
                 git push || (git pull --rebase -X theirs && git push)
               fi
 
@@ -131,7 +131,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add $RESULT_FILES scripts/scrape-report.log
           if ! git diff --staged --quiet; then
-            git commit -m "Atualizar resultados/log Sporttech [skip ci]"
+            git commit -m "Atualizar resultados/log [skip ci]"
             git push
           fi
 
@@ -154,7 +154,7 @@ jobs:
             console.log(anyPending ? "true" : "false");
           ')
           if [ "$STILL_PENDING" = "true" ]; then
-            gh workflow run live-sporttech.yml --repo "$GITHUB_REPOSITORY" --ref main -f modo=live_auto || true
+            gh workflow run live-sync.yml --repo "$GITHUB_REPOSITORY" --ref main -f modo=live_auto || true
           else
             echo "Todos os eventos terminaram. Não será iniciado novo turno."
           fi
