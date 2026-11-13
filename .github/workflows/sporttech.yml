@@ -1,0 +1,68 @@
+name: Resultados Sporttech
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      event_id:
+        description: 'ID do evento em config.json (ex: cottbus, cn-tri)'
+        required: true
+        default: 'cottbus'
+      uuid:
+        description: 'UUID do evento na Sporttech'
+        required: true
+        default: '1d53811b-c3b5-4bfc-78d9-751d8bf78f9c'
+      modo_teste:
+        description: 'Modo teste (grava em data/test-live.json e faz 1 leitura)'
+        type: boolean
+        default: true
+      prova_nacional:
+        description: 'Prova nacional (não exigir Representing == POR)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: resultados-sporttech
+  cancel-in-progress: false
+
+jobs:
+  resultados:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ler Sporttech e gravar resultados
+        run: |
+          EVENT_ID="${{ github.event.inputs.event_id || 'cottbus' }}"
+          UUID="${{ github.event.inputs.uuid || '1d53811b-c3b5-4bfc-78d9-751d8bf78f9c' }}"
+          TESTE="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.modo_teste && 'true' || 'false' }}"
+          NACIONAL="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prova_nacional && 'true' || 'false' }}"
+
+          EXTRA_ARGS=""
+          if [ "$NACIONAL" = "true" ]; then
+            EXTRA_ARGS="--national --ignore-age"
+          fi
+
+          if [ "$TESTE" = "true" ]; then
+            python3 scripts/sporttech_sync.py \
+              --uuid "$UUID" \
+              --event-id "$EVENT_ID" \
+              --out "data/test-live.json" \
+              --poll 0 \
+              $EXTRA_ARGS \
+              --git-push
+          else
+            python3 scripts/sporttech_sync.py \
+              --uuid "$UUID" \
+              --event-id "$EVENT_ID" \
+              --out "data/results.json" \
+              --poll 30 \
+              --budget 20400 \
+              $EXTRA_ARGS \
+              --git-push
+          fi
