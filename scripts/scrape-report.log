@@ -1,5 +1,5 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (LIVE SYNC) — 2026-11-13 19:29:58
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (LIVE SYNC) — 2026-11-13 19:31:59
 Competições alvo: World Championships 2026 (Swiss Timing) | WC Cottbus
 ====================================================================
 
@@ -54,57 +54,87 @@ Stages carregados (Swiss Timing): 45
 ====================================================================
 DESTINO: World Championships 2026 (Swiss Timing) (data/results.json -> "nanjing")
 ====================================================================
-[ERRO - SEM PROVA] Catarina Nunes (TRI · undefined · F · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Sofia Correia (TRI · undefined · F · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Inês Reis (TRI · undefined · F · SFRUA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Gabriel Albuquerque (TRI · undefined · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Pedro Ferreira (TRI · undefined · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Lucas Santos (TRI · undefined · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Abreu (TRI · undefined · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Alexandra Garcia (DMT · undefined · F · AGCM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Nobre (DMT · undefined · F · CCRAM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Beatriz Mendes (DMT · undefined · F · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Oliveira (DMT · undefined · F · GCV) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Cabral (DMT · undefined · M · AAE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] André Dias (DMT · undefined · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisco José (DMT · undefined · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Fernandes (DMT · undefined · M · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisca Pinto (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Mariana Cascalheira (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Santos (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Salomé Ferraz (TUM · undefined · F · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Vasco Peso (TUM · undefined · M · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Saraiva (TUM · undefined · M · ACM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Gomes (TUM · undefined · M · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Azinheira (TUM · undefined · M · GMNA) -> Nenhuma prova correspondente encontrada.
-RESUMO (World Championships 2026 (Swiss Timing)): 0 encontrados | 23 com erro/não encontrados | 0 fases atualizadas.
+[OK] Catarina Nunes (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 51.78 (séries: 51.78 + 47.45)
+[OK] Sofia Correia (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 53.6 (séries: 38.64 + 53.6)
+[OK] Sofia Correia (TRI · SEN · F) -> "Women's Trampoline - Team All Around Final" [aa] via Nome | Nota: 54.27 (séries: 54.27)
+[OK] Inês Reis (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 51.67 (séries: 51.67 + 30.36)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 64.1 (séries: 63.48 + 64.1)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Qualification Round 2" [q2] via Nome | Nota: 63.61 (séries: 63.61)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Team Final" [tf] via Nome | Nota: 65.06 (séries: 65.06)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Individual Final" [f] via Nome | Nota: 64.57 (séries: 64.57)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men's Trampoline - Team All Around Final" [aa] via Nome | Nota: 65.39 (séries: 65.39)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 60.23 (séries: 59.31 + 60.23)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men's Trampoline - Qualification Round 2" [q2] via Nome | Nota: 60.3 (séries: 60.3)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men's Trampoline - Team Final" [tf] via Nome | Nota: 59.02 (séries: 59.02)
+[OK] Lucas Santos (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 58.49 (séries: 58.49 + 57.37)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men's Trampoline - Qualification" [q1] via Nome | Nota: 57.45 (séries: 52.52 + 57.45)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men's Trampoline - Team Final" [tf] via Nome | Nota: 56.74 (séries: 56.74)
+[OK] Alexandra Garcia (DMT · SEN · F) -> "Women's Double Mini - Qualification" [q1] via Nome | Nota: 50.2 (séries: 25 + 25.2)
+[OK] Alexandra Garcia (DMT · SEN · F) -> "Women's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 25.2 (séries: 25.2)
+[OK] Alexandra Garcia (DMT · SEN · F) -> "Women's Double Mini - Team All Around Final" [aa] via Nome | Nota: 25.5 (séries: 25.5)
+[OK] Matilde Nobre (DMT · SEN · F) -> "Women's Double Mini - Qualification" [q1] via Nome | Nota: 48.3 (séries: 24.3 + 24)
+[OK] Beatriz Mendes (DMT · SEN · F) -> "Women's Double Mini - Qualification" [q1] via Nome | Nota: 47.5 (séries: 24 + 23.5)
+[ERRO - NÃO ENCONTRADO] Matilde Oliveira (DMT · SEN · F · GCV) -> Não aparece em "Women's Double Mini - Qualification / Women's Double Mini - Qualification Round 2 / Women's Double Mini - Team Final / Women's Double Mini - Final 1 / Women's Double Mini - Final 2 / Women's Double Mini - Team All Around Final".
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 56.9 (séries: 28.3 + 28.6)
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Team Final" [tf] via Nome | Nota: 30 (séries: 30)
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 20.5 (séries: 20.5)
+[OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Team All Around Final" [aa] via Nome | Nota: 29.2 (séries: 29.2)
+[OK] André Dias (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 54.7 (séries: 27.7 + 27)
+[OK] Francisco José (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 46.4 (séries: 26 + 20.4)
+[OK] Francisco José (DMT · SEN · M) -> "Men's Double Mini - Team Final" [tf] via Nome | Nota: 27 (séries: 27)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 55 (séries: 27.7 + 27.3)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Team Final" [tf] via Nome | Nota: 28.7 (séries: 28.7)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 29.2 (séries: 29.2)
+[OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Final 1" [f1] via Nome | Nota: 28.7 (séries: 28.7)
+[OK] Francisca Pinto (TUM · SEN · F) -> "Women's Tumbling - Qualification" [q1] via Nome | Nota: 43.5 (séries: 22.1 + 21.4)
+[OK] Francisca Pinto (TUM · SEN · F) -> "Women's Tumbling - Team Final" [tf] via Nome | Nota: 22.4 (séries: 22.4)
+[OK] Mariana Cascalheira (TUM · SEN · F) -> "Women's Tumbling - Qualification" [q1] via Nome | Nota: 43.4 (séries: 24 + 19.4)
+[OK] Mariana Cascalheira (TUM · SEN · F) -> "Women's Tumbling - Team Final" [tf] via Nome | Nota: 16.7 (séries: 16.7)
+[ERRO - NÃO ENCONTRADO] Matilde Santos (TUM · SEN · F · GMNA) -> Não aparece em "Women's Tumbling - Qualification / Women's Tumbling - Team Final / Women's Tumbling - Qualification Round 2 / Women's Tumbling - Final 1 / Women's Tumbling - Final 2 / Women's Tumbling - Team All Around Final".
+[OK] Salomé Ferraz (TUM · SEN · F) -> "Women's Tumbling - Qualification" [q1] via Nome | Nota: 43.3 (séries: 21.2 + 22.1)
+[OK] Salomé Ferraz (TUM · SEN · F) -> "Women's Tumbling - Team Final" [tf] via Nome | Nota: 18.9 (séries: 18.9)
+[OK] Salomé Ferraz (TUM · SEN · F) -> "Women's Tumbling - Team All Around Final" [aa] via Nome | Nota: 21.1 (séries: 21.1)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 58.2 (séries: 29 + 29.2)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 29.7 (séries: 29.7)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 29 (séries: 29)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Final 1" [f1] via Nome | Nota: 30.5 (séries: 30.5)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Final 2" [f2] via Nome | Nota: 31 (séries: 31)
+[OK] Vasco Peso (TUM · SEN · M) -> "Men's Tumbling - Team All Around Final" [aa] via Nome | Nota: 29.1 (séries: 29.1)
+[OK] João Saraiva (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 49.8 (séries: 24.9 + 24.9)
+[OK] João Saraiva (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 25.3 (séries: 25.3)
+[OK] Diogo Gomes (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 49.4 (séries: 25.7 + 23.7)
+[OK] Diogo Gomes (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.3 (séries: 25.3)
+[OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 51.3 (séries: 27 + 24.3)
+[OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 20.9 (séries: 20.9)
+[OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.1 (séries: 25.1)
+RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 51 fases atualizadas.
 Fonte [Sporttech OVS]: https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/
 Stages carregados (Sporttech OVS): 0
 
 ====================================================================
 DESTINO: WC Cottbus (data/results.json -> "cottbus")
 ====================================================================
-[ERRO - SEM PROVA] Catarina Nunes (TRI · undefined · F · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Sofia Correia (TRI · undefined · F · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Inês Reis (TRI · undefined · F · SFRUA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Gabriel Albuquerque (TRI · undefined · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Pedro Ferreira (TRI · undefined · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Lucas Santos (TRI · undefined · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Abreu (TRI · undefined · M · SCP) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Alexandra Garcia (DMT · undefined · F · AGCM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Nobre (DMT · undefined · F · CCRAM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Beatriz Mendes (DMT · undefined · F · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Oliveira (DMT · undefined · F · GCV) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Cabral (DMT · undefined · M · AAE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] André Dias (DMT · undefined · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisco José (DMT · undefined · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Fernandes (DMT · undefined · M · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisca Pinto (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Mariana Cascalheira (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Santos (TUM · undefined · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Salomé Ferraz (TUM · undefined · F · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Vasco Peso (TUM · undefined · M · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Saraiva (TUM · undefined · M · ACM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Gomes (TUM · undefined · M · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Azinheira (TUM · undefined · M · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Catarina Nunes (TRI · SEN · F · LGC) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Sofia Correia (TRI · SEN · F · SCP) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Inês Reis (TRI · SEN · F · SFRUA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Gabriel Albuquerque (TRI · SEN · M · APAGL) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Pedro Ferreira (TRI · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Lucas Santos (TRI · SEN · M · CFE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Abreu (TRI · SEN · M · SCP) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Alexandra Garcia (DMT · SEN · F · AGCM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Matilde Nobre (DMT · SEN · F · CCRAM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Beatriz Mendes (DMT · SEN · F · CFE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Matilde Oliveira (DMT · SEN · F · GCV) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Cabral (DMT · SEN · M · AAE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] André Dias (DMT · SEN · M · APAGL) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Francisco José (DMT · SEN · M · CFE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Fernandes (DMT · SEN · M · LGC) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Francisca Pinto (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Mariana Cascalheira (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Matilde Santos (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Salomé Ferraz (TUM · SEN · F · SFEM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Vasco Peso (TUM · SEN · M · SFEM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] João Saraiva (TUM · SEN · M · ACM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Gomes (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] João Azinheira (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
 RESUMO (WC Cottbus): 0 encontrados | 23 com erro/não encontrados | 0 fases atualizadas.
