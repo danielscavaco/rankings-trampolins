@@ -1,0 +1,20 @@
+[
+  {
+    "id": "eg27",
+    "engine": "fgp_minimos",
+    "curto": "EG 2027",
+    "nome": "Jogos Europeus 2027",
+    "config": "data/config.json",
+    "athletes": "data/athletes.json",
+    "results": "data/results.json",
+    "testResults": "data/test-live.json"
+  },
+  {
+    "id": "og28",
+    "engine": "la28",
+    "curto": "OG 2028",
+    "nome": "Jogos Olímpicos 2028",
+    "config": "data/og28-config.json",
+    "results": "data/og28-results.json"
+  }
+]
