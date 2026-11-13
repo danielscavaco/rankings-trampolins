@@ -397,51 +397,75 @@
         $('#liveBadge').hidden = !isLive;
       }
 
-      /* ---------- detalhe técnico por prova (tabela de rotinas) ---------- */
+/* ---------- detalhe técnico por prova (tabela de rotinas) ---------- */
       function renderDetailDrawer(r, ev, dc) {
         var p = r.per[ev.id];
         var rec = p.rec || {};
         var rot = rec.rotinas || {};
         var html = '<div class="detail" role="region" aria-label="Detalhe de ' + esc(r.entry.nome) + ' em ' + esc(ev.curto) + '">';
-        html += '<div class="detail-head"><h3>' + esc(r.entry.nome) + ' — ' + esc(ev.nome) + ' (' + esc(ev.curto) + ')</h3>';
+        html += '<div class="detail-head"><h3>' + esc(r.entry.nome) + ' — ' + esc(ev.nome) + ' (' + esc(ev.curto) + ')' + (p.simulated ? ' · Simulação' : '') + '</h3>';
         html += '<button type="button" class="detail-close" data-close-detail="1">Fechar</button></div>';
 
-        var phases;
-        if (dc.tipo === 'late') {
-          phases = (rot.q1_1 || rot.q1_2)
-            ? [['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2'], ['q2', 'Q2'], ['f', 'Final']]
-            : [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
-        } else {
-          phases = [['q1_1', 'Qual. Série 1'], ['q1_2', 'Qual. Série 2'], ['f1', 'Final 1'], ['f2', 'Final 2']];
-        }
+        if (p.simulated) {
+          /* Na simulação não se mostram parciais reais; mostra-se apenas os valores simulados */
+          var simRows = dc.tipo === 'late'
+            ? [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']]
+            : [['q1', 'Q1'], ['f1', 'Final 1'], ['f2', 'Final 2'], ['ne', 'Nota de excelência']];
+          var activeSim = simRows.filter(function (sr) { return typeof rec[sr[0]] === 'number'; });
 
-        var activePhases = phases.filter(function (ph) { return rot[ph[0]]; });
-
-        if (activePhases.length) {
-          html += '<table class="rut-table"><thead><tr>';
-          if (dc.tipo === 'late') {
-            html += '<th>Fase</th><th>E</th><th>D</th><th>HD</th><th>ToF</th><th>Pen.</th><th>Total</th>';
-          } else {
-            html += '<th>Série</th><th>E</th><th>D</th><th>Pen.</th><th>Total</th>';
+          if (activeSim.length) {
+            html += '<table class="rut-table"><thead><tr><th>Fase (Simulação)</th><th>Total</th></tr></thead><tbody>';
+            activeSim.forEach(function (sr) {
+              html += '<tr><td>' + esc(sr[1]) + '</td><td><b>' + fmt(rec[sr[0]]) + '</b></td></tr>';
+            });
+            html += '</tbody></table>';
           }
-          html += '</tr></thead><tbody>';
+        } else {
+          var phases;
+          if (dc.tipo === 'late') {
+            phases = (rot.q1_1 || rot.q1_2)
+              ? [['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2'], ['q2', 'Q2'], ['f', 'Final']]
+              : [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
+          } else {
+            phases = [
+              ['q1_1', 'Q1 · Série 1'],
+              ['q1_2', 'Q1 · Série 2'],
+              ['q2', 'Q2'],
+              ['tf', 'Team Final'],
+              ['aa', 'All-Around Team Final'],
+              ['f1', 'Final 1'],
+              ['f2', 'Final 2']
+            ];
+          }
 
-          activePhases.forEach(function (ph) {
-            var k = ph[0], label = ph[1], rt = rot[k];
-            var used = p.usedPhases && p.usedPhases.indexOf(k) >= 0;
-            html += '<tr class="' + (used ? 'used' : '') + '">';
-            html += '<td>' + esc(label) + (used ? '<span class="rut-badge">conta</span>' : '') + '</td>';
-            html += '<td>' + fmt(rt.e) + '</td>';
-            html += '<td>' + fmt(rt.d) + '</td>';
+          var activePhases = phases.filter(function (ph) { return rot[ph[0]]; });
+
+          if (activePhases.length) {
+            html += '<table class="rut-table"><thead><tr>';
             if (dc.tipo === 'late') {
-              html += '<td>' + fmt(rt.hd) + '</td>';
-              html += '<td>' + fmt(rt.tof) + '</td>';
+              html += '<th>Fase</th><th>E</th><th>D</th><th>HD</th><th>ToF</th><th>Pen.</th><th>Total</th>';
+            } else {
+              html += '<th>Série</th><th>E</th><th>D</th><th>Pen.</th><th>Total</th>';
             }
-            html += '<td>' + (rt.p ? fmt(rt.p) : '0.00') + '</td>';
-            html += '<td><b>' + fmt(rt.total) + '</b></td>';
-            html += '</tr>';
-          });
-          html += '</tbody></table>';
+            html += '</tr></thead><tbody>';
+
+            activePhases.forEach(function (ph) {
+              var k = ph[0], label = ph[1], rt = rot[k];
+              var used = p.usedPhases && p.usedPhases.indexOf(k) >= 0;
+              html += '<tr class="' + (used ? 'used' : '') + '">';
+              html += '<td>' + esc(label) + (used ? '<span class="rut-badge">conta</span>' : '') + '</td>';
+              html += '<td>' + fmt(rt.e) + '</td>';
+              html += '<td>' + fmt(rt.d) + '</td>';
+              if (dc.tipo === 'late') {
+                html += '<td>' + fmt(rt.hd) + '</td>';
+                html += '<td>' + fmt(rt.tof) + '</td>';
+              }
+              html += '<td>' + (rt.p ? fmt(rt.p) : '0.00') + '</td>';
+              html += '<td><b>' + fmt(rt.total) + '</b></td>';
+              html += '</tr>';
+            });
+            html += '</tbody></table>';
+          }
         }
 
         if (p.items && p.items.length) {
@@ -451,7 +475,7 @@
             html += '<li class="' + cls + '">' + esc(it.label) + ': <b>' + (it.value !== null ? fmt(it.value) : '—') + '</b>' + (it.note ? ' (' + esc(it.note) + ')' : '') + '</li>';
           });
           html += '</ul>';
-        } else if (!activePhases.length) {
+        } else if (!p.simulated) {
           html += '<p class="hint" style="margin:0">Sem detalhe por série registado para esta prova.</p>';
         }
 
@@ -491,7 +515,7 @@
             if (p.score > 0) {
               hasData = true;
               cl += cnt[ev.id] ? ' cont' : ' ok';
-              v = fmt(p.score) + (p.neAdd ? '<sup>exc</sup>' : '');
+              v = fmt(p.score) + (p.neValid ? '<sup>exc</sup>' : '');
               tip = cnt[ev.id] ? 'Conta para o total' : 'Mínimo atingido, fora das duas melhores';
             } else if (p.rec && p.items.length && p.items[0].value !== null) {
               hasData = true;
@@ -511,7 +535,8 @@
           }).join('');
 
           var chips = '';
-          if (r.rank !== null) chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
+          if (r.rank !== null) {chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
+            if (r.hasValidNe) chips += '<span class="chip vaga">Excelência</span>';}
           else chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
 
           if (r.tieReason) {
@@ -581,8 +606,7 @@
         if (!S.simId) { box.innerHTML = ''; return; }
         var evs = S.cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(S.disc) >= 0; });
         box.innerHTML = evs.map(function (ev) {
-          var st = evState(ev), real = S.res[ev.id] && S.res[ev.id][S.simId], ov = S.ov[ev.id] && S.ov[ev.id][S.simId], cur = ov || real || {}, fs;
-          var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
+          var st = evState(ev), rawReal = S.res[ev.id] && S.res[ev.id][S.simId], real = A.hydrateRec(rawReal, dc.tipo), ov = S.ov[ev.id] && S.ov[ev.id][S.simId], cur = ov || real || {}, fs;          var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
           if (useAgg) fs = [['agg', 'Valor da prova']];
           else fs = fieldsFor(dc.tipo);
           var fields = fs.map(function (f) {
@@ -606,36 +630,39 @@
         return isFinite(n) ? n : undefined;
       }
 
-      function onSimChange(e) {
-        var t = e.target;
-        if (!t.dataset || !t.dataset.ev) return;
-        var evId = t.dataset.ev, id = S.simId, rec = {};
-        document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
-          var v = parseNum(i.value);
-          if (v !== undefined) rec[i.dataset.f] = v;
-        });
-        var real = S.res[evId] && S.res[evId][id];
-        if (real && real.rotinas && rec.q1 === real.q1) rec.rotinas = real.rotinas;
+  function onSimChange(e) {
+     var t = e.target;
+     if (!t.dataset || !t.dataset.ev) return;
+     var evId = t.dataset.ev, id = S.simId, rec = {};
+     var dc = S.cfg.disciplinas[S.disc];
+     document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
+       var v = parseNum(i.value);
+       if (v !== undefined) rec[i.dataset.f] = v;
+     });
+     var rawReal = S.res[evId] && S.res[evId][id];
+     var real = A.hydrateRec(rawReal, dc.tipo);
 
-        var realKeys = real ? Object.keys(real).filter(function (k) { return k !== 'src' && k !== 'neFlag' && k !== 'rotinas'; }) : [];
-        var recKeys = Object.keys(rec).filter(function (k) { return k !== 'rotinas'; });
-        var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
+     var simFields = fieldsFor(dc.tipo).map(function (f) { return f[0]; });
+     if (real && real.agg !== undefined) simFields = ['agg'];
+     var realKeys = real ? simFields.filter(function (k) { return real[k] !== undefined; }) : [];
+     var recKeys = Object.keys(rec);
+     var same = real && recKeys.length === realKeys.length && recKeys.every(function (k) { return real[k] === rec[k]; });
 
-        if (same) {
-          if (S.ov[evId]) delete S.ov[evId][id];
-        } else {
-          if (!real && !recKeys.length) {
-            if (S.ov[evId]) delete S.ov[evId][id];
-          } else {
-            if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
-            (S.ov[evId] = S.ov[evId] || {})[id] = rec;
-          }
-        }
-        var C = compute();
-        renderBoard();
-        renderSimResults(C);
-        t.classList.toggle('mod', !same);
-      }
+     if (same) {
+       if (S.ov[evId]) delete S.ov[evId][id];
+     } else {
+       if (!real && !recKeys.length) {
+         if (S.ov[evId]) delete S.ov[evId][id];
+       } else {
+         if (real && real.neFlag && rec.ne === undefined) rec.neFlag = true;
+         (S.ov[evId] = S.ov[evId] || {})[id] = rec;
+       }
+     }
+     var C = compute();
+     renderBoard();
+     renderSimResults(C);
+     t.classList.toggle('mod', !same);
+   }
 
       function renderSimResults(C) {
         var rowObj = C.R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
