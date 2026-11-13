@@ -1,6 +1,6 @@
-/* Motor de cálculo do apuramento:
-   1) Jogos Europeus 2027 (FGP Secção 1)
-   2) Jogos Olímpicos Los Angeles 2028 (FIG Qualification System + FGP Secção 2) */
+/* Motor genérico de cálculo do apuramento:
+   1) Motor "fgp_minimos": rankings nacionais por mínimos e notas (EG27, CM27, etc.)
+   2) Motor "fig_olympic": apuramento olímpico FIG + ranking nacional FGP (JO28) */
 (function (root) {
   'use strict';
 
@@ -29,7 +29,7 @@
   };
 
   /* =========================================================================
-     PARTE 1: JOGOS EUROPEUS 2027
+     MOTOR 1: APURAMENTO NACIONAL POR MÍNIMOS (EG27, CM27, etc.)
      ========================================================================= */
   function calcRoutineTotal(rt) {
     if (!rt) return null;
@@ -125,7 +125,7 @@
     return { e: sumE, d: sumD, hasDetail: hasDetail };
   }
 
-  function scoreEvent(disc, sex, rawRec, minimos, tipo) {
+  function scoreEvent(disc, sex, rawRec, minimos, tipo, useExcelencia) {
     var rec = hydrateRec(rawRec, tipo);
     var m = (minimos[disc] || {})[sex] || {};
     var items = [];
@@ -172,6 +172,7 @@
     }
 
     var minBase = m.base, minNe = m.ne;
+    var allowNe = useExcelencia !== false && isNum(minNe);
     var cand = [];
     var q1Ok = false;
 
@@ -210,24 +211,26 @@
     out.stats = extractRoutineStats('ne', rec, out.usedPhases);
 
     var neAdd = 0;
-    if (isNum(rec.ne)) {
-      var meetsNe = rec.ne >= minNe;
-      var okN = q1Ok && meetsNe;
-      var phaseLabel = rec.nePhase ? (PHASE_NAMES[rec.nePhase] || rec.nePhase) : '';
-      var noteParts = [];
-      if (phaseLabel) noteParts.push(phaseLabel);
-      if (meetsNe && !q1Ok) noteParts.push('exige mínimos na Q1');
-      items.push({ label: 'Nota de excelência', value: rec.ne, ok: okN, note: noteParts.join(' · ') });
-      out.nePhase = rec.nePhase || null;
-      if (meetsNe) out.neReached = true;
-      if (okN) {
-        out.neValid = true;
-        neAdd = rec.ne;
+    if (allowNe) {
+      if (isNum(rec.ne)) {
+        var meetsNe = rec.ne >= minNe;
+        var okN = q1Ok && meetsNe;
+        var phaseLabel = rec.nePhase ? (PHASE_NAMES[rec.nePhase] || rec.nePhase) : '';
+        var noteParts = [];
+        if (phaseLabel) noteParts.push(phaseLabel);
+        if (meetsNe && !q1Ok) noteParts.push('exige mínimos na Q1');
+        items.push({ label: 'Nota de excelência', value: rec.ne, ok: okN, note: noteParts.join(' · ') });
+        out.nePhase = rec.nePhase || null;
+        if (meetsNe) out.neReached = true;
+        if (okN) {
+          out.neValid = true;
+          neAdd = rec.ne;
+        }
+      } else if (rec.neFlag) {
+        items.push({ label: 'Nota de excelência', value: null, ok: false, pending: true, note: 'obtida, valor por introduzir' });
+        out.neReached = true;
+        if (q1Ok) out.neValid = true;
       }
-    } else if (rec.neFlag) {
-      items.push({ label: 'Nota de excelência', value: null, ok: false, pending: true, note: 'obtida, valor por introduzir' });
-      out.neReached = true;
-      if (q1Ok) out.neValid = true;
     }
 
     out.score = base > 0 ? r3(base + neAdd) : 0;
@@ -261,6 +264,8 @@
     var evs = cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(disc) >= 0; });
     var m = (cfg.minimos[disc] || {})[sex] || {};
     var minBase = dcfg.tipo === 'late' ? m.q1 : m.base;
+    var nContar = isNum(dcfg.provasContam) ? dcfg.provasContam : (isNum(cfg.provasContam) ? cfg.provasContam : 2);
+    var useExcelencia = dcfg.usarExcelencia !== undefined ? dcfg.usarExcelencia : (cfg.usarExcelencia !== false);
 
     var rows = entries.map(function (en) {
       var per = {}, scoredList = [], sim = false, bestRaw = null, hasValidNe = false;
@@ -269,7 +274,7 @@
         var ov = overrides && overrides[ev.id] && overrides[ev.id][en.id];
         var rec = ov || (results[ev.id] && results[ev.id][en.id]) || null;
         if (ov) sim = true;
-        var s = scoreEvent(disc, sex, rec, cfg.minimos, dcfg.tipo);
+        var s = scoreEvent(disc, sex, rec, cfg.minimos, dcfg.tipo, useExcelencia);
         if (s.neValid) hasValidNe = true;
         per[ev.id] = {
           rec: s.hydrated || rec,
@@ -287,19 +292,21 @@
       });
 
       scoredList.sort(function (a, b) { return b.score - a.score; });
-      var top2 = scoredList.slice(0, 2);
-      var total = r3((top2[0] ? top2[0].score : 0) + (top2[1] ? top2[1].score : 0));
+      var topN = scoredList.slice(0, nContar);
+      var total = r3(topN.reduce(function (acc, item) { return acc + item.score; }, 0));
+      var usedEvMap = {};
+      topN.forEach(function (x) { usedEvMap[x.evId] = true; });
 
-      var sumD = 0, sumE = 0, hasDetail = top2.length > 0;
-      top2.forEach(function (x) {
+      var sumD = 0, sumE = 0, hasDetail = topN.length > 0;
+      topN.forEach(function (x) {
         if (!x.stats || !x.stats.hasDetail) hasDetail = false;
         else { sumD = r3(sumD + x.stats.d); sumE = r3(sumE + x.stats.e); }
       });
 
       return {
         entry: en, per: per, total: total, hasValidNe: hasValidNe,
-        nCont: top2.length, nProvas: scoredList.length,
-        best: top2[0] ? top2[0].score : 0, second: top2[1] ? top2[1].score : 0,
+        nCont: topN.length, nProvas: scoredList.length, usedEvMap: usedEvMap,
+        best: topN[0] ? topN[0].score : 0, second: topN[1] ? topN[1].score : 0,
         sumD: sumD, sumE: sumE, hasDetail: hasDetail,
         bestRaw: bestRaw, gap: bestRaw !== null && minBase ? r3(minBase - bestRaw) : null,
         simulated: sim, rank: null, tie: false, tieReason: '', naVaga: false
@@ -341,18 +348,26 @@
       return (bv - av) || a.entry.nome.localeCompare(b.entry.nome, 'pt');
     });
 
-    return { rows: ranked.concat(rest), vagas: dcfg.vagas, comMinimos: ranked.length, minBase: minBase, minimos: m, eventos: evs };
+    return {
+      rows: ranked.concat(rest),
+      vagas: dcfg.vagas,
+      provasContam: nContar,
+      useExcelencia: useExcelencia,
+      comMinimos: ranked.length,
+      minBase: minBase,
+      minimos: m,
+      eventos: evs
+    };
   }
 
   /* =========================================================================
-     PARTE 2: JOGOS OLÍMPICOS LOS ANGELES 2028 (FIG + FGP)
+     MOTOR 2: APURAMENTO OLÍMPICO FIG + NACIONAL FGP (JO28)
      ========================================================================= */
   function pointsFromRank(rk) {
     if (!isNum(rk) || rk < 1 || rk > 30) return 0;
     return FIG_WC_POINTS[Math.floor(rk)] || 0;
   }
 
-  /* Calcula os pontos de cada prova respeitando empates num mesmo lugar (Art. 16) */
   function computeEventPointsMap(evId, sexResults) {
     var evRes = sexResults[evId] || {};
     var byRank = {};
@@ -370,33 +385,34 @@
       for (var i = 0; i < group.length; i++) {
         sum += pointsFromRank(rk + i);
       }
-      var avg = r3(sum / group.length);
+      var avg = Math.round((sum / group.length) * 100) / 100;
       group.forEach(function (id) { ptsMap[id] = avg; });
     });
     return ptsMap;
   }
 
-  /* Seleciona até 3 resultados, respeitando o máximo de 2 resultados em 2027 */
-  function selectBest3Max2_2027(items) {
+  function selectBestResults(items, bestCount, maxPerYear) {
     var sorted = items.slice().sort(function (a, b) {
       if (b.pts !== a.pts) return b.pts - a.pts;
       return (a.rank || 999) - (b.rank || 999);
     });
     var chosen = [];
-    var count2027 = 0;
+    var countByYear = {};
     sorted.forEach(function (it) {
-      if (chosen.length >= 3) return;
-      if (it.ano === 2027 && count2027 >= 2) return;
+      if (chosen.length >= bestCount) return;
+      var yrKey = String(it.ano);
+      var yrLimit = maxPerYear && isNum(maxPerYear[yrKey]) ? maxPerYear[yrKey] : Infinity;
+      var curYrCount = countByYear[yrKey] || 0;
+      if (curYrCount >= yrLimit) return;
       chosen.push(it);
-      if (it.ano === 2027) count2027++;
+      countByYear[yrKey] = curYrCount + 1;
     });
-    var total = r3(chosen.reduce(function (acc, x) { return acc + x.pts; }, 0));
+    var total = Math.round(chosen.reduce(function (acc, x) { return acc + x.pts; }, 0) * 100) / 100;
     var usedMap = {};
     chosen.forEach(function (x) { usedMap[x.evId] = true; });
     return { total: total, chosen: chosen, usedMap: usedMap };
   }
 
-  /* Desempate FIG World Cup Series (Art. 17) */
   function compareFigTie(a, b) {
     if (a.sumRanks !== b.sumRanks) {
       return { diff: a.sumRanks - b.sumRanks, reason: 'Desempate FIG: soma lugares (' + a.sumRanks + ' vs ' + b.sumRanks + ')' };
@@ -413,7 +429,6 @@
     return { diff: 0, reason: 'Empate FIG' };
   }
 
-  /* Desempate FGP Nacional (Secção 2.6) */
   function compareFgpTie(a, b) {
     if (a.bestScore !== b.bestScore) {
       return { diff: b.bestScore - a.bestScore, reason: 'Desempate FGP: nota mais alta (' + fmtPt(Math.max(a.bestScore, b.bestScore)) + ' vs ' + fmtPt(Math.min(a.bestScore, b.bestScore)) + ')' };
@@ -440,6 +455,23 @@
   }
 
   function rankLA28(laCfg, sex, overrides) {
+    var rules = laCfg.regras || {};
+    var TOTAL_QUOTAS = isNum(rules.totalQuotas) ? rules.totalQuotas : 16;
+    var CRIT1_MAX = isNum(rules.crit1Max) ? rules.crit1Max : 8;
+    var MAX_SECOND_QUOTA_NOCS = isNum(rules.maxSecondQuotaNocs) ? rules.maxSecondQuotaNocs : 3;
+    var SECOND_QUOTA_MAX_POS = isNum(rules.secondQuotaMaxWcPos) ? rules.secondQuotaMaxWcPos : 3;
+    var BEST_RESULTS_COUNT = isNum(rules.bestResultsCount) ? rules.bestResultsCount : 3;
+    var MAX_RESULTS_YEAR = rules.maxResultsYear || { '2027': 2 };
+    var HOST_NOC = (rules.hostNoc || 'USA').toUpperCase();
+
+    var unionDefs = Array.isArray(laCfg.unioes) && laCfg.unioes.length ? laCfg.unioes : [
+      { code: 'EG', label: 'Europa (EG)' },
+      { code: 'AGU', label: 'Ásia (AGU)' },
+      { code: 'PAGU', label: 'Américas (PAGU)' },
+      { code: 'UAG', label: 'África (UAG)' },
+      { code: 'OGU', label: 'Oceânia (OGU)' }
+    ];
+
     var baseRes = (laCfg.resultados && laCfg.resultados[sex]) || {};
     var sexRes = {};
     laCfg.eventos.forEach(function (ev) {
@@ -472,7 +504,7 @@
       });
     });
 
-    /* 2) Critério 1: Campeonato do Mundo 2027 (Top 8 da Final, máx. 1 por NOC, desempate por Q2) */
+    /* 2) Critério 1: Campeonato do Mundo 2027 (Top 8 da Final, máx. 1 por NOC, ordenado por Q2) */
     var wchEv = laCfg.eventos.filter(function (e) { return e.tipo === 'wch'; })[0];
     var crit1ByAth = {};
     var crit1Nocs = {};
@@ -481,10 +513,9 @@
       var finalists = Object.keys(wchR).map(function (id) {
         return { id: id, rec: wchR[id] };
       }).filter(function (x) {
-        return isNum(x.rec.finalRank) && x.rec.finalRank >= 1 && x.rec.finalRank <= 8;
+        return isNum(x.rec.finalRank) && x.rec.finalRank >= 1 && x.rec.finalRank <= CRIT1_MAX;
       });
 
-      /* Se 2 atletas do mesmo NOC estão na final, fica apenas o melhor na Q2 */
       var bestFinalistByNoc = {};
       finalists.forEach(function (f) {
         var noc = (f.rec.noc || '').toUpperCase();
@@ -501,19 +532,22 @@
       var eligibleCrit1 = Object.keys(bestFinalistByNoc).map(function (noc) {
         return bestFinalistByNoc[noc];
       }).sort(function (a, b) {
-        return a.rec.finalRank - b.rec.finalRank;
-      }).slice(0, 8);
+        var qa = isNum(a.rec.q2Rank) ? a.rec.q2Rank : a.rec.finalRank;
+        var qb = isNum(b.rec.q2Rank) ? b.rec.q2Rank : b.rec.finalRank;
+        return (qa - qb) || (a.rec.finalRank - b.rec.finalRank);
+      }).slice(0, CRIT1_MAX);
 
       eligibleCrit1.forEach(function (item, idx) {
         var noc = (item.rec.noc || '').toUpperCase();
-        crit1ByAth[item.id] = { quotaRank: idx + 1, finalRank: item.rec.finalRank };
+        var q2r = isNum(item.rec.q2Rank) ? item.rec.q2Rank : item.rec.finalRank;
+        crit1ByAth[item.id] = { quotaRank: idx + 1, finalRank: item.rec.finalRank, q2Rank: q2r };
         crit1Nocs[noc] = item.id;
       });
     }
 
-    /* 3) Ranking Internacional FIG (apenas as 6 Taças do Mundo) */
+    /* 3) Preparar dados de todos os atletas nas Taças do Mundo */
     var wcEvents = laCfg.eventos.filter(function (e) { return e.tipo === 'wc'; });
-    var figRows = Object.keys(athletes).map(function (athId) {
+    var allFigRows = Object.keys(athletes).map(function (athId) {
       var ath = athletes[athId];
       var per = {};
       var validItems = [];
@@ -537,7 +571,7 @@
         }
       });
 
-      var sel = selectBest3Max2_2027(validItems);
+      var sel = selectBestResults(validItems, BEST_RESULTS_COUNT, MAX_RESULTS_YEAR);
       Object.keys(sel.usedMap).forEach(function (evId) { per[evId].used = true; });
 
       var sumRanks = sel.chosen.reduce(function (a, x) { return a + x.rank; }, 0);
@@ -557,133 +591,137 @@
         crit1: crit1ByAth[athId] || null,
         nocHasCrit1: Boolean(crit1Nocs[ath.noc]),
         simulated: isSim,
-        figRank: null,
-        status: 'out', /* 'crit1' (azul) | 'crit2_safe' (verde) | 'crit2_bubble' (amarelo) | 'noc_full' | 'out' */
+        displayRank: null,
+        status: 'out',
         statusLabel: '',
         tieReason: ''
       };
     });
 
-    /* Ordenar lista FIG: quem tem pontos > 0 ou Critério 1 */
-    var figActive = figRows.filter(function (r) { return r.total > 0 || r.crit1; });
-    figActive.sort(function (a, b) {
+    var crit1Group = allFigRows.filter(function (r) { return Boolean(r.crit1); }).sort(function (a, b) {
+      return a.crit1.quotaRank - b.crit1.quotaRank;
+    });
+
+    var wcGroup = allFigRows.filter(function (r) { return !r.crit1 && r.total > 0; }).sort(function (a, b) {
       if (b.total !== a.total) return b.total - a.total;
-      if (a.nCont > 0 && b.nCont > 0) {
-        var cmp = compareFigTie(a, b);
-        if (cmp.diff !== 0) return cmp.diff;
-      }
-      if (a.crit1 && !b.crit1) return -1;
-      if (!a.crit1 && b.crit1) return 1;
+      var cmp = compareFigTie(a, b);
+      if (cmp.diff !== 0) return cmp.diff;
       return a.ath.nome.localeCompare(b.ath.nome, 'pt');
     });
 
-    figActive.forEach(function (r, i) {
-      if (i > 0 && figActive[i - 1].total === r.total && r.total > 0) {
-        var cmp = compareFigTie(figActive[i - 1], r);
+    wcGroup.forEach(function (r, i) {
+      if (i > 0 && wcGroup[i - 1].total === r.total) {
+        var cmp = compareFigTie(wcGroup[i - 1], r);
         if (cmp.diff !== 0) {
           r.tieReason = cmp.reason;
-          if (!figActive[i - 1].tieReason) figActive[i - 1].tieReason = cmp.reason;
+          if (!wcGroup[i - 1].tieReason) wcGroup[i - 1].tieReason = cmp.reason;
         }
       }
-      r.figRank = i + 1;
     });
 
-    /* 4) Simulação Dinâmica de Alocação de Vagas Olímpicas (16 vagas totais) */
-    var TOTAL_QUOTAS = 16;
-    var crit1Count = Object.keys(crit1ByAth).length;
-
-    /* Atribuir primeiro as vagas do Critério 1 */
-    figActive.forEach(function (r) {
-      if (r.crit1) {
-        r.status = 'crit1';
-        r.statusLabel = 'Critério 1 · CM 2027 (' + r.crit1.finalRank + 'º)';
-      }
+    /* 4) Atribuir # 1..N e simular alocação dinâmica de vagas */
+    var crit1Count = crit1Group.length;
+    crit1Group.forEach(function (r, idx) {
+      r.displayRank = idx + 1;
+      r.status = 'crit1';
+      r.statusLabel = 'Critério 1 · CM 2027 (Q2: ' + r.crit1.q2Rank + 'º)';
     });
 
-    /* Percorrer elegíveis do Critério 2 (excluindo quem já ganhou vaga no Critério 1) */
-    var eligibleCrit2 = figActive.filter(function (r) { return !r.crit1 && r.total > 0; });
     var nocQuotas = {};
     Object.keys(crit1Nocs).forEach(function (noc) { nocQuotas[noc] = 1; });
     var secondQuotaCountries = 0;
-
+    var nextRankNum = crit1Count + 1;
     var crit2Candidates = [];
-    eligibleCrit2.forEach(function (r, idx) {
+
+    wcGroup.forEach(function (r, idx) {
       var noc = r.ath.noc;
       var currentNocQ = nocQuotas[noc] || 0;
-      var worldCupPos = idx + 1; /* Posição entre os elegíveis do circuito de Taças do Mundo */
+      var worldCupPos = idx + 1;
 
       if (currentNocQ === 0) {
         nocQuotas[noc] = 1;
+        r.displayRank = nextRankNum++;
         crit2Candidates.push(r);
-      } else if (currentNocQ === 1 && crit1Nocs[noc] && worldCupPos <= 3 && secondQuotaCountries < 3) {
-        /* Top 3 do ranking de Taças do Mundo pode dar 2.ª vaga a país com vaga no CM 2027 */
+      } else if (currentNocQ === 1 && crit1Nocs[noc] && worldCupPos <= SECOND_QUOTA_MAX_POS && secondQuotaCountries < MAX_SECOND_QUOTA_NOCS) {
         nocQuotas[noc] = 2;
         secondQuotaCountries++;
         r.isSecondQuota = true;
+        r.displayRank = nextRankNum++;
         crit2Candidates.push(r);
       } else {
+        r.displayRank = null;
         r.status = 'noc_full';
         r.statusLabel = 'País já com vaga';
       }
     });
 
-    /* Calcular quantas vagas ficam reservadas para Critério 3 (Continental) + Anfitrião (USA)
-       no cenário máximo (Verde) vs cenário mínimo / realocação (Amarelo) */
-    function countReservedSlots(qualifiedNocsList) {
-      var repContinents = {};
-      var hasUsa = false;
-      qualifiedNocsList.forEach(function (noc) {
-        if (noc === 'USA') hasUsa = true;
-        var cont = continentsMap[noc];
-        if (cont) repContinents[cont] = true;
+    function evaluateReservations(qualifiedList) {
+      var contWinner = {};
+      var hostWinner = false;
+      qualifiedList.forEach(function (item) {
+        if (item.noc === HOST_NOC) hostWinner = true;
+        var c = continentsMap[item.noc];
+        if (c && !contWinner[c]) contWinner[c] = item.noc;
       });
-      var allContinents = ['EU', 'AS', 'AM', 'AF', 'OC'];
-      var missingContinents = allContinents.filter(function (c) { return !repContinents[c]; }).length;
-      var hostReserve = hasUsa ? 0 : 1;
-      /* Universalidade assume-se sempre realocada ao Critério 2 */
+      var missingCont = unionDefs.filter(function (cd) { return !contWinner[cd.code]; }).length;
+      var hostMissing = hostWinner ? 0 : 1;
       return {
-        missingContinents: missingContinents,
-        hostReserve: hostReserve,
-        totalReserved: missingContinents + hostReserve
+        contWinner: contWinner,
+        hostWinner: hostWinner,
+        totalReserved: missingCont + hostMissing
       };
     }
 
-    /* Atribuir estado Verde (garantido) vs Amarelo (dependente das vagas continentais/USA) */
-    var maxPool = TOTAL_QUOTAS - crit1Count; /* Máximo de vagas possíveis no Critério 2 (se tudo realocar) */
-    var acceptedNocsSoFar = Object.keys(crit1Nocs);
+    var maxPool = TOTAL_QUOTAS - crit1Count;
+    var qualifiedEntries = crit1Group.map(function (r) { return { noc: r.ath.noc }; });
 
     crit2Candidates.forEach(function (r, cIdx) {
-      var slotNum = cIdx + 1; /* 1.ª, 2.ª, 3.ª... vaga atribuída via Critério 2 */
+      var slotNum = cIdx + 1;
       if (slotNum > maxPool) {
         r.status = 'out';
         r.statusLabel = 'Fora das vagas';
         return;
       }
-      var nextNocs = acceptedNocsSoFar.concat([r.ath.noc]);
-      var resInfo = countReservedSlots(nextNocs);
+      var nextEntries = qualifiedEntries.concat([{ noc: r.ath.noc }]);
+      var resInfo = evaluateReservations(nextEntries);
       var safePool = TOTAL_QUOTAS - crit1Count - resInfo.totalReserved;
 
       if (slotNum <= safePool) {
         r.status = 'crit2_safe';
         r.statusLabel = r.isSecondQuota ? 'Critério 2 · 2.ª vaga' : 'Critério 2 · Garantido';
-        acceptedNocsSoFar = nextNocs;
+        qualifiedEntries = nextEntries;
       } else {
         r.status = 'crit2_bubble';
-        r.statusLabel = 'Zona de corte (dep. Cont./USA)';
-        acceptedNocsSoFar = nextNocs;
+        r.statusLabel = 'Zona de corte (dep. Uniões/' + HOST_NOC + ')';
+        qualifiedEntries = nextEntries;
       }
     });
 
-    /* Resumo dinâmico de vagas e situação de Portugal (POR) */
-    var finalResInfo = countReservedSlots(acceptedNocsSoFar);
-    var safeCrit2Slots = Math.max(0, TOTAL_QUOTAS - crit1Count - finalResInfo.totalReserved);
+    var finalReservations = evaluateReservations(qualifiedEntries);
+    var safeCrit2Slots = Math.max(0, TOTAL_QUOTAS - crit1Count - finalReservations.totalReserved);
     var bubbleCrit2Slots = Math.max(0, maxPool - safeCrit2Slots);
 
+    var continentTrackers = unionDefs.map(function (cd) {
+      return {
+        id: cd.code,
+        label: cd.label,
+        qualified: Boolean(finalReservations.contWinner[cd.code]),
+        byNoc: finalReservations.contWinner[cd.code] || null
+      };
+    });
+    continentTrackers.push({
+      id: 'HOST',
+      label: 'Anfitrião (' + HOST_NOC + ')',
+      qualified: finalReservations.hostWinner,
+      byNoc: finalReservations.hostWinner ? HOST_NOC : null
+    });
+
+    var figActive = crit1Group.concat(wcGroup);
     var porFigRows = figActive.filter(function (r) { return r.ath.noc === 'POR'; });
     var porQuotasSafe = porFigRows.filter(function (r) { return r.status === 'crit1' || r.status === 'crit2_safe'; }).length;
     var porQuotasBubble = porFigRows.filter(function (r) { return r.status === 'crit2_bubble'; }).length;
 
-    /* 5) Ranking Nacional FGP (7 provas: 6 Taças do Mundo + CM 2027, máx. 2 de 2027, apenas atletas POR) */
+    /* 5) Ranking Nacional FGP */
     var allEvents = laCfg.eventos;
     var porIds = Object.keys(athletes).filter(function (id) { return athletes[id].noc === 'POR'; });
     var fgpRows = porIds.map(function (athId) {
@@ -721,7 +759,7 @@
         }
       });
 
-      var sel = selectBest3Max2_2027(validItems);
+      var sel = selectBestResults(validItems, BEST_RESULTS_COUNT, MAX_RESULTS_YEAR);
       Object.keys(sel.usedMap).forEach(function (evId) { per[evId].used = true; });
 
       allScores.sort(function (a, b) { return b - a; });
@@ -743,7 +781,7 @@
         simulated: isSim,
         rank: null,
         tieReason: '',
-        quotaState: 'out' /* 'safe' | 'bubble' | 'out' */
+        quotaState: 'out'
       };
     });
 
@@ -775,16 +813,17 @@
       wchEvent: wchEv,
       figRows: figActive,
       fgpRows: fgpRows,
+      continentTrackers: continentTrackers,
       summary: {
         totalQuotas: TOTAL_QUOTAS,
         crit1Count: crit1Count,
         safeCrit2Slots: safeCrit2Slots,
         bubbleCrit2Slots: bubbleCrit2Slots,
-        reservedSlots: finalResInfo.totalReserved,
-        missingContinents: finalResInfo.missingContinents,
-        hostReserve: finalResInfo.hostReserve,
+        reservedSlots: finalReservations.totalReserved,
         porQuotasSafe: porQuotasSafe,
-        porQuotasBubble: porQuotasBubble
+        porQuotasBubble: porQuotasBubble,
+        bestResultsCount: BEST_RESULTS_COUNT,
+        hostNoc: HOST_NOC
       }
     };
   }
