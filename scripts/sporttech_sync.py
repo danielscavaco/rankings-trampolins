@@ -173,16 +173,26 @@ def fetch_event_results(uuid, athletes, minimos, ignore_age=False, national_mode
                 rec = event_records.setdefault(ath['id'], {'rotinas': {}})
 
                 if disc == 'TRI':
-                    rt = frames[0] if frames else {'total': perf_mk}
-                    tot = rt['total']
                     if kind == 'Q':
-                        rec['q1'] = tot
-                        rec['rotinas']['q1'] = rt
+                        # Q1 em TRI tem 2 séries: guarda ambas e escolhe a melhor
+                        if len(frames) >= 1:
+                            rec['rotinas']['q1_1'] = frames[0]
+                        if len(frames) >= 2:
+                            rec['rotinas']['q1_2'] = frames[1]
+                        if frames:
+                            best_f = max(frames, key=lambda x: x['total'])
+                            rec['q1'] = best_f['total']
+                            rec['rotinas']['q1'] = best_f
+                        elif perf_mk is not None:
+                            rec['q1'] = perf_mk
+                            rec['rotinas']['q1'] = {'total': perf_mk}
                     elif kind == 'Q2':
-                        rec['q2'] = tot
+                        rt = frames[0] if frames else {'total': perf_mk}
+                        rec['q2'] = rt['total']
                         rec['rotinas']['q2'] = rt
                     elif kind in ('F', 'F1'):
-                        rec['f'] = tot
+                        rt = frames[0] if frames else {'total': perf_mk}
+                        rec['f'] = rt['total']
                         rec['rotinas']['f'] = rt
                 else:
                     if kind == 'Q':
