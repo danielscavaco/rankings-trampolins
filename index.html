@@ -143,7 +143,7 @@
 
     .controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
     .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; }
-    .seg button { border: 0; background: transparent; padding: 8px 15px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
+    .seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; min-height: 38px; }
     .seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); box-shadow: 0 1px 2px rgb(0 0 0 / .16); }
     .seg .full { display: none; }
     @media (min-width: 560px) { .seg .full { display: inline; } .seg .short { display: none; } }
@@ -219,7 +219,7 @@
     /* Lista de seriação */
     .board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
     .board ol { list-style: none; margin: 0; padding: 0; }
-    .head, .rowgrid { display: grid; grid-template-columns: 38px minmax(165px, 1.35fr) minmax(0, 4.2fr) 84px 155px; gap: 0 10px; align-items: center; padding: 10px 14px; }
+    .head, .rowgrid { display: grid; grid-template-columns: 38px minmax(175px, 1.35fr) minmax(0, 4.2fr) 84px 155px; gap: 0 10px; align-items: center; padding: 10px 14px; }
     .head { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); align-items: end; }
     .cells { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 4px; }
     .hcell { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1px; text-transform: none; letter-spacing: 0; min-width: 0; }
@@ -241,7 +241,7 @@
     .rk.nocfull, .row.out .rk { color: var(--muted); font-size: 22px; }
 
     .who { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
-    .who b { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .who b { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; line-height: 1.28; }
     .who small { color: var(--muted); font-size: 12px; }
     .noc-tag {
       display: inline-flex;
@@ -519,6 +519,43 @@
       var DISC_SHORT = { TRI: 'TRA', TRA: 'TRA', SYN: 'SYN', DMT: 'DMT', TUM: 'TUM' };
       var AGE_ORDER = ['11-12', '13-14', 'JUN', '17-21', 'SEN'];
 
+      /* Formata pares de Sincronizado: Ginasta 1, Ginasta 2 (ordem alfabética) e Clube 1 · Clube 2 */
+      function formatEntryIdentity(entry, disc, hideClub) {
+        var isSyn = disc === 'SYN' || String(entry.nome || '').indexOf('/') >= 0;
+        if (!isSyn) {
+          var singleClub = !hideClub && entry.clube ? '<small>' + esc(entry.clube) + '</small>' : '';
+          return '<b>' + esc(entry.nome) + '</b>' + singleClub;
+        }
+        var names = String(entry.nome || '').split('/').map(function (s) { return s.trim(); }).filter(Boolean);
+        var clubs = String(entry.clube || '').split('/').map(function (s) { return s.trim(); }).filter(Boolean);
+
+        var pairs = names.map(function (nm, idx) {
+          return { nome: nm, clube: clubs[idx] || clubs[0] || '' };
+        });
+        pairs.sort(function (a, b) { return a.nome.localeCompare(b.nome, 'pt'); });
+
+        var namesHtml = pairs.map(function (p) {
+          return '<b>' + esc(p.nome) + '</b>';
+        }).join('');
+
+        var clubLine = '';
+        if (!hideClub) {
+          var uniqueClubs = [];
+          pairs.forEach(function (p) {
+            if (p.clube && uniqueClubs.indexOf(p.clube) < 0) uniqueClubs.push(p.clube);
+          });
+          if (uniqueClubs.length) {
+            clubLine = '<small>' + esc(uniqueClubs.join(' · ')) + '</small>';
+          }
+        }
+        return namesHtml + clubLine;
+      }
+
+      function entryHasClub(entry, club) {
+        if (!club) return true;
+        return String(entry.clube || '').split('/').map(function (s) { return s.trim(); }).indexOf(club) >= 0;
+      }
+
       /* Mapa completo NOC (IOC) -> ISO 3166-1 alpha-2 para todas as federações FIG */
       var NOC_TO_ISO2 = {
         ALB: 'al', ALG: 'dz', ANG: 'ao', ARG: 'ar', ARM: 'am', ARU: 'aw', ASA: 'as', AUS: 'au', AUT: 'at', AZE: 'az',
@@ -690,6 +727,26 @@
           .concat(keys.filter(function (k) { return DEFAULT_DISC_ORDER.indexOf(k) < 0; }));
       }
 
+      function agesFor(cfg, athList) {
+        var ages = [];
+        if (Array.isArray(cfg.escaloes) && cfg.escaloes.length) {
+          ages = cfg.escaloes.slice();
+        } else if (Array.isArray(athList)) {
+          athList.forEach(function (a) {
+            var escVal = (a.escalao || a.age || '').trim().toUpperCase();
+            if (escVal && ages.indexOf(escVal) < 0) ages.push(escVal);
+          });
+        }
+        ages.sort(function (a, b) {
+          var ia = AGE_ORDER.indexOf(a), ib = AGE_ORDER.indexOf(b);
+          if (ia >= 0 && ib >= 0) return ia - ib;
+          if (ia >= 0) return -1;
+          if (ib >= 0) return 1;
+          return a.localeCompare(b, 'pt');
+        });
+        return ages;
+      }
+
       /* ---------- menu lateral, cabeçalho e badge live contextual ---------- */
       function renderChrome(pack) {
         var comp = activeCompMeta();
@@ -717,23 +774,7 @@
             return '<button role="tab" type="button" data-d="' + d + '" aria-selected="' + (d === S.disc && !S.club) + '">' + esc(label) + '</button>';
           }).join('');
 
-          var ages = [];
-          if (Array.isArray(cfg.escaloes) && cfg.escaloes.length) {
-            ages = cfg.escaloes.slice();
-          } else if (Array.isArray(pack.ath)) {
-            pack.ath.forEach(function (a) {
-              var escVal = (a.escalao || a.age || '').trim().toUpperCase();
-              if (escVal && ages.indexOf(escVal) < 0) ages.push(escVal);
-            });
-          }
-          ages.sort(function (a, b) {
-            var ia = AGE_ORDER.indexOf(a), ib = AGE_ORDER.indexOf(b);
-            if (ia >= 0 && ib >= 0) return ia - ib;
-            if (ia >= 0) return -1;
-            if (ib >= 0) return 1;
-            return a.localeCompare(b, 'pt');
-          });
-
+          var ages = agesFor(cfg, pack.ath);
           if (ages.length > 1) {
             if (!S.age || ages.indexOf(S.age) < 0) S.age = ages[0];
             tabsAge.hidden = false;
@@ -750,8 +791,8 @@
           tabsAge.hidden = true;
           tabsAge.innerHTML = '';
           $('#tabsSub').innerHTML =
-            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG</span><span class="full">Internacional</span></button>' +
-            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP</span><span class="full">Nacional</span></button>';
+            '<button role="tab" type="button" data-laview="fig" aria-selected="' + (S.laView === 'fig') + '"><span class="short">FIG</span><span class="full">Ranking Internacional (FIG)</span></button>' +
+            '<button role="tab" type="button" data-laview="fgp" aria-selected="' + (S.laView === 'fgp') + '"><span class="short">FGP</span><span class="full">Ranking Nacional (FGP)</span></button>';
         }
 
         var sexes = ['F', 'M'];
@@ -767,13 +808,15 @@
           return '<button role="tab" type="button" data-s="' + s + '" aria-selected="' + (s === S.sex && !S.club) + '">' + s + '</button>';
         }).join('');
 
-        /* Filtro de Clube */
+        /* Filtro de Clube (separa pares "Clube A / Clube B" pelos clubes individuais) */
         var clubBox = $('#clubFilterBox');
         if (!isOlympic && Array.isArray(pack.ath)) {
           var clubs = [];
           pack.ath.forEach(function (a) {
-            var c = (a.clube || '').trim();
-            if (c && clubs.indexOf(c) < 0) clubs.push(c);
+            String(a.clube || '').split('/').forEach(function (part) {
+              var c = part.trim();
+              if (c && clubs.indexOf(c) < 0) clubs.push(c);
+            });
           });
           clubs.sort(function (a, b) { return a.localeCompare(b, 'pt'); });
           if (S.club && clubs.indexOf(S.club) < 0) S.club = '';
@@ -808,14 +851,20 @@
         var ovObj = getOvEG(comp.id);
         var hasAnyOv = Object.keys(ovObj).some(function (e) { return Object.keys(ovObj[e]).length; });
         var ov = hasAnyOv ? ovObj : null;
-        var R = A.rank(pack.cfg, S.disc, S.sex, en, pack.res, ov);
-        var base = ov ? A.rank(pack.cfg, S.disc, S.sex, en, pack.res, null) : R;
+        var R = A.rank(pack.cfg, S.disc, S.sex, en, pack.res, ov, S.age);
+        var base = ov ? A.rank(pack.cfg, S.disc, S.sex, en, pack.res, null, S.age) : R;
         var br = {};
         base.rows.forEach(function (r) { br[r.entry.id] = r.rank; });
         return { R: R, br: br, entries: en };
       }
 
-      function renderDetailDrawerEG(r, ev, dc, useExcelencia) {
+      function formatMinimosText(tipo, m, useExcelencia) {
+        if (tipo === 'late') return 'Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late);
+        if (tipo === 'q1_only') return 'Q1 ' + fmt(m.base);
+        return 'Q1 ou F1+F2 ' + fmt(m.base) + (useExcelencia && m.ne ? ' · Excelência ' + fmt(m.ne) : '');
+      }
+
+      function renderDetailDrawerEG(r, ev, tipo, useExcelencia) {
         var p = r.per[ev.id];
         var rec = p.rec || {};
         var rot = rec.rotinas || {};
@@ -824,9 +873,11 @@
         html += '<button type="button" class="detail-close" data-close-detail="1">Fechar</button></div>';
 
         if (p.simulated) {
-          var simRows = dc.tipo === 'late'
+          var simRows = tipo === 'late'
             ? [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']]
-            : (useExcelencia ? [['q1', 'Q1'], ['f1', 'Final 1'], ['f2', 'Final 2'], ['ne', 'Nota de excelência']] : [['q1', 'Q1'], ['f1', 'Final 1'], ['f2', 'Final 2']]);
+            : (tipo === 'q1_only'
+              ? [['q1', 'Q1']]
+              : (useExcelencia ? [['q1', 'Q1'], ['f1', 'Final 1'], ['f2', 'Final 2'], ['ne', 'Nota de excelência']] : [['q1', 'Q1'], ['f1', 'Final 1'], ['f2', 'Final 2']]));
           var activeSim = simRows.filter(function (sr) { return typeof rec[sr[0]] === 'number'; });
 
           if (activeSim.length) {
@@ -838,10 +889,14 @@
           }
         } else {
           var phases;
-          if (dc.tipo === 'late') {
+          if (tipo === 'late') {
             phases = (rot.q1_1 || rot.q1_2)
               ? [['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2'], ['q2', 'Q2'], ['f', 'Final']]
               : [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
+          } else if (tipo === 'q1_only') {
+            phases = (rot.q1_1 || rot.q1_2)
+              ? [['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2']]
+              : [['q1', 'Q1']];
           } else {
             var allNePhases = [
               ['q1_1', 'Q1 · Série 1'], ['q1_2', 'Q1 · Série 2'],
@@ -860,8 +915,8 @@
 
           if (activePhases.length) {
             html += '<table class="rut-table"><thead><tr>';
-            if (dc.tipo === 'late') {
-              html += '<th>Fase</th><th>E</th><th>D</th><th>HD</th><th>ToF</th><th>Pen.</th><th>Total</th>';
+            if (tipo === 'late' || tipo === 'q1_only') {
+              html += '<th>Série</th><th>E</th><th>D</th><th>HD</th><th>ToF</th><th>Pen.</th><th>Total</th>';
             } else {
               html += '<th>Série</th><th>E</th><th>D</th><th>Pen.</th><th>Total</th>';
             }
@@ -880,7 +935,7 @@
               html += '<td>' + esc(label) + badges + '</td>';
               html += '<td>' + fmt(rt.e) + '</td>';
               html += '<td>' + fmt(rt.d) + '</td>';
-              if (dc.tipo === 'late') {
+              if (tipo === 'late' || tipo === 'q1_only') {
                 html += '<td>' + fmt(rt.hd) + '</td>';
                 html += '<td>' + fmt(rt.tof) + '</td>';
               }
@@ -910,9 +965,11 @@
       function renderBoardEG(comp, pack) {
         var cfg = pack.cfg;
 
-        /* --- MODO CLUBE: mostra todos os ginastas do clube em todas as disciplinas/géneros --- */
+        /* --- MODO CLUBE: mostra todos os ginastas/pares do clube em todas as disciplinas/escalões/géneros --- */
         if (S.club) {
           var dKeys = discKeysFor(cfg);
+          var ages = agesFor(cfg, pack.ath);
+          var ageSlots = ages.length ? ages : [''];
           var ovObj = getOvEG(comp.id);
           var hasAnyOv = Object.keys(ovObj).some(function (e) { return Object.keys(ovObj[e]).length; });
           var ov = hasAnyOv ? ovObj : null;
@@ -922,30 +979,34 @@
           var totalVagas = 0;
 
           dKeys.forEach(function (dKey) {
-            ['F', 'M'].forEach(function (sx) {
-              var en = pack.ath.filter(function (a) { return a.disc === dKey && a.sexo === sx; });
-              if (!en.length) return;
-              var R = A.rank(cfg, dKey, sx, en, pack.res, ov);
-              var clubRows = R.rows.filter(function (r) { return (r.entry.clube || '').trim() === S.club; });
-              if (clubRows.length) {
-                totalAthletes += clubRows.length;
-                totalVagas += clubRows.filter(function (r) { return r.naVaga; }).length;
-                groups.push({
-                  disc: dKey,
-                  discLabel: DISC_SHORT[dKey] || dKey,
-                  discNome: cfg.disciplinas[dKey].nome,
-                  dc: cfg.disciplinas[dKey],
-                  sex: sx,
-                  R: R,
-                  rows: clubRows
+            ageSlots.forEach(function (ag) {
+              ['F', 'M'].forEach(function (sx) {
+                var en = pack.ath.filter(function (a) {
+                  var matchAge = !ag || !a.escalao || a.escalao.toUpperCase() === ag;
+                  return a.disc === dKey && a.sexo === sx && matchAge;
                 });
-              }
+                if (!en.length) return;
+                var R = A.rank(cfg, dKey, sx, en, pack.res, ov, ag);
+                var clubRows = R.rows.filter(function (r) { return entryHasClub(r.entry, S.club); });
+                if (clubRows.length) {
+                  totalAthletes += clubRows.length;
+                  totalVagas += clubRows.filter(function (r) { return r.naVaga; }).length;
+                  groups.push({
+                    disc: dKey,
+                    discLabel: DISC_SHORT[dKey] || dKey,
+                    age: ag,
+                    sex: sx,
+                    R: R,
+                    rows: clubRows
+                  });
+                }
+              });
             });
           });
 
           $('#facts').innerHTML =
             '<div class="fact"><span>Clube</span><b>' + esc(S.club) + '</b></div>' +
-            '<div class="fact"><span>Ginastas em apuramento</span><b>' + totalAthletes + '</b></div>' +
+            '<div class="fact"><span>Em apuramento</span><b>' + totalAthletes + '</b></div>' +
             '<div class="fact good"><span>Dentro das vagas</span><b>' + totalVagas + '</b></div>';
           $('#trackerBox').innerHTML = '';
           $('#legendBox').innerHTML = '';
@@ -959,13 +1020,13 @@
 
           var htmlClub = '';
           groups.forEach(function (g) {
-            var m = g.R.minimos;
-            var minTxt = g.dc.tipo === 'late'
-              ? ('Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late))
-              : ('Q1 ou F1+F2 ' + fmt(m.base) + (g.R.useExcelencia ? ' · Excelência ' + fmt(m.ne) : ''));
+            var minTxt = formatMinimosText(g.R.tipo, g.R.minimos, g.R.useExcelencia);
+            var titleParts = [g.discLabel];
+            if (g.age) titleParts.push(g.age);
+            titleParts.push(SEX[g.sex]);
 
             htmlClub += '<li class="club-group-head">' +
-              '<span>' + esc(g.discLabel) + ' · ' + SEX[g.sex] + '</span>' +
+              '<span>' + esc(titleParts.join(' · ')) + '</span>' +
               '<small>' + g.R.vagas + (g.R.vagas === 1 ? ' vaga' : ' vagas') + ' · Mínimos: ' + minTxt + '</small>' +
               '</li>';
 
@@ -974,7 +1035,8 @@
               var cnt = r.usedEvMap || {};
 
               var cells = allEvs.map(function (ev) {
-                if (ev.disciplinas.indexOf(g.disc) < 0) {
+                var evApplies = ev.disciplinas.indexOf(g.disc) >= 0 && (!ev.escaloes || !g.age || ev.escaloes.indexOf(g.age) >= 0);
+                if (!evApplies) {
                   return '<span class="cell faded" data-l="' + esc(ev.curto) + '">—</span>';
                 }
                 var p = r.per[ev.id], cl = 'cell', v = '—', tip = '', hasData = false;
@@ -1002,7 +1064,7 @@
 
               var chips = '';
               if (r.rank !== null) {
-                chips += r.naVaga ? '<span class="chip vaga">Dentro</span>' : '<span class="chip min">Com mínimos</span>';
+                chips += r.naVaga ? '<span class="chip vaga">Dentro (' + r.rank + 'º)</span>' : '<span class="chip min">Com mínimos (' + r.rank + 'º)</span>';
               } else {
                 chips += '<span class="chip">' + (r.bestRaw === null ? 'Sem resultados' : 'Sem mínimos') + '</span>';
               }
@@ -1021,13 +1083,17 @@
                 ? g.R.eventos.filter(function (e) { return e.id === S.detail.evId; })[0]
                 : null;
 
+              /* No modo clube, mostra os clubes apenas se for um par misto de clubes */
+              var isMixedPair = String(r.entry.clube || '').indexOf('/') >= 0;
+              var idHtml = formatEntryIdentity(r.entry, g.disc, !isMixedPair);
+
               htmlClub += '<li class="row' + (r.rank === null ? ' out' : '') + '">' +
                 '<div class="rowgrid">' +
                 '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
-                '<span class="who"><b>' + esc(r.entry.nome) + '</b>' + gap + '</span>' +
+                '<span class="who">' + idHtml + gap + '</span>' +
                 '<span class="cells" style="--cols:' + nEv + '">' + cells + '</span>' +
                 '<span class="tot">' + tot + '</span><span class="st">' + chips + '</span></div>' +
-                (openEv ? renderDetailDrawerEG(r, openEv, g.dc, g.R.useExcelencia) : '') +
+                (openEv ? renderDetailDrawerEG(r, openEv, g.R.tipo, g.R.useExcelencia) : '') +
                 '</li>';
             });
           });
@@ -1037,12 +1103,9 @@
           return;
         }
 
-        /* --- MODO NORMAL (POR DISCIPLINA / GÉNERO) --- */
-        var C = computeEG(comp, pack), R = C.R, d = S.disc, dc = cfg.disciplinas[d];
-        var m = R.minimos;
-        var minTxt = dc.tipo === 'late'
-          ? ('Q1 ' + fmt(m.q1) + ' · Q2/Final ' + fmt(m.late))
-          : ('Q1 ou F1+F2 ' + fmt(m.base) + (R.useExcelencia ? ' · Excelência ' + fmt(m.ne) : ''));
+        /* --- MODO NORMAL (POR DISCIPLINA / ESCALÃO / GÉNERO) --- */
+        var C = computeEG(comp, pack), R = C.R, d = S.disc;
+        var minTxt = formatMinimosText(R.tipo, R.minimos, R.useExcelencia);
 
         $('#facts').innerHTML =
           '<div class="fact"><span>Vagas</span><b>' + R.vagas + '</b></div>' +
@@ -1105,7 +1168,6 @@
             chips += '<span class="chip simc">' + (b2 > r.rank ? '↑' + (b2 - r.rank) : '↓' + (r.rank - b2)) + '</span>';
           }
 
-          var sub = esc(r.entry.clube || '');
           var gap = '';
           if (r.rank === null) {
             gap = r.gap !== null && r.gap > 0
@@ -1124,10 +1186,10 @@
           html += '<li class="row' + (r.rank === null ? ' out' : '') + '">' +
             '<div class="rowgrid">' +
             '<span class="rk tn">' + (r.rank !== null ? r.rank : '—') + '</span>' +
-            '<span class="who"><b>' + esc(r.entry.nome) + '</b><small>' + sub + '</small>' + gap + '</span>' +
+            '<span class="who">' + formatEntryIdentity(r.entry, d, false) + gap + '</span>' +
             '<span class="cells" style="--cols:' + nEv + '">' + cells + '</span>' +
             '<span class="tot">' + tot + '</span><span class="st">' + chips + '</span></div>' +
-            (openEv ? renderDetailDrawerEG(r, openEv, dc, R.useExcelencia) : '') +
+            (openEv ? renderDetailDrawerEG(r, openEv, R.tipo, R.useExcelencia) : '') +
             '</li>';
 
           var next = R.rows[i + 1];
@@ -1143,6 +1205,7 @@
 
       function fieldsForEG(tipo, useExcelencia) {
         if (tipo === 'late') return [['q1', 'Q1'], ['q2', 'Q2'], ['f', 'Final']];
+        if (tipo === 'q1_only') return [['q1', 'Q1']];
         return useExcelencia
           ? [['q1', 'Q1'], ['f1', 'F1'], ['f2', 'F2'], ['ne', 'Excelência']]
           : [['q1', 'Q1'], ['f1', 'F1'], ['f2', 'F2']];
@@ -1150,26 +1213,26 @@
 
       function renderSimEG(comp, pack, C) {
         $('#simHint').textContent = 'Escolhe uma ginasta e mete resultados hipotéticos (ou altera os existentes). A seriação acima recalcula logo.';
-        var sel = $('#simAth'), dc = pack.cfg.disciplinas[S.disc];
+        var sel = $('#simAth'), R = C.R;
         sel.innerHTML = '<option value="">Escolher…</option>' + C.entries.map(function (e) {
           return '<option value="' + esc(e.id) + '"' + (e.id === S.simId ? ' selected' : '') + '>' + esc(e.nome) + '</option>';
         }).join('');
         var box = $('#simRows');
         if (!S.simId) { box.innerHTML = ''; return; }
         var ovObj = getOvEG(comp.id);
-        var evs = pack.cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(S.disc) >= 0; });
+        var evs = R.eventos;
         box.innerHTML = evs.map(function (ev) {
-          var st = evState(ev), rawReal = pack.res[ev.id] && pack.res[ev.id][S.simId], real = A.hydrateRec(rawReal, dc.tipo), ov = ovObj[ev.id] && ovObj[ev.id][S.simId], cur = ov || real || {}, fs;
+          var st = evState(ev), rawReal = pack.res[ev.id] && pack.res[ev.id][S.simId], real = A.hydrateRec(rawReal, R.tipo), ov = ovObj[ev.id] && ovObj[ev.id][S.simId], cur = ov || real || {}, fs;
           var useAgg = real && real.agg !== undefined && !(ov && ov.agg === undefined);
           if (useAgg) fs = [['agg', 'Valor da prova']];
-          else fs = fieldsForEG(dc.tipo, C.R.useExcelencia);
+          else fs = fieldsForEG(R.tipo, R.useExcelencia);
           var fields = fs.map(function (f) {
             var v = cur[f[0]], mod = ov && ov[f[0]] !== undefined && (!real || ov[f[0]] !== real[f[0]]);
             return '<label class="fld">' + f[1] + '<input type="text" inputmode="decimal" autocomplete="off" data-ev="' + ev.id + '" data-f="' + f[0] + '" value="' + (v === undefined ? '' : String(v)) + '" class="' + (mod ? 'mod' : '') + '" placeholder="—"></label>';
           }).join('');
           var res = '';
-          var rowObj = C.R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
-          if (rowObj && rowObj.per[ev.id].rec) {
+          var rowObj = R.rows.filter(function (r) { return r.entry.id === S.simId; })[0];
+          if (rowObj && rowObj.per[ev.id] && rowObj.per[ev.id].rec) {
             var p = rowObj.per[ev.id];
             res = '<div class="res tn">' + (p.score > 0 ? '<b>' + fmt(p.score) + ' pontos</b> na prova' : 'Não conta (' + (p.items.filter(function (i) { return !i.ok && !i.pending; }).map(function (i) { return i.note; })[0] || 'sem mínimos') + ')') + '</div>';
           }
@@ -1339,7 +1402,7 @@
             }).join('');
 
             var chips = '';
-            if (r.quotaState === 'safe') chips += '<span class="chip vaga">Dentro</span>';
+            if (r.quotaState === 'safe') chips += '<span class="chip vaga">Na vaga</span>';
             else if (r.quotaState === 'bubble') chips += '<span class="chip bubble">Vaga provisória</span>';
             else if (r.rank !== null) chips += '<span class="chip min">Com pontos FIG</span>';
             else chips += '<span class="chip">Sem pontos Top 30</span>';
@@ -1518,8 +1581,7 @@
         if (!isOlympic) {
           if (!t.dataset || !t.dataset.ev) return;
           var evId = t.dataset.ev, id = S.simId, rec = {};
-          var dc = pack.cfg.disciplinas[S.disc];
-          var useExc = dc.usarExcelencia !== undefined ? dc.usarExcelencia : (pack.cfg.usarExcelencia !== false);
+          var rules = A.resolveDiscRules(pack.cfg, S.disc, S.sex, S.age);
           var ovObj = getOvEG(comp.id);
           document.querySelectorAll('#simRows input[data-ev="' + evId + '"]').forEach(function (i) {
             var s = String(i.value).trim().replace(',', '.');
@@ -1527,8 +1589,8 @@
             if (s && isFinite(n)) rec[i.dataset.f] = n;
           });
           var rawReal = pack.res[evId] && pack.res[evId][id];
-          var real = A.hydrateRec(rawReal, dc.tipo);
-          var simFields = fieldsForEG(dc.tipo, useExc).map(function (f) { return f[0]; });
+          var real = A.hydrateRec(rawReal, rules.tipo);
+          var simFields = fieldsForEG(rules.tipo, rules.useExcelencia).map(function (f) { return f[0]; });
           if (real && real.agg !== undefined) simFields = ['agg'];
           var realKeys = real ? simFields.filter(function (k) { return real[k] !== undefined; }) : [];
           var recKeys = Object.keys(rec);
