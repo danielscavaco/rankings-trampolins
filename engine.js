@@ -125,9 +125,35 @@
     return { e: sumE, d: sumD, hasDetail: hasDetail };
   }
 
-  function scoreEvent(disc, sex, rawRec, minimos, tipo, useExcelencia) {
+  function resolveDiscRules(cfg, disc, sex, escalao) {
+    var dcfg = cfg.disciplinas[disc] || {};
+    var ageCfg = (escalao && dcfg.porEscalao && dcfg.porEscalao[escalao]) ? dcfg.porEscalao[escalao] : {};
+    var tipo = ageCfg.tipo || dcfg.tipo || 'ne';
+    var vagas = isNum(ageCfg.vagas) ? ageCfg.vagas : (isNum(dcfg.vagas) ? dcfg.vagas : 4);
+    var nContar = isNum(ageCfg.provasContam) ? ageCfg.provasContam : (isNum(dcfg.provasContam) ? dcfg.provasContam : (isNum(cfg.provasContam) ? cfg.provasContam : 2));
+    var useExcelencia = ageCfg.usarExcelencia !== undefined
+      ? ageCfg.usarExcelencia
+      : (dcfg.usarExcelencia !== undefined ? dcfg.usarExcelencia : (cfg.usarExcelencia !== false));
+
+    var minObj = {};
+    if (ageCfg.minimos && ageCfg.minimos[sex]) minObj = ageCfg.minimos[sex];
+    else if (cfg.minimos && cfg.minimos[disc]) {
+      if (escalao && cfg.minimos[disc][escalao] && cfg.minimos[disc][escalao][sex]) minObj = cfg.minimos[disc][escalao][sex];
+      else if (cfg.minimos[disc][sex]) minObj = cfg.minimos[disc][sex];
+    }
+
+    return {
+      tipo: tipo,
+      vagas: vagas,
+      provasContam: nContar,
+      useExcelencia: useExcelencia,
+      minObj: minObj
+    };
+  }
+
+  function scoreEvent(disc, sex, rawRec, minimos, tipo, useExcelencia, mOverride) {
     var rec = hydrateRec(rawRec, tipo);
-    var m = (minimos[disc] || {})[sex] || {};
+    var m = mOverride || ((minimos && minimos[disc] && minimos[disc][sex]) || {});
     var items = [];
     var out = {
       score: 0, items: items, base: null, baseOk: false,
@@ -137,7 +163,7 @@
     if (!rec) return out;
 
     if (tipo === 'late') {
-      var minQ1 = m.q1, minLate = m.late;
+      var minQ1 = m.q1 || 0, minLate = m.late || 0;
       if (isNum(rec.agg)) {
         var ok = rec.agg >= minQ1;
         items.push({ label: 'Valor da prova (Q1 + melhor fase seguinte)', value: rec.agg, ok: ok, note: '' });
@@ -171,14 +197,15 @@
       return out;
     }
 
-    var minBase = m.base, minNe = m.ne;
+    var minBase = m.base || 0, minNe = m.ne;
     var allowNe = useExcelencia !== false && isNum(minNe);
+    var allowFinals = tipo !== 'q1_only';
     var cand = [];
     var q1Ok = false;
 
     if (isNum(rec.agg)) {
       var okA = rec.agg >= minBase;
-      items.push({ label: 'Valor da prova (Q1 ou F1+F2)', value: rec.agg, ok: okA, note: '' });
+      items.push({ label: allowFinals ? 'Valor da prova (Q1 ou F1+F2)' : 'Valor da prova (Q1)', value: rec.agg, ok: okA, note: '' });
       out.base = rec.agg;
       q1Ok = okA;
       if (okA) cand.push({ val: rec.agg, keys: [] });
@@ -189,7 +216,7 @@
         out.base = rec.q1;
         if (q1Ok) cand.push({ val: rec.q1, keys: ['q1_1', 'q1_2'] });
       }
-      if (isNum(rec.f1) && isNum(rec.f2)) {
+      if (allowFinals && isNum(rec.f1) && isNum(rec.f2)) {
         var ff = r3(rec.f1 + rec.f2);
         var meetsF = ff >= minBase;
         var okF = q1Ok && meetsF;
@@ -259,13 +286,17 @@
     return { diff: 0, reason: (!a.hasDetail || !b.hasDetail) ? 'Empate (aguarda detalhe D/E)' : 'Empate técnico' };
   }
 
-  function rank(cfg, disc, sex, entries, results, overrides) {
-    var dcfg = cfg.disciplinas[disc];
-    var evs = cfg.eventos.filter(function (e) { return e.disciplinas.indexOf(disc) >= 0; });
-    var m = (cfg.minimos[disc] || {})[sex] || {};
-    var minBase = dcfg.tipo === 'late' ? m.q1 : m.base;
-    var nContar = isNum(dcfg.provasContam) ? dcfg.provasContam : (isNum(cfg.provasContam) ? cfg.provasContam : 2);
-    var useExcelencia = dcfg.usarExcelencia !== undefined ? dcfg.usarExcelencia : (cfg.usarExcelencia !== false);
+  function rank(cfg, disc, sex, entries, results, overrides, escalao) {
+    var rules = resolveDiscRules(cfg, disc, sex, escalao);
+    var evs = cfg.eventos.filter(function (e) {
+      var matchDisc = e.disciplinas.indexOf(disc) >= 0;
+      var matchEsc = !e.escaloes || !escalao || e.escaloes.indexOf(escalao) >= 0;
+      return matchDisc && matchEsc;
+    });
+    var m = rules.minObj;
+    var minBase = rules.tipo === 'late' ? m.q1 : m.base;
+    var nContar = rules.provasContam;
+    var useExcelencia = rules.useExcelencia;
 
     var rows = entries.map(function (en) {
       var per = {}, scoredList = [], sim = false, bestRaw = null, hasValidNe = false;
@@ -274,7 +305,7 @@
         var ov = overrides && overrides[ev.id] && overrides[ev.id][en.id];
         var rec = ov || (results[ev.id] && results[ev.id][en.id]) || null;
         if (ov) sim = true;
-        var s = scoreEvent(disc, sex, rec, cfg.minimos, dcfg.tipo, useExcelencia);
+        var s = scoreEvent(disc, sex, rec, cfg.minimos, rules.tipo, useExcelencia, m);
         if (s.neValid) hasValidNe = true;
         per[ev.id] = {
           rec: s.hydrated || rec,
@@ -340,7 +371,7 @@
       } else {
         r.rank = i + 1;
       }
-      r.naVaga = r.rank <= dcfg.vagas;
+      r.naVaga = r.rank <= rules.vagas;
     });
 
     rest.sort(function (a, b) {
@@ -350,7 +381,8 @@
 
     return {
       rows: ranked.concat(rest),
-      vagas: dcfg.vagas,
+      vagas: rules.vagas,
+      tipo: rules.tipo,
       provasContam: nContar,
       useExcelencia: useExcelencia,
       comMinimos: ranked.length,
@@ -491,7 +523,6 @@
       ptsByEv[ev.id] = computeEventPointsMap(ev.id, sexRes);
     });
 
-    /* 1) Recolher todos os atletas que aparecem em qualquer evento */
     var athletes = {};
     laCfg.eventos.forEach(function (ev) {
       var evR = sexRes[ev.id] || {};
@@ -504,7 +535,6 @@
       });
     });
 
-    /* 2) Critério 1: Campeonato do Mundo 2027 (Top 8 da Final, máx. 1 por NOC, ordenado por Q2) */
     var wchEv = laCfg.eventos.filter(function (e) { return e.tipo === 'wch'; })[0];
     var crit1ByAth = {};
     var crit1Nocs = {};
@@ -545,7 +575,6 @@
       });
     }
 
-    /* 3) Preparar dados de todos os atletas nas Taças do Mundo */
     var wcEvents = laCfg.eventos.filter(function (e) { return e.tipo === 'wc'; });
     var allFigRows = Object.keys(athletes).map(function (athId) {
       var ath = athletes[athId];
@@ -619,7 +648,6 @@
       }
     });
 
-    /* 4) Atribuir # 1..N e simular alocação dinâmica de vagas */
     var crit1Count = crit1Group.length;
     crit1Group.forEach(function (r, idx) {
       r.displayRank = idx + 1;
@@ -721,7 +749,6 @@
     var porQuotasSafe = porFigRows.filter(function (r) { return r.status === 'crit1' || r.status === 'crit2_safe'; }).length;
     var porQuotasBubble = porFigRows.filter(function (r) { return r.status === 'crit2_bubble'; }).length;
 
-    /* 5) Ranking Nacional FGP */
     var allEvents = laCfg.eventos;
     var porIds = Object.keys(athletes).filter(function (id) { return athletes[id].noc === 'POR'; });
     var fgpRows = porIds.map(function (athId) {
@@ -833,7 +860,8 @@
     rank: rank,
     hydrateRec: hydrateRec,
     rankLA28: rankLA28,
-    pointsFromRank: pointsFromRank
+    pointsFromRank: pointsFromRank,
+    resolveDiscRules: resolveDiscRules
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Apuramento = api;
