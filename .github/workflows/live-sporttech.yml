@@ -34,26 +34,32 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Verificar se algum evento alvo ainda está ativo (via live-targets.json)
+      - name: Verificar janela temporal (inicio <= agora <= fim)
         id: check_active
         run: |
-          ACTIVE=$(node -e '
+          STATUS=$(node -e '
             const fs = require("fs");
             const lt = JSON.parse(fs.readFileSync("scripts/live-targets.json", "utf8"));
-            const anyActive = (lt.targets || []).some(t => {
+            const now = Date.now();
+            let anyRunning = false;
+            let anyPending = false;
+
+            for (const t of (lt.targets || [])) {
               const cfg = JSON.parse(fs.readFileSync(t.configFile, "utf8"));
-              const res = fs.existsSync(t.resultsFile) ? JSON.parse(fs.readFileSync(t.resultsFile, "utf8")) : { live: true };
-              const fimStr = (cfg.eventos && cfg.eventos[0] && cfg.eventos[0].fim) || "2099-12-31";
-              const fimTs = Date.parse(fimStr + "T23:59:59Z");
-              return Date.now() <= fimTs && res.live !== false;
-            });
-            console.log(anyActive ? "true" : "false");
+              const ev = (cfg.eventos || []).find(e => e.id === t.eventoId) || (cfg.eventos && cfg.eventos[0]);
+              if (!ev) continue;
+              const iniTs = Date.parse((ev.inicio || "2000-01-01") + "T00:00:00Z");
+              const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59Z");
+              if (now >= iniTs && now <= fimTs) anyRunning = true;
+              if (now <= fimTs) anyPending = true;
+            }
+            console.log(anyRunning ? "running" : (anyPending ? "waiting" : "ended"));
           ')
-          echo "active=$ACTIVE" >> $GITHUB_OUTPUT
-          echo "Algum evento alvo ativo: $ACTIVE"
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "Estado do evento: $STATUS"
 
       - name: Executar scraper Sporttech (ciclo 10s)
-        if: steps.check_active.outputs.active == 'true' || github.event.inputs.modo != 'live_auto'
+        if: steps.check_active.outputs.status != 'ended' || github.event.inputs.modo != 'live_auto'
         env:
           MODO: ${{ github.event.inputs.modo || 'live_auto' }}
         run: |
@@ -77,22 +83,33 @@ jobs:
                 break
               fi
 
-              STILL_ACTIVE=$(node -e '
+              STATE=$(node -e '
                 const fs = require("fs");
                 const lt = JSON.parse(fs.readFileSync("scripts/live-targets.json", "utf8"));
-                const anyActive = (lt.targets || []).some(t => {
+                const now = Date.now();
+                let anyRunning = false;
+                let anyPending = false;
+                for (const t of (lt.targets || [])) {
                   const cfg = JSON.parse(fs.readFileSync(t.configFile, "utf8"));
-                  const res = fs.existsSync(t.resultsFile) ? JSON.parse(fs.readFileSync(t.resultsFile, "utf8")) : { live: true };
-                  const fimStr = (cfg.eventos && cfg.eventos[0] && cfg.eventos[0].fim) || "2099-12-31";
-                  const fimTs = Date.parse(fimStr + "T23:59:59Z");
-                  return Date.now() <= fimTs && res.live !== false;
-                });
-                console.log(anyActive ? "true" : "false");
+                  const ev = (cfg.eventos || []).find(e => e.id === t.eventoId) || (cfg.eventos && cfg.eventos[0]);
+                  if (!ev) continue;
+                  const iniTs = Date.parse((ev.inicio || "2000-01-01") + "T00:00:00Z");
+                  const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59Z");
+                  if (now >= iniTs && now <= fimTs) anyRunning = true;
+                  if (now <= fimTs) anyPending = true;
+                }
+                console.log(anyRunning ? "running" : (anyPending ? "waiting" : "ended"));
               ')
 
-              if [ "$STILL_ACTIVE" != "true" ]; then
-                echo "Data de fim ultrapassada nos JSONs ou live=false. A encerrar."
+              if [ "$STATE" = "ended" ]; then
+                echo "Evento terminado (agora > fim). A encerrar."
                 break
+              fi
+
+              if [ "$STATE" = "waiting" ]; then
+                echo "Antes do início da prova (agora < inicio). A aguardar..."
+                sleep 60
+                continue
               fi
 
               node scripts/scrape-sporttech.js
@@ -119,25 +136,26 @@ jobs:
             git push
           fi
 
-      - name: Encadear próximo turno (apenas se algum evento ainda não acabou)
+      - name: Encadear próximo turno (enquanto agora <= fim)
         if: ${{ !cancelled() && (github.event.inputs.modo == 'live_auto' || github.event.inputs.modo == '') }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          STILL_ACTIVE=$(node -e '
+          STILL_PENDING=$(node -e '
             const fs = require("fs");
             const lt = JSON.parse(fs.readFileSync("scripts/live-targets.json", "utf8"));
-            const anyActive = (lt.targets || []).some(t => {
+            const now = Date.now();
+            const anyPending = (lt.targets || []).some(t => {
               const cfg = JSON.parse(fs.readFileSync(t.configFile, "utf8"));
-              const res = fs.existsSync(t.resultsFile) ? JSON.parse(fs.readFileSync(t.resultsFile, "utf8")) : { live: true };
-              const fimStr = (cfg.eventos && cfg.eventos[0] && cfg.eventos[0].fim) || "2099-12-31";
-              const fimTs = Date.parse(fimStr + "T23:59:59Z");
-              return Date.now() <= fimTs && res.live !== false;
+              const ev = (cfg.eventos || []).find(e => e.id === t.eventoId) || (cfg.eventos && cfg.eventos[0]);
+              if (!ev) return false;
+              const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59Z");
+              return now <= fimTs;
             });
-            console.log(anyActive ? "true" : "false");
+            console.log(anyPending ? "true" : "false");
           ')
-          if [ "$STILL_ACTIVE" = "true" ]; then
+          if [ "$STILL_PENDING" = "true" ]; then
             gh workflow run live-sporttech.yml --repo "$GITHUB_REPOSITORY" --ref main -f modo=live_auto || true
           else
-            echo "Eventos concluídos. Não será iniciado novo turno."
+            echo "Todos os eventos terminaram. Não será iniciado novo turno."
           fi
