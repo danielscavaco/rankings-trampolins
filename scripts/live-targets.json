@@ -1,12 +1,20 @@
 {
   "targets": [
     {
-      "nome": "Teste Velocidade Live",
-      "url": "https://sporttech.io/events/COLOCA-AQUI-O-ID-DO-EVENTO/ovs/",
-      "eventoId": "teste_velocidade",
-      "configFile": "data/temp-live-config.json",
-      "athletesFile": "data/temp-live-athletes.json",
-      "resultsFile": "data/temp-live-results.json"
+      "nome": "TM Cottbus",
+      "url": "https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/",
+      "eventoId": "cottbus",
+      "configFile": "data/eg27-config.json",
+      "athletesFile": "data/eg27-athletes.json",
+      "resultsFile": "data/eg27-results.json"
+    },
+    {
+      "nome": "CM Nanjing",
+      "url": "https://gym.longinestiming.com/2026/Trampoline-18189/en-us/Default",
+      "eventoId": "nanjing",
+      "configFile": "data/eg27-config.json",
+      "athletesFile": "data/eg27-athletes.json",
+      "resultsFile": "data/eg27-results.json"
     }
   ]
 }
