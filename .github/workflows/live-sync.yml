@@ -70,57 +70,10 @@ jobs:
           elif [ "$MODO" = "sync_once" ]; then
             node scripts/sync-live.js
           else
-            START_TS=$(date +%s)
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            while true; do
-              NOW_TS=$(date +%s)
-
-              if [ $((NOW_TS - START_TS)) -ge 12600 ]; then
-                echo "Turno de 3h30m concluído. A encadear próximo turno..."
-                break
-              fi
-
-              STATE=$(node -e '
-                const fs = require("fs");
-                const lt = JSON.parse(fs.readFileSync("scripts/live-targets.json", "utf8"));
-                const now = Date.now();
-                let anyRunning = false;
-                let anyPending = false;
-                for (const t of (lt.targets || [])) {
-                  const cfg = JSON.parse(fs.readFileSync(t.configFile, "utf8"));
-                  const ev = (cfg.eventos || []).find(e => e.id === t.eventoId) || (cfg.eventos && cfg.eventos[0]);
-                  if (!ev) continue;
-                  const iniTs = Date.parse((ev.inicio || "2000-01-01") + "T00:00:00" + (ev.tz || "+14:00"));
-                  const fimTs = Date.parse((ev.fim || "2099-12-31") + "T23:59:59" + (ev.tz || "-12:00"));
-                  if (now >= iniTs && now <= fimTs) anyRunning = true;
-                  if (now <= fimTs) anyPending = true;
-                }
-                console.log(anyRunning ? "running" : (anyPending ? "waiting" : "ended"));
-              ')
-
-              if [ "$STATE" = "ended" ]; then
-                echo "Evento terminado (agora > fim). A encerrar."
-                break
-              fi
-
-              if [ "$STATE" = "waiting" ]; then
-                echo "Antes do início da prova (agora < inicio). A aguardar..."
-                sleep 60
-                continue
-              fi
-
-              node scripts/sync-live.js
-
-              git add $RESULT_FILES scripts/scrape-report.log
-              if ! git diff --staged --quiet; then
-                git commit -m "Live update resultados [skip ci]"
-                git push || (git pull --rebase -X theirs && git push)
-              fi
-
-              sleep 10
-            done
+            node scripts/sync-live.js --live
           fi
 
       - name: Guardar ficheiros (modos manuais check_only / sync_once)
