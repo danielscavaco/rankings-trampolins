@@ -3,7 +3,7 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-const EVENT_URL = process.env.CMGI_URL || 'https://sporttech.io/events/COLOCA-AQUI-O-ID-DO-CMGI/ovs/';
+const EVENT_URL = process.env.CMGI_URL || 'https://sporttech.io/events/01a1be6a-b476-781a-a380-de9079956fde/ovs/';
 const OUT_FILE = 'data/temp-cmgi-results.json';
 const INTERVAL_MS = 3000; // 3 segundos
 
