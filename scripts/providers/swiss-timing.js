@@ -64,7 +64,8 @@ function parseRoutineCell(cellHtml) {
   if (!totalMatch) return null;
 
   const total = Number(parseFloat(totalMatch[1]).toFixed(3));
-  if (!Number.isFinite(total) || total <= 0) return null;
+  // Aceita 0.000 quando a nota está publicada na célula (série concluída com zero)
+  if (!Number.isFinite(total) || total < 0) return null;
 
   const smallMatch = cellHtml.match(/<small>([\s\S]*?)<\/small>/i);
   const detail = extractJudgeScoresFromText(smallMatch ? smallMatch[1] : cellHtml);
@@ -126,16 +127,14 @@ function parseRankingTable(html, isSyn) {
 
     const totalMatch = rowHtml.match(/<td[^>]*class="[^"]*\btotal\b[^"]*"[^>]*>([\s\S]*?)<\/td>/i);
     const totalVal = totalMatch ? parseFloat(decodeHtml(totalMatch[1])) : NaN;
-    const total = Number.isFinite(totalVal) && totalVal > 0 ? Number(totalVal.toFixed(3)) : null;
+    const total = Number.isFinite(totalVal) && totalVal >= 0 ? Number(totalVal.toFixed(3)) : null;
 
     let routines = [];
     const hasSubScores = scoreCells.some(c => /<small>/i.test(c));
 
     if (hasSubScores) {
-      for (const cell of scoreCells) {
-        const parsed = parseRoutineCell(cell);
-        if (parsed) routines.push(parsed);
-      }
+      // Preserva a posição exata da célula (0 = Série 1, 1 = Série 2) mesmo quando Série 1 é 0.000
+      routines = scoreCells.map(cell => parseRoutineCell(cell));
     } else if (total !== null) {
       const singleDetail = extractJudgeScoresFromText(rowHtml);
       singleDetail.total = total;
@@ -157,11 +156,12 @@ function parseRankingTable(html, isSyn) {
       routines = [singleDetail];
     }
 
+    const validRoutines = routines.filter(Boolean);
     const finalTotal = total !== null
       ? total
-      : (routines.length > 0 ? Number(routines.reduce((acc, r) => acc + r.total, 0).toFixed(3)) : null);
+      : (validRoutines.length > 0 ? Number(validRoutines.reduce((acc, r) => acc + r.total, 0).toFixed(3)) : null);
 
-    if (routines.length === 0 && finalTotal === null) continue;
+    if (validRoutines.length === 0 && finalTotal === null) continue;
 
     entries.push({
       nome,
