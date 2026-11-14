@@ -1,63 +1,46 @@
-name: Teste CMGI Live
+name: CMGI Live Sync
 
 on:
   workflow_dispatch:
     inputs:
-      modo:
-        description: 'Modo de execução'
-        required: true
-        default: 'live_auto'
-        type: choice
-        options:
-          - live_auto
-          - sync_once
+      teste:
+        description: 'Fazer apenas uma leitura única agora (sem loop contínuo)'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '*/30 * * * *'
 
 permissions:
   contents: write
+  actions: write
+
+concurrency:
+  group: cmgi-live-sync
+  cancel-in-progress: false
 
 jobs:
-  cmgi:
+  sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 250
-    env:
-      # COLOCA AQUI O URL EXATO DO CMGI (ex: https://sporttech.io/events/xxxx-xxxx/ovs/)
-      CMGI_URL: https://sporttech.io/events/01a1be6a-b476-781a-a380-de9079956fde/ovs/
+    timeout-minutes: 320
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Executar sync CMGI
+      - name: Sincronizar Sporttech em tempo real
+        env:
+          CMGI_URL: ${{ secrets.CMGI_URL }}
+          SINGLE_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.teste && 'true' || 'false' }}
+          POLL_MS: '10000'
+          MIN_COMMIT_MS: '15000'
+          BUDGET_MS: '18000000'
+        run: node scripts/cmgi-sync.js
+
+      - name: Encadear execução seguinte
+        if: ${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.teste) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ "${{ github.event.inputs.modo }}" = "sync_once" ]; then
-            node scripts/cmgi-sync.js
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add data/temp-cmgi-results.json
-            if ! git diff --staged --quiet; then
-              git commit -m "Sync CMGI [skip ci]"
-              git push
-            fi
-          else
-            START_TS=$(date +%s)
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-
-            while true; do
-              NOW_TS=$(date +%s)
-              if [ $((NOW_TS - START_TS)) -ge 12600 ]; then
-                break
-              fi
-
-              node scripts/cmgi-sync.js
-
-              git add data/temp-cmgi-results.json
-              if ! git diff --staged --quiet; then
-                git commit -m "Live CMGI [skip ci]"
-                git push || (git pull --rebase -X theirs && git push)
-              fi
-
-              sleep 5
-            done
-          fi
+          gh workflow run cmgi-sync.yml --repo "$GITHUB_REPOSITORY" --ref main -f teste=false || true
