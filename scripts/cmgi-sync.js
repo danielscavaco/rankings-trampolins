@@ -40,14 +40,13 @@ function parseFrameDetail(f) {
   return out;
 }
 
-function isValidCompletedFrame(f, p) {
+function isValidCompletedFrame(f) {
   if (!f) return false;
-  const state = f.State || 0;
+  if ((f.State || 0) !== 3) return false;
 
-  // Na Sporttech, State === 3 é série concluída e avaliada; State > 3 (4, 5...) costuma ser DNS/DNF/DSQ
-  if (state !== 3) return false;
-
-  if (f.DNS || f.IsDNS || f.DidNotStart || p.DNS || p.IsDNS || p.DidNotStart) {
+  const log = String(f.ChangeLog || '');
+  // Na Sporttech, DNS / não iniciado é registado como "Fail" no ChangeLog e sem elementos/notas
+  if (/\b(fail|dns)\b/i.test(log) && (f.MarkTTT_G || 0) === 0 && !f.DifficultyElements) {
     return false;
   }
 
