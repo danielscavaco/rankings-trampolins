@@ -121,14 +121,6 @@ async function resolveSporttechApi(rawUrl) {
         const clube = cleanClub(a.Club || a.Team || a.Representing || 'POR');
         const key = `${disc}|${escalao}|${sexo}|${nome}`;
 
-        if (nome.toLowerCase().includes('francisco rodrigues') && disc === 'TUM') {
-          console.log('=== DEBUG FRANCISCO RODRIGUES ===');
-          console.log('Performance:', JSON.stringify(p));
-          for (const fid of (p.Frames || [])) {
-            console.log(`Frame ${fid}:`, JSON.stringify(F[String(fid)] || F[fid]));
-          }
-        }
-
         if (!athletesMap.has(key)) {
           athletesMap.set(key, { nome, disc, escalao, sexo, clube, rotinas: {}, q1: null, f: null });
         }
