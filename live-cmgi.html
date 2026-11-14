@@ -30,8 +30,9 @@
   <div id="app"></div>
 
   <script>
-    const OWNER = 'TEU-UTILIZADOR-GITHUB';
-    const REPO = 'TEU-REPOSITORIO';
+    const OWNER = 'danielscavaco';
+    const REPO = 'rankings-trampolins';
+    const FILE_PATH = 'data/temp-cmgi-results.json';
 
     const nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
     const fmt = v => (v === null || v === undefined) ? '—' : nf.format(v);
@@ -56,14 +57,18 @@
       return `<td>${fmt(r.e)}</td><td>${fmt(r.d)}</td><td>${fmt(r.p)}</td><td><b>${fmt(r.total)}</b></td>`;
     }
 
+    async function fetchLiveDoc() {
+      const res = await fetch(
+        `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`,
+        { cache: 'no-store', headers: { 'Accept': 'application/vnd.github.raw' } }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status} ao ler ${FILE_PATH}`);
+      return res.json();
+    }
+
     async function refresh() {
       try {
-        const res = await fetch(
-          `https://api.github.com/repos/${OWNER}/${REPO}/contents/data/temp-cmgi-results.json`,
-          { cache: 'no-store', headers: { 'Accept': 'application/vnd.github.raw' } }
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const doc = await res.json();
+        const doc = await fetchLiveDoc();
         const aths = doc.atletas || [];
 
         document.getElementById('meta').textContent =
@@ -109,7 +114,7 @@
             </table>`;
         }).join('');
       } catch (e) {
-        document.getElementById('meta').textContent = 'A aguardar primeiro push em data/temp-cmgi-results.json...';
+        document.getElementById('meta').textContent = `Erro: ${e.message}`;
       }
     }
 
