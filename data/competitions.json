@@ -24,18 +24,6 @@
     "results": "data/cm27-results.json"
   },
   {
-    "id": "teste26",
-    "engine": "fgp_minimos",
-    "ordemData": "2026-11-14",
-    "visivelDe": "2099-11-13",
-    "visivelAte": "2099-12-10",
-    "curto": "Teste Live",
-    "nome": "Ensaio Live Sporttech",
-    "config": "data/test-config.json",
-    "athletes": "data/test-athletes.json",
-    "results": "data/test-results.json"
-  },
-  {
     "id": "og28",
     "engine": "fig_olympic",
     "ordemData": "2028-07-14",
