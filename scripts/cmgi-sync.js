@@ -113,24 +113,24 @@ async function resolveSporttechApi(rawUrl) {
         }
         const rec = athletesMap.get(key);
 
-        const routines = [];
-        for (const fid of (p.Frames || []).slice(0, lim)) {
+        const routines = (p.Frames || []).slice(0, lim).map(fid => {
           const f = F[String(fid)] || F[fid];
-          if (f && (f.MarkTTT_G || 0) > 0 && (f.State || 0) >= 3) {
-            routines.push(parseFrameDetail(f));
+          if (f && (f.State || 0) >= 3) {
+            return parseFrameDetail(f);
           }
-        }
+          return null;
+        });
 
         const totalMk = (p.MarkTTT_G || 0) > 0 ? Number(((p.MarkTTT_G || 0) / 1000.0).toFixed(3)) : null;
 
         if (fase === 'q1') {
-          if (totalMk !== null) rec.q1 = totalMk;
-          if (routines[0]) rec.rotinas.q1_1 = routines[0];
-          if (routines[1]) rec.rotinas.q1_2 = routines[1];
-        } else if (routines[0]) {
-          rec.rotinas[fase] = routines[0];
-          if (totalMk !== null) rec[fase] = totalMk;
-        }
+  if (totalMk !== null) rec.q1 = totalMk;
+  if (routinesBySlot[0]) rec.rotinas.q1_1 = routinesBySlot[0];
+  if (routinesBySlot[1]) rec.rotinas.q1_2 = routinesBySlot[1];
+} else if (routinesBySlot[0]) {
+  rec.rotinas[fase] = routinesBySlot[0];
+  if (totalMk !== null) rec[fase] = totalMk;
+}
       }
     }
   }
