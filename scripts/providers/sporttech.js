@@ -98,17 +98,19 @@ async function loadStages(competitionUrl, logLines) {
         const filiados = athObjs.map(a => String(a.FederationID || a.License || a.NationalID || '').trim()).filter(Boolean);
         const figIds = athObjs.map(a => String(a.FIGID || a.FigId || a.LicenseFIG || '').trim()).filter(Boolean);
 
-        const routines = [];
-        for (const fid of (p.Frames || []).slice(0, lim)) {
+        // Mantém a posição fixa de cada série (0 = Série 1, 1 = Série 2) e aceita zero oficial (State >= 3)
+        const routines = (p.Frames || []).slice(0, lim).map(fid => {
           const f = F[String(fid)] || F[fid];
-          if (!f) continue;
-          const mk = f.MarkTTT_G || 0;
-          if (mk > 0 && (f.State || 0) >= 3) {
-            routines.push(parseFrameDetail(f));
+          if (f && (f.State || 0) >= 3) {
+            return parseFrameDetail(f);
           }
-        }
+          return null;
+        });
 
-        const totalMk = (p.MarkTTT_G || 0) > 0 ? Number(((p.MarkTTT_G || 0) / 1000.0).toFixed(3)) : null;
+        const hasCompletedRoutine = routines.some(Boolean);
+        const totalMk = ((p.MarkTTT_G || 0) > 0 || hasCompletedRoutine)
+          ? Number(((p.MarkTTT_G || 0) / 1000.0).toFixed(3))
+          : null;
 
         entries.push({
           nome: fullNames.join(' / '),
