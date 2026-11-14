@@ -40,6 +40,21 @@ function parseFrameDetail(f) {
   return out;
 }
 
+function isValidCompletedFrame(f, p) {
+  if (!f) return false;
+  const state = f.State || 0;
+
+  // Na Sporttech, State === 3 é série concluída e avaliada; State > 3 (4, 5...) costuma ser DNS/DNF/DSQ
+  if (state !== 3) return false;
+
+  // Verifica também flags explícitas de DNS na Performance ou no Frame
+  if (f.DNS || f.IsDNS || f.DidNotStart || p.DNS || p.IsDNS || p.DidNotStart) {
+    return false;
+  }
+
+  return true;
+}
+
 function isPortuguese(ath) {
   const vals = [ath.Club, ath.Team, ath.Representing, ath.Country, ath.Nation, ath.NOC]
     .map(v => String(v || '').trim().toUpperCase());
@@ -108,6 +123,14 @@ async function resolveSporttechApi(rawUrl) {
         const clube = cleanClub(a.Club || a.Team || a.Representing || 'POR');
         const key = `${disc}|${escalao}|${sexo}|${nome}`;
 
+        if (nome.toLowerCase().includes('francisco rodrigues') && disc === 'TUM') {
+          console.log('=== DEBUG FRANCISCO RODRIGUES ===');
+          console.log('Performance:', JSON.stringify(p));
+          for (const fid of (p.Frames || [])) {
+            console.log(`Frame ${fid}:`, JSON.stringify(F[String(fid)] || F[fid]));
+          }
+        }
+
         if (!athletesMap.has(key)) {
           athletesMap.set(key, { nome, disc, escalao, sexo, clube, rotinas: {}, q1: null, f: null });
         }
@@ -115,7 +138,7 @@ async function resolveSporttechApi(rawUrl) {
 
         const routines = (p.Frames || []).slice(0, lim).map(fid => {
           const f = F[String(fid)] || F[fid];
-          if (f && (f.State || 0) >= 3) {
+          if (isValidCompletedFrame(f, p)) {
             return parseFrameDetail(f);
           }
           return null;
@@ -141,16 +164,4 @@ async function resolveSporttechApi(rawUrl) {
 
   // Só atualiza o ficheiro se houver alteração real nos dados (evita commits vazios)
   let prevJson = '';
-  if (fs.existsSync(OUT_FILE)) {
-    try {
-      prevJson = JSON.stringify(JSON.parse(fs.readFileSync(OUT_FILE, 'utf8')).atletas || []);
-    } catch (_) {}
-  }
-
-  if (JSON.stringify(list) !== prevJson) {
-    fs.writeFileSync(OUT_FILE, JSON.stringify({ atualizadoEm: new Date().toISOString(), atletas: list }, null, 2));
-    console.log(`Atualizado: ${list.length} ginastas POR.`);
-  } else {
-    console.log(`Sem alterações (${list.length} ginastas POR).`);
-  }
-})();
+  if
