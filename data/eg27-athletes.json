@@ -10,6 +10,7 @@
   { "id": "dmt-f-matilde-nobre", "nome": "Matilde Nobre", "clube": "CCRAM", "disc": "DMT", "sexo": "F", "escalao": "SEN" },
   { "id": "dmt-f-beatriz-mendes", "nome": "Beatriz Mendes", "clube": "CFE", "disc": "DMT", "sexo": "F", "escalao": "SEN" },
   { "id": "dmt-f-matilde-oliveira", "nome": "Matilde Oliveira", "clube": "GCV", "disc": "DMT", "sexo": "F", "escalao": "SEN" },
+  { "id": "dmt-f-ines-reis", "nome": "Inês Reis", "clube": "SFRUA", "disc": "DMT", "sexo": "F", "escalao": "SEN" },
   { "id": "dmt-m-diogo-cabral", "nome": "Diogo Cabral", "clube": "AAE", "disc": "DMT", "sexo": "M", "escalao": "SEN" },
   { "id": "dmt-m-andre-dias", "nome": "André Dias", "clube": "APAGL", "disc": "DMT", "sexo": "M", "escalao": "SEN" },
   { "id": "dmt-m-francisco-jose", "nome": "Francisco José", "clube": "CFE", "disc": "DMT", "sexo": "M", "escalao": "SEN" },
@@ -21,5 +22,6 @@
   { "id": "tum-m-vasco-peso", "nome": "Vasco Peso", "clube": "SFEM", "disc": "TUM", "sexo": "M", "escalao": "SEN" },
   { "id": "tum-m-joao-saraiva", "nome": "João Saraiva", "clube": "ACM", "disc": "TUM", "sexo": "M", "escalao": "SEN" },
   { "id": "tum-m-diogo-gomes", "nome": "Diogo Gomes", "clube": "GMNA", "disc": "TUM", "sexo": "M", "escalao": "SEN" },
-  { "id": "tum-m-joao-azinheira", "nome": "João Azinheira", "clube": "GMNA", "disc": "TUM", "sexo": "M", "escalao": "SEN" }
+  { "id": "tum-m-joao-azinheira", "nome": "João Azinheira", "clube": "GMNA", "disc": "TUM", "sexo": "M", "escalao": "SEN" },
+  { "id": "tri-m-salvador-luzindro", "nome": "Salvador Luzindro", "clube": "TCL", "disc": "TRI", "sexo": "M", "escalao": "SEN" }
 ]
