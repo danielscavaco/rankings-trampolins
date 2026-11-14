@@ -43,4 +43,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run cmgi-sync.yml --repo "$GITHUB_REPOSITORY" --ref main -f teste=false || true
+          gh workflow run test-cmgi.yml --repo "$GITHUB_REPOSITORY" --ref main -f teste=false || true
