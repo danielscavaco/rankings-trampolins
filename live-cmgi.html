@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CMGI Live — Portugal</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, sans-serif; background: #f6f3f3; color: #221415; }
+    body { max-width: 1150px; margin: 24px auto; padding: 0 16px; }
+    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .badge { background: #dcf0e4; color: #146b3a; padding: 6px 12px; border-radius: 999px; font-weight: 600; font-size: 13px; }
+    h2 { margin: 24px 0 8px; color: #8b1a22; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgb(0 0 0 / .08); margin-bottom: 16px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #e2d5d6; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
+    th { background: #efe8e8; font-size: 11.5px; text-transform: uppercase; color: #6b5759; }
+    td:first-child, th:first-child { text-align: left; font-weight: 600; }
+    .tag { display: inline-block; background: #efe8e8; color: #221415; padding: 1px 6px; border-radius: 4px; font-size: 11px; margin-left: 6px; font-weight: 500; }
+    .tot { font-weight: 700; font-size: 14px; color: #146b3a; }
+    .muted { color: #8c7a7b; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1 style="margin:0;font-size:24px">CMGI — Resultados Portugal em Direto</h1>
+      <small id="meta" class="muted">A carregar...</small>
+    </div>
+    <div class="badge">LIVE · 3s</div>
+  </header>
+  <div id="app"></div>
+
+  <script>
+    const OWNER = 'TEU-UTILIZADOR-GITHUB';
+    const REPO = 'TEU-REPOSITORIO';
+
+    const nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+    const fmt = v => (v === null || v === undefined) ? '—' : nf.format(v);
+
+    function calcPrelim(disc, r1, r2, q1Fallback) {
+      const s1 = r1 ? r1.total : null;
+      const s2 = r2 ? r2.total : null;
+      if (disc === 'TRI') {
+        const vals = [s1, s2].filter(v => typeof v === 'number');
+        return vals.length ? Math.max(...vals) : (q1Fallback ?? null);
+      }
+      if (typeof s1 === 'number' && typeof s2 === 'number') return Number((s1 + s2).toFixed(3));
+      if (typeof s1 === 'number') return s1;
+      return q1Fallback ?? null;
+    }
+
+    function renderRoutineCells(r, isTra) {
+      if (!r) return isTra ? '<td colspan="6" class="muted">—</td>' : '<td colspan="4" class="muted">—</td>';
+      if (isTra) {
+        return `<td>${fmt(r.e)}</td><td>${fmt(r.d)}</td><td>${fmt(r.hd)}</td><td>${fmt(r.tof)}</td><td>${fmt(r.p)}</td><td><b>${fmt(r.total)}</b></td>`;
+      }
+      return `<td>${fmt(r.e)}</td><td>${fmt(r.d)}</td><td>${fmt(r.p)}</td><td><b>${fmt(r.total)}</b></td>`;
+    }
+
+    async function refresh() {
+      try {
+        const res = await fetch(
+          `https://api.github.com/repos/${OWNER}/${REPO}/contents/data/temp-cmgi-results.json`,
+          { cache: 'no-store', headers: { 'Accept': 'application/vnd.github.raw' } }
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const doc = await res.json();
+        const aths = doc.atletas || [];
+
+        document.getElementById('meta').textContent =
+          `Último push GitHub: ${doc.atualizadoEm || '—'} · Leitura browser: ${new Date().toLocaleTimeString('pt-PT')} · ${aths.length} ginastas POR`;
+
+        const sections = [
+          { code: 'TRI', label: 'Trampolim Individual (TRA) — Melhor Série', isTra: true },
+          { code: 'DMT', label: 'Duplo Mini-Trampolim (DMT) — Soma S1 + S2', isTra: false },
+          { code: 'TUM', label: 'Tumbling (TUM) — Soma S1 + S2', isTra: false }
+        ];
+
+        document.getElementById('app').innerHTML = sections.map(sec => {
+          const list = aths.filter(a => a.disc === sec.code);
+          if (!list.length) return '';
+
+          const headS = sec.isTra
+            ? '<th>E</th><th>D</th><th>HD</th><th>ToF</th><th>Pen</th><th>Total</th>'
+            : '<th>E</th><th>D</th><th>Pen</th><th>Total</th>';
+
+          const rows = list.map(a => {
+            const rot = a.rotinas || {};
+            const prelim = calcPrelim(sec.code, rot.q1_1, rot.q1_2, a.q1);
+            return `<tr>
+              <td>${a.nome}<span class="tag">${a.escalao} · ${a.sexo}</span></td>
+              ${renderRoutineCells(rot.q1_1, sec.isTra)}
+              ${renderRoutineCells(rot.q1_2, sec.isTra)}
+              <td class="tot">${fmt(prelim)}</td>
+            </tr>`;
+          }).join('');
+
+          return `<h2>${sec.label}</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th rowspan="2">Ginasta</th>
+                  <th colspan="${sec.isTra ? 6 : 4}">Série 1</th>
+                  <th colspan="${sec.isTra ? 6 : 4}">Série 2</th>
+                  <th rowspan="2">Total Prelim.</th>
+                </tr>
+                <tr>${headS}${headS}</tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>`;
+        }).join('');
+      } catch (e) {
+        document.getElementById('meta').textContent = 'A aguardar dados em data/temp-cmgi-results.json...';
+      }
+    }
+
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
