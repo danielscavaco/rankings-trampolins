@@ -25,7 +25,7 @@
       <h1 style="margin:0;font-size:24px">CMGI — Resultados Portugal em Direto</h1>
       <small id="meta" class="muted">A carregar...</small>
     </div>
-    <div class="badge">LIVE · 3s</div>
+    <div class="badge">LIVE · 5s</div>
   </header>
   <div id="app"></div>
 
@@ -109,12 +109,12 @@
             </table>`;
         }).join('');
       } catch (e) {
-        document.getElementById('meta').textContent = 'A aguardar dados em data/temp-cmgi-results.json...';
+        document.getElementById('meta').textContent = 'A aguardar primeiro push em data/temp-cmgi-results.json...';
       }
     }
 
     refresh();
-    setInterval(refresh, 3000);
+    setInterval(refresh, 5000);
   </script>
 </body>
 </html>
