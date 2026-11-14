@@ -13,4 +13,4 @@ jobs:
           node-version: '20'
       - run: node scripts/test-cmgi-live.js
         env:
-          CMGI_URL: https://sporttech.io/events/COLOCA-AQUI-O-ID-DO-CMGI/ovs/
+          CMGI_URL: https://sporttech.io/events/01a1be6a-b476-781a-a380-de9079956fde/ovs/
