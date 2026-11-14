@@ -67,19 +67,37 @@ async function loadStages(competitionUrl, logLines) {
       if (!isSenOnly && fase !== 'q1') continue;
 
       const cacheKey = `${st.LastEdit_G}|${st.FinishedFrames_G}|${st.InProgress_G}`;
-      let det = stageCache.get(String(sid));
-      if (!det || det.cacheKey !== cacheKey) {
-        try {
-          const rawDet = await fetchWithRetry(
-            `${apiBase}stages/${sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`
-          );
-          det = { cacheKey, data: rawDet };
-          stageCache.set(String(sid), det);
-        } catch (err) {
-          logLines.push(`[AVISO] Erro ao ler stage ${sid} (${c.Title}): ${err.message}`);
-          continue;
-        }
-      }
+let det = stageCache.get(String(sid));
+
+if (!det || det.cacheKey !== cacheKey) {
+  try {
+    const fetchStart = Date.now();
+
+    const rawDet = await fetchWithRetry(
+      `${apiBase}stages/${sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`
+    );
+
+    const elapsed = Date.now() - fetchStart;
+
+    det = {
+      cacheKey,
+      data: rawDet
+    };
+
+    stageCache.set(String(sid), det);
+
+    logLines.push(
+      `[CACHE MISS] Stage ${sid}: atualizado em ${(elapsed / 1000).toFixed(2)} s`
+    );
+
+  } catch (err) {
+    logLines.push(`[AVISO] Erro ao ler stage ${sid} (${c.Title}): ${err.message}`);
+    continue;
+  }
+
+} else {
+  logLines.push(`[CACHE HIT] Stage ${sid}: dados reutilizados`);
+}
 
       const A = det.data.Athletes || {};
       const P = det.data.Performances || {};
