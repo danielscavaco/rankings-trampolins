@@ -1,11 +1,17 @@
 'use strict';
 
 const fs = require('fs');
+const { execFileSync } = require('child_process');
 const { cleanClub, normalizeSex, fetchWithRetry } = require('./lib/core');
 
 const DISC_MAP = { 0: 'TRI', 1: 'SYN', 2: 'DMT', 3: 'TUM' };
 const KIND_MAP = { 0: 'q1', 6: 'q2', 3: 'f', 8: 'f1', 7: 'f2' };
 const OUT_FILE = 'data/temp-cmgi-results.json';
+
+const POLL_MS = Number(process.env.POLL_MS || 10000);         // Lê Sporttech a cada 10s
+const MIN_COMMIT_MS = Number(process.env.MIN_COMMIT_MS || 15000); // Intervalo mínimo entre commits (15s)
+const BUDGET_MS = Number(process.env.BUDGET_MS || 18000000);  // 5 horas por execução
+const SINGLE_RUN = process.env.SINGLE_RUN === 'true';
 
 function parseFrameDetail(f) {
   const T = (f.MarkTTT_G || 0) / 1000.0;
@@ -41,15 +47,12 @@ function parseFrameDetail(f) {
 }
 
 function isValidCompletedFrame(f) {
-  if (!f) return false;
-  if ((f.State || 0) !== 3) return false;
-
+  if (!f || (f.State || 0) !== 3) return false;
   const log = String(f.ChangeLog || '');
-  // Na Sporttech, DNS / não iniciado é registado como "Fail" no ChangeLog e sem elementos/notas
+  // Ignora registos de DNS / não iniciado ("Fail" / "DNS" no ChangeLog sem elementos nem pontuação)
   if (/\b(fail|dns)\b/i.test(log) && (f.MarkTTT_G || 0) === 0 && !f.DifficultyElements) {
     return false;
   }
-
   return true;
 }
 
@@ -74,23 +77,44 @@ async function resolveSporttechApi(rawUrl) {
     try {
       const data = await fetchWithRetry(`${base}event?fetch_event_competitions=true&fetch_competition_stages=true`);
       if (data && typeof data === 'object' && (data.Competitions || data.Stages || data.Id || data.Title)) {
-        return { apiBase: base, evData: data };
+        return base;
       }
-    } catch (_) {
-      // Tenta o próximo formato de endpoint
-    }
+    } catch (_) {}
   }
   throw new Error(`Nenhum endpoint da Sporttech aceitou o evento ${uuid}.`);
 }
 
-(async () => {
-  const { apiBase, evData } = await resolveSporttechApi(process.env.CMGI_URL);
+function git(...args) {
+  try {
+    execFileSync('git', args, { stdio: 'pipe' });
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function commitAndPush() {
+  git('add', OUT_FILE);
+  if (git('diff', '--cached', '--quiet')) return true;
+  git('commit', '-m', 'Live CMGI: atualização automática (Sporttech)');
+
+  for (let i = 0; i < 4; i++) {
+    if (git('push')) return true;
+    git('pull', '--rebase', '-X', 'theirs');
+  }
+  console.error('[AVISO] Falha ao fazer git push.');
+  return false;
+}
+
+const stageCache = new Map();
+
+async function pollOnce(apiBase) {
+  const evData = await fetchWithRetry(`${apiBase}event?fetch_event_competitions=true&fetch_competition_stages=true`);
   const comps = evData.Competitions || {};
   const stages = evData.Stages || {};
-
   const athletesMap = new Map();
 
-  for (const [, c] of Object.entries(comps)) {
+  for (const c of Object.values(comps)) {
     if ((c.Title || '').toLowerCase() === 'test') continue;
     const disc = DISC_MAP[c.Discipline];
     if (!disc || disc === 'SYN') continue;
@@ -103,13 +127,19 @@ async function resolveSporttechApi(rawUrl) {
       if (!st) continue;
       const fase = KIND_MAP[st.Kind] || String(st.Kind);
 
-      const det = await fetchWithRetry(
-        `${apiBase}stages/${sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`
-      );
+      const cacheKey = `${st.LastEdit_G}|${st.FinishedFrames_G}|${st.InProgress_G}`;
+      let det = stageCache.get(String(sid));
+      if (!det || det.cacheKey !== cacheKey) {
+        const rawDet = await fetchWithRetry(
+          `${apiBase}stages/${sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`
+        );
+        det = { cacheKey, data: rawDet };
+        stageCache.set(String(sid), det);
+      }
 
-      const A = det.Athletes || {};
-      const P = det.Performances || {};
-      const F = det.Frames || {};
+      const A = det.data.Athletes || {};
+      const P = det.data.Performances || {};
+      const F = det.data.Frames || {};
       const lim = st.PerfomanceFramesLimit || 2;
 
       for (const p of Object.values(P)) {
@@ -128,10 +158,7 @@ async function resolveSporttechApi(rawUrl) {
 
         const routines = (p.Frames || []).slice(0, lim).map(fid => {
           const f = F[String(fid)] || F[fid];
-          if (isValidCompletedFrame(f, p)) {
-            return parseFrameDetail(f);
-          }
-          return null;
+          return isValidCompletedFrame(f) ? parseFrameDetail(f) : null;
         });
 
         const totalMk = (p.MarkTTT_G || 0) > 0 ? Number(((p.MarkTTT_G || 0) / 1000.0).toFixed(3)) : null;
@@ -140,17 +167,28 @@ async function resolveSporttechApi(rawUrl) {
           if (totalMk !== null) rec.q1 = totalMk;
           if (routines[0]) rec.rotinas.q1_1 = routines[0];
           if (routines[1]) rec.rotinas.q1_2 = routines[1];
-        } else if (routines[0]) {
-          rec.rotinas[fase] = routines[0];
-          if (totalMk !== null) rec[fase] = totalMk;
+        } else {
+          const firstCompleted = routines.find(Boolean);
+          if (firstCompleted) {
+            rec.rotinas[fase] = firstCompleted;
+            if (totalMk !== null) rec[fase] = totalMk;
+          }
         }
       }
     }
   }
 
-  const list = [...athletesMap.values()].sort((a, b) =>
+  return [...athletesMap.values()].sort((a, b) =>
     a.disc.localeCompare(b.disc) || a.escalao.localeCompare(b.escalao) || a.nome.localeCompare(b.nome, 'pt')
   );
+}
+
+(async () => {
+  const startTime = Date.now();
+  git('config', 'user.name', 'CMGI Live Sync');
+  git('config', 'user.email', 'actions@users.noreply.github.com');
+
+  const apiBase = await resolveSporttechApi(process.env.CMGI_URL);
 
   let prevJson = '';
   if (fs.existsSync(OUT_FILE)) {
@@ -159,10 +197,27 @@ async function resolveSporttechApi(rawUrl) {
     } catch (_) {}
   }
 
-  if (JSON.stringify(list) !== prevJson) {
-    fs.writeFileSync(OUT_FILE, JSON.stringify({ atualizadoEm: new Date().toISOString(), atletas: list }, null, 2));
-    console.log(`Atualizado: ${list.length} ginastas POR.`);
-  } else {
-    console.log(`Sem alterações (${list.length} ginastas POR).`);
+  let lastCommitTime = 0;
+
+  while (true) {
+    try {
+      const list = await pollOnce(apiBase);
+      const currJson = JSON.stringify(list);
+
+      if (currJson !== prevJson && (Date.now() - lastCommitTime >= MIN_COMMIT_MS || SINGLE_RUN)) {
+        fs.mkdirSync('data', { recursive: true });
+        fs.writeFileSync(OUT_FILE, JSON.stringify({ atualizadoEm: new Date().toISOString(), atletas: list }));
+        if (commitAndPush()) {
+          prevJson = currJson;
+          lastCommitTime = Date.now();
+          console.log(`[${new Date().toISOString()}] Atualizado: ${list.length} ginastas POR.`);
+        }
+      }
+    } catch (err) {
+      console.error(`[${new Date().toISOString()}] Erro no ciclo:`, err.message);
+    }
+
+    if (SINGLE_RUN || (Date.now() - startTime >= BUDGET_MS)) break;
+    await new Promise(r => setTimeout(r, POLL_MS));
   }
 })();
