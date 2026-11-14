@@ -143,20 +143,50 @@ function matchAthlete(ath, stageEntries) {
   return null;
 }
 
-async function fetchWithRetry(url, { accept = 'application/json' } = {}) {
+async function fetchWithRetry(
+  url,
+  { accept = 'application/json', timeoutMs = 12000 } = {}
+) {
   for (let i = 0; i < 3; i++) {
+    const controller = new AbortController();
+
+    const timeout = setTimeout(
+      () => controller.abort(),
+      timeoutMs
+    );
+
     try {
       const res = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) RankingsTrampolins/2.0',
           'Accept': accept
-        }
+        },
+        signal: controller.signal
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return accept.includes('json') ? await res.json() : await res.text();
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      return accept.includes('json')
+        ? await res.json()
+        : await res.text();
+
     } catch (err) {
-      if (i === 2) throw err;
-      await new Promise(r => setTimeout(r, 1500 * (i + 1)));
+      if (i === 2) {
+        throw err;
+      }
+
+      console.warn(
+        `[FETCH] Tentativa ${i + 1}/3 falhou: ${url} | ${err.message}`
+      );
+
+      await new Promise(
+        resolve => setTimeout(resolve, 1500 * (i + 1))
+      );
+
+    } finally {
+      clearTimeout(timeout);
     }
   }
 }
