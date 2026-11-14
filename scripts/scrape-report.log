@@ -1,8 +1,54 @@
 ====================================================================
-RELATÓRIO LIVE SYNC MULTI-SISTEMA (LIVE SYNC) — 2026-11-13 19:51:42
-Competições alvo: World Championships 2026 (Swiss Timing) | WC Cottbus
+RELATÓRIO LIVE SYNC MULTI-SISTEMA (LIVE SYNC) — 2026-11-14 04:52:06
+Competições alvo: TM Cottbus | CM Nanjing
 ====================================================================
 
+Fonte [Sporttech OVS]: https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/
+Stages carregados (Sporttech OVS): 11
+  • [1] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (44 atletas)
+  • [9] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q2 (24 atletas)
+  • [14] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
+  • [2] Women (SEN) -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (26 atletas)
+  • [8] Women (SEN) -> TRI | Escalões: [SEN] | Sexo: F | Fase: f (8 atletas)
+  • [3] Men (SEN) -> SYN | Escalões: [SEN] | Sexo: M | Fase: q1 (14 atletas)
+  • [12] Men (SEN) -> SYN | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
+  • [4] Women (SEN) -> SYN | Escalões: [SEN] | Sexo: F | Fase: q1 (7 atletas)
+  • [11] Women (SEN) -> SYN | Escalões: [SEN] | Sexo: F | Fase: f (6 atletas)
+  • [5] Mixed (SEN) -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q1 (10 atletas)
+  • [10] Mixed (SEN) -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: f (7 atletas)
+
+====================================================================
+DESTINO: TM Cottbus (data/eg27-results.json -> "cottbus")
+====================================================================
+[OK] Catarina Nunes (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 52.25 (séries: 52.25 + 51.06)
+[OK] Sofia Correia (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 48.51 (séries: 6.03 + 48.51)
+[OK] Inês Reis (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 37.93 (séries: 10.31 + 37.93)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 64.75 (séries: 64.75 + 13.93)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 64.37 (séries: 64.37)
+[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [f] via Nome | Nota: 7.15 (séries: 7.15)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 61.57 (séries: 61.57 + 0)
+[OK] Pedro Ferreira (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 60.08 (séries: 60.08)
+[OK] Lucas Santos (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 59.23 (séries: 58.7 + 59.23)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 59.51 (séries: 58.59 + 59.51)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 60.11 (séries: 60.11)
+[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [f] via Nome | Nota: 60.03 (séries: 60.03)
+[ERRO - SEM PROVA] Alexandra Garcia (DMT · SEN · F · AGCM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Matilde Nobre (DMT · SEN · F · CCRAM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Beatriz Mendes (DMT · SEN · F · CFE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Matilde Oliveira (DMT · SEN · F · GCV) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Cabral (DMT · SEN · M · AAE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] André Dias (DMT · SEN · M · APAGL) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Francisco José (DMT · SEN · M · CFE) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Fernandes (DMT · SEN · M · LGC) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Francisca Pinto (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Mariana Cascalheira (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Matilde Santos (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Salomé Ferraz (TUM · SEN · F · SFEM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Vasco Peso (TUM · SEN · M · SFEM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] João Saraiva (TUM · SEN · M · ACM) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] Diogo Gomes (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
+[ERRO - SEM PROVA] João Azinheira (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
+RESUMO (TM Cottbus): 7 encontrados | 16 com erro/não encontrados | 12 fases atualizadas.
 Fonte [Swiss Timing]: https://gym.longinestiming.com/2026/Trampoline-18189/en-us/Default
 Stages carregados (Swiss Timing): 45
   • [000018040001010401] Men's Tumbling - Qualification -> TUM | Escalões: [SEN] | Sexo: M | Fase: q1 (42 atletas)
@@ -20,15 +66,15 @@ Stages carregados (Swiss Timing): 45
   • [000018040001020302] Women's Double Mini - Qualification Round 2 -> DMT | Escalões: [SEN] | Sexo: F | Fase: q2 (16 atletas)
   • [000018040001030102] Mixed Synchro - Qualification Round 2 -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q2 (16 atletas)
   • [000018040001020405] Women's Tumbling - Team Final -> TUM | Escalões: [SEN] | Sexo: F | Fase: tf (23 atletas)
-  • [000018040001010305] Men's Double Mini - Team Final -> DMT | Escalões: [SEN] | Sexo: M | Fase: tf (13 atletas)
+  • [000018040001010305] Men's Double Mini - Team Final -> DMT | Escalões: [SEN] | Sexo: M | Fase: tf (15 atletas)
   • [000018040001020305] Women's Double Mini - Team Final -> DMT | Escalões: [SEN] | Sexo: F | Fase: tf (15 atletas)
   • [000018040001010405] Men's Tumbling - Team Final -> TUM | Escalões: [SEN] | Sexo: M | Fase: tf (15 atletas)
-  • [000018040001010302] Men's Double Mini - Qualification Round 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: q2 (23 atletas)
+  • [000018040001010302] Men's Double Mini - Qualification Round 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: q2 (24 atletas)
   • [000018040001020402] Women's Tumbling - Qualification Round 2 -> TUM | Escalões: [SEN] | Sexo: F | Fase: q2 (24 atletas)
   • [000018040001010102] Men's Trampoline - Qualification Round 2 -> TRI | Escalões: [SEN] | Sexo: M | Fase: q2 (24 atletas)
   • [000018040001020102] Women's Trampoline - Qualification Round 2 -> TRI | Escalões: [SEN] | Sexo: F | Fase: q2 (24 atletas)
   • [000018040001010303] Men's Double Mini - Final 1 -> DMT | Escalões: [SEN] | Sexo: M | Fase: f1 (8 atletas)
-  • [000018040001010304] Men's Double Mini - Final 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: f2 (3 atletas)
+  • [000018040001010304] Men's Double Mini - Final 2 -> DMT | Escalões: [SEN] | Sexo: M | Fase: f2 (4 atletas)
   • [000018040001020403] Women's Tumbling - Final 1 -> TUM | Escalões: [SEN] | Sexo: F | Fase: f1 (7 atletas)
   • [000018040001020404] Women's Tumbling - Final 2 -> TUM | Escalões: [SEN] | Sexo: F | Fase: f2 (4 atletas)
   • [000018040001030103] Mixed Synchro - Individual Final -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: f (8 atletas)
@@ -52,7 +98,7 @@ Stages carregados (Swiss Timing): 45
   • [000018040001020406] Women's Tumbling - Team All Around Final -> TUM | Escalões: [SEN] | Sexo: F | Fase: aa (5 atletas)
 
 ====================================================================
-DESTINO: World Championships 2026 (Swiss Timing) (data/results.json -> "nanjing")
+DESTINO: CM Nanjing (data/eg27-results.json -> "nanjing")
 ====================================================================
 [OK] Catarina Nunes (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 51.78 (séries: 51.78 + 47.45)
 [OK] Sofia Correia (TRI · SEN · F) -> "Women's Trampoline - Qualification" [q1] via Nome | Nota: 53.6 (séries: 38.64 + 53.6)
@@ -80,6 +126,7 @@ DESTINO: World Championships 2026 (Swiss Timing) (data/results.json -> "nanjing"
 [OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 20.5 (séries: 20.5)
 [OK] Diogo Cabral (DMT · SEN · M) -> "Men's Double Mini - Team All Around Final" [aa] via Nome | Nota: 29.2 (séries: 29.2)
 [OK] André Dias (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 54.7 (séries: 27.7 + 27)
+[OK] André Dias (DMT · SEN · M) -> "Men's Double Mini - Qualification Round 2" [q2] via Nome | Nota: 0 (séries: 0)
 [OK] Francisco José (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 46.4 (séries: 26 + 20.4)
 [OK] Francisco José (DMT · SEN · M) -> "Men's Double Mini - Team Final" [tf] via Nome | Nota: 27 (séries: 27)
 [OK] Diogo Fernandes (DMT · SEN · M) -> "Men's Double Mini - Qualification" [q1] via Nome | Nota: 55 (séries: 27.7 + 27.3)
@@ -107,50 +154,4 @@ DESTINO: World Championships 2026 (Swiss Timing) (data/results.json -> "nanjing"
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification" [q1] via Nome | Nota: 51.3 (séries: 27 + 24.3)
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Qualification Round 2" [q2] via Nome | Nota: 20.9 (séries: 20.9)
 [OK] João Azinheira (TUM · SEN · M) -> "Men's Tumbling - Team Final" [tf] via Nome | Nota: 25.1 (séries: 25.1)
-RESUMO (World Championships 2026 (Swiss Timing)): 21 encontrados | 2 com erro/não encontrados | 51 fases atualizadas.
-Fonte [Sporttech OVS]: https://sporttech.io/events/1d53811b-c3b5-4bfc-78d9-751d8bf78f9c/ovs/
-Stages carregados (Sporttech OVS): 11
-  • [1] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q1 (44 atletas)
-  • [9] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: q2 (24 atletas)
-  • [14] Men (SEN) -> TRI | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
-  • [2] Women (SEN) -> TRI | Escalões: [SEN] | Sexo: F | Fase: q1 (26 atletas)
-  • [8] Women (SEN) -> TRI | Escalões: [SEN] | Sexo: F | Fase: f (8 atletas)
-  • [3] Men (SEN) -> SYN | Escalões: [SEN] | Sexo: M | Fase: q1 (14 atletas)
-  • [12] Men (SEN) -> SYN | Escalões: [SEN] | Sexo: M | Fase: f (8 atletas)
-  • [4] Women (SEN) -> SYN | Escalões: [SEN] | Sexo: F | Fase: q1 (7 atletas)
-  • [11] Women (SEN) -> SYN | Escalões: [SEN] | Sexo: F | Fase: f (6 atletas)
-  • [5] Mixed (SEN) -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: q1 (10 atletas)
-  • [10] Mixed (SEN) -> SYN | Escalões: [SEN] | Sexo: Mix | Fase: f (7 atletas)
-
-====================================================================
-DESTINO: WC Cottbus (data/results.json -> "cottbus")
-====================================================================
-[OK] Catarina Nunes (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 52.25 (séries: 52.25 + 51.06)
-[OK] Sofia Correia (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 48.51 (séries: 6.03 + 48.51)
-[OK] Inês Reis (TRI · SEN · F) -> "Women (SEN)" [q1] via Nome | Nota: 37.93 (séries: 10.31 + 37.93)
-[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 64.75 (séries: 64.75 + 13.93)
-[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 64.37 (séries: 64.37)
-[OK] Gabriel Albuquerque (TRI · SEN · M) -> "Men (SEN)" [f] via Nome | Nota: 7.15 (séries: 7.15)
-[OK] Pedro Ferreira (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 61.57 (séries: 61.57)
-[OK] Pedro Ferreira (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 60.08 (séries: 60.08)
-[OK] Lucas Santos (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 59.23 (séries: 58.7 + 59.23)
-[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [q1] via Nome | Nota: 59.51 (séries: 58.59 + 59.51)
-[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [q2] via Nome | Nota: 60.11 (séries: 60.11)
-[OK] Diogo Abreu (TRI · SEN · M) -> "Men (SEN)" [f] via Nome | Nota: 60.03 (séries: 60.03)
-[ERRO - SEM PROVA] Alexandra Garcia (DMT · SEN · F · AGCM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Nobre (DMT · SEN · F · CCRAM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Beatriz Mendes (DMT · SEN · F · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Oliveira (DMT · SEN · F · GCV) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Cabral (DMT · SEN · M · AAE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] André Dias (DMT · SEN · M · APAGL) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisco José (DMT · SEN · M · CFE) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Fernandes (DMT · SEN · M · LGC) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Francisca Pinto (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Mariana Cascalheira (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Matilde Santos (TUM · SEN · F · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Salomé Ferraz (TUM · SEN · F · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Vasco Peso (TUM · SEN · M · SFEM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Saraiva (TUM · SEN · M · ACM) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] Diogo Gomes (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
-[ERRO - SEM PROVA] João Azinheira (TUM · SEN · M · GMNA) -> Nenhuma prova correspondente encontrada.
-RESUMO (WC Cottbus): 7 encontrados | 16 com erro/não encontrados | 12 fases atualizadas.
+RESUMO (CM Nanjing): 21 encontrados | 2 com erro/não encontrados | 52 fases atualizadas.
