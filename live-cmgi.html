@@ -26,13 +26,17 @@
       <h1 style="margin:0;font-size:24px">CMGI — Resultados Portugal em Direto</h1>
       <small id="meta" class="muted">A ligar à Sporttech...</small>
     </div>
-    <div class="badge">LIVE · 3s (Direto Sporttech)</div>
+    <div class="badge">LIVE · 4s</div>
   </header>
   <div id="app"></div>
 
   <script>
-    // Cola aqui o URL do evento na Sporttech (o mesmo que tens no Secret CMGI_URL)
-    const CMGI_URL = 'https://sporttech.io/events/01a1be6a-b476-781a-a380-de9079956fde/ovs/';
+    // Cola aqui o URL do evento na Sporttech
+    const CMGI_URL = 'https://sporttech.io/events/COLOCA-AQUI-O-UUID/ovs/event/schedule';
+
+    const OWNER = 'danielscavaco';
+    const REPO = 'rankings-trampolins';
+    const FALLBACK_FILE = 'data/temp-cmgi-results.json';
 
     const DISC_MAP = { 0: 'TRI', 1: 'SYN', 2: 'DMT', 3: 'TUM' };
     const KIND_MAP = { 0: 'q1', 6: 'q2', 3: 'f', 8: 'f1', 7: 'f2' };
@@ -85,33 +89,63 @@
       return out;
     }
 
+    // Wrappers CORS sem cache para aceder à Sporttech a partir do browser
+    const PROXIES = [
+      u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+      u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+      u => u // Tenta direto caso o browser/extensão permita
+    ];
+
+    let workingProxyIdx = 0;
     let resolvedBase = null;
+
+    async function fetchProxiedJson(targetUrl) {
+      const sep = targetUrl.includes('?') ? '&' : '?';
+      const bustedUrl = `${targetUrl}${sep}_=${Date.now()}`;
+
+      for (let attempt = 0; attempt < PROXIES.length; attempt++) {
+        const idx = (workingProxyIdx + attempt) % PROXIES.length;
+        try {
+          const res = await fetch(PROXIES[idx](bustedUrl), { cache: 'no-store' });
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            workingProxyIdx = idx;
+            return data;
+          }
+        } catch (_) {}
+      }
+      throw new Error('Proxies CORS indisponíveis');
+    }
+
     async function getSporttechBase() {
       if (resolvedBase) return resolvedBase;
       const uuid = (CMGI_URL.match(/events\/([0-9a-f-]{36})/i) || [])[1];
       if (!uuid) throw new Error('UUID inválido em CMGI_URL');
+
       for (const base of [
         `https://sporttech.io/events/${uuid}/ovs/api/`,
         `https://sporttech.io/events/${uuid}/livescore/api/`,
         `https://sporttech.io/api/events/${uuid}/`
       ]) {
         try {
-          const r = await fetch(`${base}event?fetch_event_competitions=true&fetch_competition_stages=true`, { cache: 'no-store' });
-          if (r.ok) { resolvedBase = base; return base; }
+          const data = await fetchProxiedJson(`${base}event?fetch_event_competitions=true&fetch_competition_stages=true`);
+          if (data && (data.Competitions || data.Stages || data.Id)) {
+            resolvedBase = base;
+            return base;
+          }
         } catch (_) {}
       }
-      throw new Error('Não foi possível ligar à API da Sporttech');
+      throw new Error('Sem resposta da Sporttech');
     }
 
     async function fetchDirectFromSporttech() {
       const apiBase = await getSporttechBase();
-      const evRes = await fetch(`${apiBase}event?fetch_event_competitions=true&fetch_competition_stages=true`, { cache: 'no-store' });
-      const evData = await evRes.json();
+      const evData = await fetchProxiedJson(`${apiBase}event?fetch_event_competitions=true&fetch_competition_stages=true`);
       const comps = evData.Competitions || {};
       const stages = evData.Stages || {};
       const athletesMap = new Map();
 
-      // Lê todos os stages em paralelo para máxima velocidade (< 400ms total)
       const stageTasks = [];
       for (const c of Object.values(comps)) {
         if ((c.Title || '').toLowerCase() === 'test') continue;
@@ -130,8 +164,7 @@
 
       const stageResults = await Promise.all(
         stageTasks.map(t =>
-          fetch(`${apiBase}stages/${t.sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`, { cache: 'no-store' })
-            .then(r => r.json())
+          fetchProxiedJson(`${apiBase}stages/${t.sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`)
             .then(det => ({ ...t, det }))
         )
       );
@@ -174,6 +207,13 @@
       );
     }
 
+    async function fetchFallbackGitHub() {
+      const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${FALLBACK_FILE}?t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const doc = await res.json();
+      return doc.atletas || [];
+    }
+
     function calcPrelim(disc, r1, r2, q1Fallback) {
       const s1 = r1 ? r1.total : null;
       const s2 = r2 ? r2.total : null;
@@ -193,11 +233,19 @@
     async function refresh() {
       try {
         const t0 = performance.now();
-        const aths = await fetchDirectFromSporttech();
-        const ms = Math.round(performance.now() - t0);
+        let aths;
+        let sourceLabel;
+
+        try {
+          aths = await fetchDirectFromSporttech();
+          sourceLabel = `Direto Sporttech (${Math.round(performance.now() - t0)}ms)`;
+        } catch (_) {
+          aths = await fetchFallbackGitHub();
+          sourceLabel = 'Backup GitHub';
+        }
 
         document.getElementById('meta').textContent =
-          `Direto Sporttech (${ms}ms) · Atualizado: ${new Date().toLocaleTimeString('pt-PT')} · ${aths.length} ginastas POR`;
+          `${sourceLabel} · Atualizado: ${new Date().toLocaleTimeString('pt-PT')} · ${aths.length} ginastas POR`;
 
         const sections = [
           { code: 'TRI', label: 'Trampolim Individual (TRA) — Melhor Série', isTra: true },
@@ -262,7 +310,7 @@
     }
 
     refresh();
-    setInterval(refresh, 3000);
+    setInterval(refresh, 4000);
   </script>
 </body>
 </html>
