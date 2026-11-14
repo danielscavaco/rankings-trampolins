@@ -1,10 +1,11 @@
 <script>
-    // Cola aqui o URL do evento na Sporttech
     const CMGI_URL = 'https://sporttech.io/events/01a1be6a-b476-781a-a380-de9079956fde/ovs/';
 
     const OWNER = 'danielscavaco';
     const REPO = 'rankings-trampolins';
+    const BRANCH = 'main';
     const FALLBACK_FILE = 'data/temp-cmgi-results.json';
+    const RAW_GITHUB_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${FALLBACK_FILE}`;
 
     const DISC_MAP = { 0: 'TRI', 1: 'SYN', 2: 'DMT', 3: 'TUM' };
     const KIND_MAP = { 0: 'q1', 6: 'q2', 3: 'f', 8: 'f1', 7: 'f2' };
@@ -184,12 +185,10 @@
       );
     }
 
-    async function fetchFallbackGitHub() {
-      // Caminho relativo no próprio GitHub Pages (sem CORS e sem limite de API)
-      const res = await fetchWithTimeout(`./${FALLBACK_FILE}?t=${Date.now()}`, {}, 4000);
+    async function fetchFastGitHubRaw() {
+      const res = await fetchWithTimeout(`${RAW_GITHUB_URL}?t=${Date.now()}`, {}, 4000);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const doc = await res.json();
-      return doc.atletas || [];
+      return await res.json();
     }
 
     function calcPrelim(disc, r1, r2, q1Fallback) {
@@ -210,9 +209,9 @@
 
     function renderTables(aths) {
       const sections = [
-        { code: 'TRI', label: 'Trampolim Individual (TRA) — Melhor Série', isTra: true },
-        { code: 'DMT', label: 'Duplo Mini-Trampolim (DMT) — Soma S1 + S2', isTra: false },
-        { code: 'TUM', label: 'Tumbling (TUM) — Soma S1 + S2', isTra: false }
+        { code: 'TRI', label: 'Trampolim Individual (TRA)', isTra: true },
+        { code: 'DMT', label: 'Duplo Mini-Trampolim (DMT)', isTra: false },
+        { code: 'TUM', label: 'Tumbling (TUM)', isTra: false }
       ];
 
       document.getElementById('app').innerHTML = sections.map(sec => {
@@ -268,31 +267,29 @@
       }).join('');
     }
 
-    let isFirstLoad = true;
-
     async function refresh() {
-      // No arranque, carrega imediatamente o JSON local para não haver ecrã branco
-      if (isFirstLoad) {
-        isFirstLoad = false;
-        fetchFallbackGitHub().then(aths => {
-          if (aths.length && !document.getElementById('app').innerHTML) {
-            renderTables(aths);
-            document.getElementById('meta').textContent = `Carregado · A sincronizar em direto...`;
-          }
-        }).catch(() => {});
-      }
-
+      if (document.visibilityState === 'hidden') return;
       try {
         const t0 = performance.now();
-        let aths;
-        let sourceLabel;
+        let aths = [];
+        let sourceLabel = '';
 
         try {
+          const doc = await fetchFastGitHubRaw();
+          aths = doc.atletas || [];
+          const ageSec = doc.atualizadoEm ? Math.round((Date.now() - new Date(doc.atualizadoEm).getTime()) / 1000) : 999;
+          sourceLabel = `GitHub Live (${Math.round(performance.now() - t0)}ms · sync há ${ageSec}s)`;
+
+          if (ageSec > 45) {
+            const direct = await fetchDirectFromSporttech();
+            if (direct.length) {
+              aths = direct;
+              sourceLabel = `Direto Sporttech (${Math.round(performance.now() - t0)}ms)`;
+            }
+          }
+        } catch (_) {
           aths = await fetchDirectFromSporttech();
           sourceLabel = `Direto Sporttech (${Math.round(performance.now() - t0)}ms)`;
-        } catch (err) {
-          aths = await fetchFallbackGitHub();
-          sourceLabel = `GitHub Pages (${err.message})`;
         }
 
         renderTables(aths);
@@ -304,5 +301,6 @@
     }
 
     refresh();
-    setInterval(refresh, 5000);
+    setInterval(refresh, 10000);
+    document.addEventListener('visibilitychange', refresh);
   </script>
