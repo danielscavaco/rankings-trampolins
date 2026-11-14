@@ -16,6 +16,7 @@
     td:first-child, th:first-child { text-align: left; font-weight: 600; }
     .tag { display: inline-block; background: #efe8e8; color: #221415; padding: 1px 6px; border-radius: 4px; font-size: 11px; margin-left: 6px; font-weight: 500; }
     .tot { font-weight: 700; font-size: 14px; color: #146b3a; }
+    .pen { color: #b91c1c; font-weight: 600; }
     .muted { color: #8c7a7b; }
   </style>
 </head>
@@ -25,7 +26,7 @@
       <h1 style="margin:0;font-size:24px">CMGI — Resultados Portugal em Direto</h1>
       <small id="meta" class="muted">A carregar...</small>
     </div>
-    <div class="badge">LIVE · 5s</div>
+    <div class="badge">LIVE · 3s</div>
   </header>
   <div id="app"></div>
 
@@ -49,12 +50,10 @@
       return q1Fallback ?? null;
     }
 
-    function renderRoutineCells(r, isTra) {
-      if (!r) return isTra ? '<td colspan="6" class="muted">—</td>' : '<td colspan="4" class="muted">—</td>';
-      if (isTra) {
-        return `<td>${fmt(r.e)}</td><td>${fmt(r.d)}</td><td>${fmt(r.hd)}</td><td>${fmt(r.tof)}</td><td>${fmt(r.p)}</td><td><b>${fmt(r.total)}</b></td>`;
-      }
-      return `<td>${fmt(r.e)}</td><td>${fmt(r.d)}</td><td>${fmt(r.p)}</td><td><b>${fmt(r.total)}</b></td>`;
+    function renderPenCell(p) {
+      return (typeof p === 'number' && p > 0)
+        ? `<td class="pen">-${fmt(p)}</td>`
+        : '<td></td>';
     }
 
     async function fetchLiveDoc() {
@@ -82,17 +81,36 @@
           const list = aths.filter(a => a.disc === sec.code);
           if (!list.length) return '';
 
-          const headS = sec.isTra
-            ? '<th>E</th><th>D</th><th>HD</th><th>ToF</th><th>Pen</th><th>Total</th>'
-            : '<th>E</th><th>D</th><th>Pen</th><th>Total</th>';
+          const hasPen1 = list.some(a => (a.rotinas?.q1_1?.p || 0) > 0);
+          const hasPen2 = list.some(a => (a.rotinas?.q1_2?.p || 0) > 0);
+
+          const head1 = sec.isTra
+            ? `<th>E</th><th>D</th><th>HD</th><th>ToF</th>${hasPen1 ? '<th>Pen</th>' : ''}<th>Total</th>`
+            : `<th>E</th><th>D</th>${hasPen1 ? '<th>Pen</th>' : ''}<th>Total</th>`;
+
+          const head2 = sec.isTra
+            ? `<th>E</th><th>D</th><th>HD</th><th>ToF</th>${hasPen2 ? '<th>Pen</th>' : ''}<th>Total</th>`
+            : `<th>E</th><th>D</th>${hasPen2 ? '<th>Pen</th>' : ''}<th>Total</th>`;
+
+          const cols1 = (sec.isTra ? 5 : 3) + (hasPen1 ? 1 : 0);
+          const cols2 = (sec.isTra ? 5 : 3) + (hasPen2 ? 1 : 0);
+
+          const renderCell = (r, showPen, cols) => {
+            if (!r) return `<td colspan="${cols}" class="muted">—</td>`;
+            const penTd = showPen ? renderPenCell(r.p) : '';
+            if (sec.isTra) {
+              return `<td>${fmt(r.e)}</td><td>${fmt(r.d)}</td><td>${fmt(r.hd)}</td><td>${fmt(r.tof)}</td>${penTd}<td><b>${fmt(r.total)}</b></td>`;
+            }
+            return `<td>${fmt(r.e)}</td><td>${fmt(r.d)}</td>${penTd}<td><b>${fmt(r.total)}</b></td>`;
+          };
 
           const rows = list.map(a => {
             const rot = a.rotinas || {};
             const prelim = calcPrelim(sec.code, rot.q1_1, rot.q1_2, a.q1);
             return `<tr>
               <td>${a.nome}<span class="tag">${a.escalao} · ${a.sexo}</span></td>
-              ${renderRoutineCells(rot.q1_1, sec.isTra)}
-              ${renderRoutineCells(rot.q1_2, sec.isTra)}
+              ${renderCell(rot.q1_1, hasPen1, cols1)}
+              ${renderCell(rot.q1_2, hasPen2, cols2)}
               <td class="tot">${fmt(prelim)}</td>
             </tr>`;
           }).join('');
@@ -102,11 +120,11 @@
               <thead>
                 <tr>
                   <th rowspan="2">Ginasta</th>
-                  <th colspan="${sec.isTra ? 6 : 4}">Série 1</th>
-                  <th colspan="${sec.isTra ? 6 : 4}">Série 2</th>
+                  <th colspan="${cols1}">Série 1</th>
+                  <th colspan="${cols2}">Série 2</th>
                   <th rowspan="2">Total Prelim.</th>
                 </tr>
-                <tr>${headS}${headS}</tr>
+                <tr>${head1}${head2}</tr>
               </thead>
               <tbody>${rows}</tbody>
             </table>`;
@@ -117,7 +135,7 @@
     }
 
     refresh();
-    setInterval(refresh, 5000);
+    setInterval(refresh, 3000);
   </script>
 </body>
 </html>
