@@ -24,19 +24,155 @@
   <header>
     <div>
       <h1 style="margin:0;font-size:24px">CMGI — Resultados Portugal em Direto</h1>
-      <small id="meta" class="muted">A carregar...</small>
+      <small id="meta" class="muted">A ligar à Sporttech...</small>
     </div>
-    <div class="badge">LIVE · 3s</div>
+    <div class="badge">LIVE · 3s (Direto Sporttech)</div>
   </header>
   <div id="app"></div>
 
   <script>
-    const OWNER = 'danielscavaco';
-    const REPO = 'rankings-trampolins';
-    const FILE_PATH = 'data/temp-cmgi-results.json';
+    // Cola aqui o URL do evento na Sporttech (o mesmo que tens no Secret CMGI_URL)
+    const CMGI_URL = 'https://sporttech.io/events/01a1be6a-b476-781a-a380-de9079956fde/ovs/';
+
+    const DISC_MAP = { 0: 'TRI', 1: 'SYN', 2: 'DMT', 3: 'TUM' };
+    const KIND_MAP = { 0: 'q1', 6: 'q2', 3: 'f', 8: 'f1', 7: 'f2' };
 
     const nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
     const fmt = v => (v === null || v === undefined) ? '—' : nf.format(v);
+
+    function normalizeSex(s) {
+      const str = String(s || '').toLowerCase();
+      if (/\b(women|woman|female|girls|f)\b/.test(str)) return 'F';
+      if (/\b(men|man|male|boys|m)\b/.test(str)) return 'M';
+      return '';
+    }
+
+    function isPortuguese(ath) {
+      const vals = [ath.Club, ath.Team, ath.Representing, ath.Country, ath.Nation, ath.NOC]
+        .map(v => String(v || '').trim().toUpperCase());
+      return vals.some(v => v === 'POR' || v === 'PRT' || /^POR\b/.test(v));
+    }
+
+    function isValidCompletedFrame(f) {
+      if (!f || (f.State || 0) !== 3) return false;
+      const log = String(f.ChangeLog || '');
+      if (/\b(fail|dns)\b/i.test(log) && (f.MarkTTT_G || 0) === 0 && !f.DifficultyElements) return false;
+      return true;
+    }
+
+    function parseFrameDetail(f) {
+      const T = (f.MarkTTT_G || 0) / 1000.0;
+      const E = f.ETotalT_G || 0;
+      const D = (f.DifficultyT_G || 0) / 10.0;
+      const H = f.Displacement_G || 0;
+      const X = f.TimeTMS_G || 0;
+      const P = (f.PenaltyT || 0) / 10.0;
+      const B = (f.BonusT || 0) / 10.0;
+
+      const out = { e: 0, d: Number(D.toFixed(3)), hd: 0, tof: 0, p: Number(P.toFixed(3)), total: Number(T.toFixed(3)) };
+      for (const e of [E / 10.0, E / 1000.0, E / 100.0]) {
+        for (const h of [H / 100.0, H / 10.0, H / 1000.0]) {
+          for (const x of [X / 1000.0, (X * 2) / 100.0, X / 100.0, X / 10.0]) {
+            if (Math.abs(e + D + h + x + B - P - T) < 0.006) {
+              out.e = Number(e.toFixed(3));
+              out.hd = Number(h.toFixed(3));
+              out.tof = Number(x.toFixed(3));
+              return out;
+            }
+          }
+        }
+      }
+      return out;
+    }
+
+    let resolvedBase = null;
+    async function getSporttechBase() {
+      if (resolvedBase) return resolvedBase;
+      const uuid = (CMGI_URL.match(/events\/([0-9a-f-]{36})/i) || [])[1];
+      if (!uuid) throw new Error('UUID inválido em CMGI_URL');
+      for (const base of [
+        `https://sporttech.io/events/${uuid}/ovs/api/`,
+        `https://sporttech.io/events/${uuid}/livescore/api/`,
+        `https://sporttech.io/api/events/${uuid}/`
+      ]) {
+        try {
+          const r = await fetch(`${base}event?fetch_event_competitions=true&fetch_competition_stages=true`, { cache: 'no-store' });
+          if (r.ok) { resolvedBase = base; return base; }
+        } catch (_) {}
+      }
+      throw new Error('Não foi possível ligar à API da Sporttech');
+    }
+
+    async function fetchDirectFromSporttech() {
+      const apiBase = await getSporttechBase();
+      const evRes = await fetch(`${apiBase}event?fetch_event_competitions=true&fetch_competition_stages=true`, { cache: 'no-store' });
+      const evData = await evRes.json();
+      const comps = evData.Competitions || {};
+      const stages = evData.Stages || {};
+      const athletesMap = new Map();
+
+      // Lê todos os stages em paralelo para máxima velocidade (< 400ms total)
+      const stageTasks = [];
+      for (const c of Object.values(comps)) {
+        if ((c.Title || '').toLowerCase() === 'test') continue;
+        const disc = DISC_MAP[c.Discipline];
+        if (!disc || disc === 'SYN') continue;
+        const sexo = normalizeSex(`${c.SexCategory || ''} ${c.Title || ''}`);
+        const escalao = String(c.AgeGroup || c.Title || 'OPEN').trim();
+
+        for (const sid of (c.Stages || [])) {
+          const st = stages[String(sid)] || stages[sid];
+          if (!st) continue;
+          const fase = KIND_MAP[st.Kind] || String(st.Kind);
+          stageTasks.push({ sid, st, disc, sexo, escalao, fase });
+        }
+      }
+
+      const stageResults = await Promise.all(
+        stageTasks.map(t =>
+          fetch(`${apiBase}stages/${t.sid}?fetch_stage_groups=true&fetch_group_performances=true&fetch_performance_athletes=true&fetch_performance_frames=true`, { cache: 'no-store' })
+            .then(r => r.json())
+            .then(det => ({ ...t, det }))
+        )
+      );
+
+      for (const { st, disc, sexo, escalao, fase, det } of stageResults) {
+        const A = det.Athletes || {};
+        const P = det.Performances || {};
+        const F = det.Frames || {};
+        const lim = st.PerfomanceFramesLimit || 2;
+
+        for (const p of Object.values(P)) {
+          const athObjs = (p.Athletes || []).map(aid => A[String(aid)] || A[aid]).filter(Boolean);
+          if (!athObjs.length || !athObjs.some(isPortuguese)) continue;
+
+          const a = athObjs[0];
+          const nome = `${a.GivenName || ''} ${a.Surname || ''}`.trim();
+          const key = `${disc}|${escalao}|${sexo}|${nome}`;
+
+          if (!athletesMap.has(key)) {
+            athletesMap.set(key, { nome, disc, escalao, sexo, rotinas: {}, q1: null });
+          }
+          const rec = athletesMap.get(key);
+
+          const routines = (p.Frames || []).slice(0, lim).map(fid => {
+            const f = F[String(fid)] || F[fid];
+            return isValidCompletedFrame(f) ? parseFrameDetail(f) : null;
+          });
+
+          const totalMk = (p.MarkTTT_G || 0) > 0 ? Number(((p.MarkTTT_G || 0) / 1000.0).toFixed(3)) : null;
+          if (fase === 'q1') {
+            if (totalMk !== null) rec.q1 = totalMk;
+            if (routines[0]) rec.rotinas.q1_1 = routines[0];
+            if (routines[1]) rec.rotinas.q1_2 = routines[1];
+          }
+        }
+      }
+
+      return [...athletesMap.values()].sort((a, b) =>
+        a.disc.localeCompare(b.disc) || a.escalao.localeCompare(b.escalao) || a.nome.localeCompare(b.nome, 'pt')
+      );
+    }
 
     function calcPrelim(disc, r1, r2, q1Fallback) {
       const s1 = r1 ? r1.total : null;
@@ -51,25 +187,17 @@
     }
 
     function renderPenCell(p) {
-      return (typeof p === 'number' && p > 0)
-        ? `<td class="pen">-${fmt(p)}</td>`
-        : '<td></td>';
-    }
-
-    async function fetchLiveDoc() {
-      const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${FILE_PATH}?t=${Date.now()}`;
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status} ao ler ${FILE_PATH}`);
-      return res.json();
+      return (typeof p === 'number' && p > 0) ? `<td class="pen">-${fmt(p)}</td>` : '<td></td>';
     }
 
     async function refresh() {
       try {
-        const doc = await fetchLiveDoc();
-        const aths = doc.atletas || [];
+        const t0 = performance.now();
+        const aths = await fetchDirectFromSporttech();
+        const ms = Math.round(performance.now() - t0);
 
         document.getElementById('meta').textContent =
-          `Último push GitHub: ${doc.atualizadoEm || '—'} · Leitura browser: ${new Date().toLocaleTimeString('pt-PT')} · ${aths.length} ginastas POR`;
+          `Direto Sporttech (${ms}ms) · Atualizado: ${new Date().toLocaleTimeString('pt-PT')} · ${aths.length} ginastas POR`;
 
         const sections = [
           { code: 'TRI', label: 'Trampolim Individual (TRA) — Melhor Série', isTra: true },
@@ -87,7 +215,6 @@
           const head1 = sec.isTra
             ? `<th>E</th><th>D</th><th>HD</th><th>ToF</th>${hasPen1 ? '<th>Pen</th>' : ''}<th>Total</th>`
             : `<th>E</th><th>D</th>${hasPen1 ? '<th>Pen</th>' : ''}<th>Total</th>`;
-
           const head2 = sec.isTra
             ? `<th>E</th><th>D</th><th>HD</th><th>ToF</th>${hasPen2 ? '<th>Pen</th>' : ''}<th>Total</th>`
             : `<th>E</th><th>D</th>${hasPen2 ? '<th>Pen</th>' : ''}<th>Total</th>`;
