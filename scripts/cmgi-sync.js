@@ -47,7 +47,6 @@ function isValidCompletedFrame(f, p) {
   // Na Sporttech, State === 3 é série concluída e avaliada; State > 3 (4, 5...) costuma ser DNS/DNF/DSQ
   if (state !== 3) return false;
 
-  // Verifica também flags explícitas de DNS na Performance ou no Frame
   if (f.DNS || f.IsDNS || f.DidNotStart || p.DNS || p.IsDNS || p.DidNotStart) {
     return false;
   }
@@ -95,7 +94,7 @@ async function resolveSporttechApi(rawUrl) {
   for (const [, c] of Object.entries(comps)) {
     if ((c.Title || '').toLowerCase() === 'test') continue;
     const disc = DISC_MAP[c.Discipline];
-    if (!disc || disc === 'SYN') continue; // Apenas TRA (TRI), DMT e TUM
+    if (!disc || disc === 'SYN') continue;
 
     const sexo = normalizeSex(`${c.SexCategory || ''} ${c.Title || ''}`);
     const escalao = String(c.AgeGroup || c.Title || 'OPEN').trim();
@@ -162,6 +161,17 @@ async function resolveSporttechApi(rawUrl) {
     a.disc.localeCompare(b.disc) || a.escalao.localeCompare(b.escalao) || a.nome.localeCompare(b.nome, 'pt')
   );
 
-  // Só atualiza o ficheiro se houver alteração real nos dados (evita commits vazios)
   let prevJson = '';
-  if
+  if (fs.existsSync(OUT_FILE)) {
+    try {
+      prevJson = JSON.stringify(JSON.parse(fs.readFileSync(OUT_FILE, 'utf8')).atletas || []);
+    } catch (_) {}
+  }
+
+  if (JSON.stringify(list) !== prevJson) {
+    fs.writeFileSync(OUT_FILE, JSON.stringify({ atualizadoEm: new Date().toISOString(), atletas: list }, null, 2));
+    console.log(`Atualizado: ${list.length} ginastas POR.`);
+  } else {
+    console.log(`Sem alterações (${list.length} ginastas POR).`);
+  }
+})();
