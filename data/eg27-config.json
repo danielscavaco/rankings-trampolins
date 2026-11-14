@@ -33,6 +33,20 @@
       "nacional": false
     },
     {
+      "id": "test",
+      "nome": "Teste",
+      "curto": "CMGI",
+      "local": "Nanjing (CHN)",
+      "datas": "9–15 nov 2026",
+      "inicio": "2026-11-09",
+      "fim": "2026-11-15",
+      "fuso": "Asia/Shanghai",
+      "disciplinas": ["TRI", "DMT"],
+      "fonte": "sporttech",
+      "codigo": "01a1be6a-b476-781a-a380-de9079956fde",
+      "nacional": false
+    },
+    {
       "id": "apur1",
       "nome": "Prova de Apuramento",
       "curto": "Apuramento",
