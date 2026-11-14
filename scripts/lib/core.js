@@ -74,9 +74,11 @@ function mapEscalaoText(rawInput, { allowDefaultSenior = false } = {}) {
 }
 
 function computeEffectiveScore(ath, entry, faseKey) {
+  const validRoutines = (entry.routines || []).filter(Boolean);
+
   if (ath.disc !== 'SYN' || faseKey !== 'q1') {
-    const bestSingle = entry.routines.length > 0
-      ? Math.max(...entry.routines.map(r => r.total))
+    const bestSingle = validRoutines.length > 0
+      ? Math.max(...validRoutines.map(r => r.total))
       : entry.total;
     return { qScore: entry.total, singleScore: bestSingle };
   }
@@ -190,7 +192,7 @@ function applyStagesToTarget({ target, stageList, nowStr, isCheckOnly, logLines,
       if (st.sexo && st.sexo !== ath.sexo) return false;
       if (!st.escaloes.includes(ath.escalao)) return false;
       return true;
-    });;
+    });
 
     if (relevantStages.length === 0) {
       missingCount++;
@@ -208,8 +210,9 @@ function applyStagesToTarget({ target, stageList, nowStr, isCheckOnly, logLines,
         const e = m.entry;
         const faseKey = st.fase;
         const { qScore, singleScore } = computeEffectiveScore(ath, e, faseKey);
+        const seriesStr = (e.routines || []).map(r => (r ? r.total : '—')).join(' + ') || '—';
 
-        logLines.push(`[OK] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo}) -> "${st.title}" [${faseKey}] via ${m.method} | Nota: ${qScore ?? 'sem nota'} (séries: ${e.routines.map(r => r.total).join(' + ') || '—'})`);
+        logLines.push(`[OK] ${ath.nome} (${ath.disc} · ${ath.escalao} · ${ath.sexo}) -> "${st.title}" [${faseKey}] via ${m.method} | Nota: ${qScore ?? 'sem nota'} (séries: ${seriesStr})`);
 
         if (!isCheckOnly && qScore !== null) {
           evRec[faseKey] = qScore;
@@ -217,8 +220,9 @@ function applyStagesToTarget({ target, stageList, nowStr, isCheckOnly, logLines,
             if (singleScore !== null) evRec.late = singleScore;
             if (e.routines[0]) evRec.rotinas.q1_1 = e.routines[0];
             if (e.routines[1]) evRec.rotinas.q1_2 = e.routines[1];
-          } else if (e.routines.length > 0) {
-            evRec.rotinas[faseKey] = e.routines[0];
+          } else {
+            const firstCompleted = (e.routines || []).find(Boolean);
+            if (firstCompleted) evRec.rotinas[faseKey] = firstCompleted;
           }
           updatedScores++;
         }
