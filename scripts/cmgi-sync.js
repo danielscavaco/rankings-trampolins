@@ -16,7 +16,14 @@ function parseFrameDetail(f) {
   const P = (f.PenaltyT || 0) / 10.0;
   const B = (f.BonusT || 0) / 10.0;
 
-  const out = { e: 0, d: Number(D.toFixed(3)), hd: 0, tof: 0, p: Number(P.toFixed(3)), total: Number(T.toFixed(3)) };
+  const out = {
+    e: 0,
+    d: Number(D.toFixed(3)),
+    hd: 0,
+    tof: 0,
+    p: Number(P.toFixed(3)),
+    total: Number(T.toFixed(3))
+  };
 
   for (const e of [E / 10.0, E / 1000.0, E / 100.0]) {
     for (const h of [H / 100.0, H / 10.0, H / 1000.0]) {
@@ -39,10 +46,32 @@ function isPortuguese(ath) {
   return vals.some(v => v === 'POR' || v === 'PRT' || /^POR\b/.test(v));
 }
 
+async function resolveSporttechApi(rawUrl) {
+  const uuidMatch = String(rawUrl || '').match(/events\/([0-9a-f-]{36})/i);
+  if (!uuidMatch) throw new Error(`UUID do evento não encontrado em: ${rawUrl}`);
+  const uuid = uuidMatch[1];
+
+  const candidates = [
+    `https://sporttech.io/events/${uuid}/ovs/api/`,
+    `https://sporttech.io/events/${uuid}/livescore/api/`,
+    `https://sporttech.io/api/events/${uuid}/`
+  ];
+
+  for (const base of candidates) {
+    try {
+      const data = await fetchWithRetry(`${base}event?fetch_event_competitions=true&fetch_competition_stages=true`);
+      if (data && typeof data === 'object' && (data.Competitions || data.Stages || data.Id || data.Title)) {
+        return { apiBase: base, evData: data };
+      }
+    } catch (_) {
+      // Tenta o próximo formato de endpoint
+    }
+  }
+  throw new Error(`Nenhum endpoint da Sporttech aceitou o evento ${uuid}.`);
+}
+
 (async () => {
-  const rawUrl = process.env.CMGI_URL || '';
-  const apiBase = rawUrl.replace(/\/+$/, '') + '/api/';
-  const evData = await fetchWithRetry(apiBase + 'event?fetch_event_competitions=true&fetch_competition_stages=true');
+  const { apiBase, evData } = await resolveSporttechApi(process.env.CMGI_URL);
   const comps = evData.Competitions || {};
   const stages = evData.Stages || {};
 
