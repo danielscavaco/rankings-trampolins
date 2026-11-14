@@ -7,9 +7,9 @@
     "visivelAte": "2027-06-27",
     "curto": "EG 2027",
     "nome": "Jogos Europeus 2027",
-    "config": "data/config.json",
-    "athletes": "data/athletes.json",
-    "results": "data/results.json"
+    "config": "data/eg27-config.json",
+    "athletes": "data/eg27-athletes.json",
+    "results": "data/eg27-results.json"
   },
   {
     "id": "cm27",
