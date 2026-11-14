@@ -1,5 +1,5 @@
 {
-  "atualizadoEm": "2026-11-14T02:55:09.446Z",
+  "atualizadoEm": "2026-11-14T02:55:57.394Z",
   "atletas": [
     {
       "nome": "Andre RIBEIRO",
@@ -1482,8 +1482,17 @@
       "escalao": "AG1",
       "sexo": "F",
       "clube": "POR",
-      "rotinas": {},
-      "q1": null,
+      "rotinas": {
+        "q1_1": {
+          "e": 16.9,
+          "d": 2.2,
+          "hd": 0,
+          "tof": 0,
+          "p": 0.4,
+          "total": 18.7
+        }
+      },
+      "q1": 18.7,
       "f": null
     },
     {
