@@ -58,10 +58,8 @@
     }
 
     async function fetchLiveDoc() {
-      const res = await fetch(
-        `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`,
-        { cache: 'no-store', headers: { 'Accept': 'application/vnd.github.raw' } }
-      );
+      const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${FILE_PATH}?t=${Date.now()}`;
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status} ao ler ${FILE_PATH}`);
       return res.json();
     }
